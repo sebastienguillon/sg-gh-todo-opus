@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-17T14:03:15.000Z",
+  "generatedAt": "2026-10-17T16:40:00.000Z",
   "title": "Design System: To Do",
   "extensions": {
     "colorMeta": {
@@ -516,19 +516,19 @@
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "List section headings: the two-digit number in the list ink, then the name."
+        "purpose": "List section headings: the two-digit number in the list ink, then the name. Also the setup screen's heading."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Dialog, sheet and popover titles, and the phone bar date. The palette query and large dialog fields use this size at 400."
+        "purpose": "Dialog, sheet and popover titles, and the phone bar date. The palette query and the large fields (dialogs and setup) use this size at 400."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "To-do titles, fields and running text, on a 20px line box in rows (1.4 elsewhere; 1.45 for notes). Buttons use 500."
+        "purpose": "To-do titles, fields and running text, on a 20px line box in rows (1.4 elsewhere; 1.45 for notes and running prose such as the setup lede, the setup alert and errors, and the sync popover). Buttons use 500."
       },
       "label": {
         "displayName": "Label",
-        "purpose": "Tags, plain dates, counts, summary and hints. Small headings 700; list names on Today rows 600; the today label 600 and late labels 700."
+        "purpose": "Tags, plain dates, counts, summary and hints. Small headings and form labels 700; list names on Today rows 600; the today label 600 and late labels 700."
       },
       "numeral": {
         "displayName": "Numeral",
@@ -660,6 +660,14 @@
       "css": ".ds-capture { display: grid; grid-template-columns: 124px minmax(0, 1fr) 12px; align-items: start; padding: 8px 0; background: var(--pad, #fbfbf9); color: var(--ink, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-variant-numeric: tabular-nums; } .ds-capture-mark { display: grid; place-items: center; width: 32px; height: 40px; margin-left: 8px; color: var(--ink-3, #6b6b73); } .ds-capture-input { display: grid; gap: 6px; } .ds-field { width: 100%; min-height: 40px; padding: 6px 10px; border: 1px solid var(--ink, #141414); border-radius: 0; background: var(--pad, #fbfbf9); color: var(--ink, #141414); font: inherit; font-size: 0.9375rem; } .ds-field::placeholder { color: var(--ink-3, #6b6b73); } .ds-field:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 0; } .ds-capture-hint { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; min-height: 20px; color: var(--ink-2, #55555d); font-size: 0.8125rem; line-height: 20px; } .ds-capture-hint span { display: inline-flex; align-items: center; gap: 6px; } .ds-capture .ds-kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border: 1px solid currentColor; border-radius: 0; font: inherit; font-size: 0.75rem; font-weight: 600; line-height: 1; } .ds-capture-hint .ds-kbd { min-width: 18px; height: 18px; } .ds-capture-where { margin-left: auto; } .ds-capture .ds-glyph { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; } .ds-capture .ds-glyph circle { stroke: none; }"
     },
     {
+      "name": "Labelled Field",
+      "kind": "input",
+      "refersTo": "field-large",
+      "description": "The form pattern of the setup screen: 13px 700 labels over 44px ink-bordered fields at 18px, a Graphite hint, and a field error drawn as the focus outline at rest plus a bold line led by the alert icon. Read-only and disabled fields drop to a Perforation Grey border.",
+      "html": "<form class=\"ds-form\" onsubmit=\"return false\" novalidate><label class=\"ds-label\" for=\"ds-repo\">Repo</label><input id=\"ds-repo\" class=\"ds-field-lg\" value=\"you/todo-data\" autocomplete=\"off\" spellcheck=\"false\"><label class=\"ds-label\" for=\"ds-token\">Token</label><input id=\"ds-token\" class=\"ds-field-lg\" type=\"password\" placeholder=\"github_pat_…\" autocomplete=\"off\" aria-invalid=\"true\" aria-describedby=\"ds-token-hint ds-token-error\"><p class=\"ds-hint\" id=\"ds-token-hint\">Kept only in this browser on this device, and sent only to GitHub.</p><p class=\"ds-error\" id=\"ds-token-error\"><svg class=\"ds-icon\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 2.75l5.75 10.5H2.25z M8 6.75v3 M8 11.75v.01\"/></svg><span>Paste the token for this device.</span></p></form>",
+      "css": ".ds-form { display: grid; max-width: 600px; padding: 0 12px 12px; background: var(--pad, #fbfbf9); color: var(--ink, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size: 0.9375rem; font-variant-numeric: tabular-nums; } .ds-label { margin: 12px 0 4px; font-size: 0.8125rem; font-weight: 700; } .ds-field-lg { width: 100%; min-height: 44px; padding: 6px 10px; border: 1px solid var(--ink, #141414); border-radius: 0; background: var(--pad, #fbfbf9); color: var(--ink, #141414); font: inherit; font-size: 1.125rem; font-variant-numeric: tabular-nums; } .ds-field-lg::placeholder { color: var(--ink-3, #6b6b73); } .ds-field-lg:focus-visible, .ds-field-lg[aria-invalid='true'] { outline: 2px solid var(--ink, #141414); outline-offset: 0; } .ds-field-lg[readonly] { border-color: var(--rule, #a9a9b1); color: var(--ink-2, #55555d); } .ds-field-lg:disabled { border-color: var(--rule, #a9a9b1); color: var(--ink-3, #6b6b73); cursor: not-allowed; } .ds-hint { margin: 6px 0 0; color: var(--ink-2, #55555d); font-size: 0.8125rem; line-height: 20px; } .ds-error { display: flex; gap: 8px; margin: 12px 0 0; font-weight: 700; line-height: 1.45; } .ds-error .ds-icon { display: block; flex: none; margin-top: 2px; }"
+    },
+    {
       "name": "Index Rail",
       "kind": "nav",
       "refersTo": "index-rail",
@@ -724,7 +732,7 @@
       },
       {
         "name": "The Notation Column Rule",
-        "body": "Text starts at one gutter line, 124px on desktop and 44px on phone, for every row, list heading, capture field and empty-state line. The gutter holds only signifiers, key hints, the dot grid and the Done fold's \u00d7 count at the perforation.",
+        "body": "Text starts at one gutter line, 124px on desktop and 44px on phone, for every row, list heading, capture field and empty-state line, and on the setup screen. The gutter holds only signifiers, key hints, the dot grid and the Done fold's × count at the perforation.",
         "section": "layout"
       },
       {
