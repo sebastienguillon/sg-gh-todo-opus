@@ -13,6 +13,8 @@
   let foldOpen = $derived(!!store.openDone[list.id])
   let filtered = $derived(!!store.tagFilter)
   let renaming = $derived(ui.renaming === list.id)
+  /** While the name is a field, a Delete stands in for the jump keys (the count, on a phone). */
+  let canDelete = $derived(renaming && store.lists.length > 1)
 
   let section = $state<HTMLElement>()
   let heading = $state<HTMLElement>()
@@ -44,6 +46,14 @@
       e.stopPropagation()
       finishRename(false, value, true)
     }
+  }
+
+  /** The field goes without saving a half-typed name; the delete asks first if open to-dos would go. */
+  function deleteFromHeading() {
+    settled = true
+    ui.renaming = null
+    heading?.focus({ preventScroll: true })
+    ui.requestDeleteList(list.id)
   }
 
   function clearDone() {
@@ -83,8 +93,21 @@
           <button class="name" tabindex="-1" title="Rename (r)" onclick={() => ui.renameList(list.id)}>{list.name}</button>
         {/if}
       </h2>
-      <span class="count">{open.filter((t) => !t.done).length} open</span>
-      <span class="jump" aria-hidden="true"><kbd>g</kbd><kbd>{pad2(list.index)}</kbd></span>
+      <span class="count" class:yields={canDelete}>{open.filter((t) => !t.done).length} open</span>
+      {#if canDelete}
+        <!-- Pressing it mustn't blur the field first, or the field would save and take the button with it. -->
+        <button
+          class="btn quiet delete"
+          tabindex="-1"
+          title="Delete the list (⇧ D)"
+          onpointerdown={(e) => e.preventDefault()}
+          onclick={deleteFromHeading}
+        >
+          <Icon name="trash" /> Delete
+        </button>
+      {:else}
+        <span class="jump" aria-hidden="true"><kbd>g</kbd><kbd>{pad2(list.index)}</kbd></span>
+      {/if}
     </header>
 
     {#if open.length}
@@ -201,6 +224,13 @@
     color: var(--ink-3);
   }
 
+  /* A quiet button pulls its box out by 12px, so its text meets the right edge. */
+  .delete {
+    min-height: 28px;
+    margin: 0 -12px 0 auto;
+    font-size: var(--t-meta);
+  }
+
   .empty {
     padding: 4px var(--edge) 4px var(--gutter);
     color: var(--ink-2);
@@ -260,6 +290,14 @@
 
     .jump {
       display: none;
+    }
+
+    .count.yields {
+      display: none;
+    }
+
+    .delete {
+      min-height: 44px;
     }
 
     .empty {

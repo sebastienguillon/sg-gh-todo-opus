@@ -2,6 +2,12 @@
 // merged on its own, field by field against the last version both sides
 // shared: a field changed on one side only takes that side's value, and a
 // field changed on both takes the latest write (`updatedAt`).
+//
+// A deleted list removes only what the deleting device had seen. A to-do
+// another device changed (beyond its order), added or moved into the list
+// meanwhile survives, and keeps the list alive with just those to-dos; a
+// rename or ink change alone never brings a deleted list back. The outcome
+// is the same whichever device commits first.
 
 import type { Todo, TodoList } from './types'
 
@@ -14,7 +20,22 @@ export interface Model {
 export interface Dirty {
   /** To-do ids, with the deletion time for a to-do deleted here. */
   todos: Map<string, string | null>
-  lists: Set<string>
+  /** List ids, with the path of the list's `_list.md`. A dirty list missing here was deleted here. */
+  lists: Map<string, string>
+}
+
+/** A list that a delete on one device and a change on another met over. */
+export interface ListNotice {
+  list: TodoList
+  /**
+   * `kept`: deleted here, kept for to-dos changed or added on GitHub. `revived`: deleted on GitHub,
+   * kept for to-dos changed here. `changeLost`: deleted on GitHub, so this device's rename or ink gave way.
+   */
+  kind: 'kept' | 'revived' | 'changeLost'
+  /** To-dos the list was kept for. */
+  count: number
+  /** For `kept`: to-dos deleted with it that stay deleted. */
+  left: number
 }
 
 export interface Merged extends Model {
@@ -25,6 +46,7 @@ export interface Merged extends Model {
   relist: string[]
   /** To-dos changed on both sides where one side's edit gave way. */
   conflicts: string[]
+  notices: ListNotice[]
 }
 
 type Group = readonly (keyof Todo)[]
@@ -42,6 +64,11 @@ function pick(t: Todo, g: Group): unknown[] {
 export function sameTodo(a: Todo | undefined, b: Todo | undefined): boolean {
   if (!a || !b) return a === b
   return GROUPS.every((g) => eq(pick(a, g), pick(b, g)))
+}
+
+/** Changed in anything but its place in the list. */
+function changedBeyondOrder(a: Todo, b: Todo): boolean {
+  return GROUPS.some((g) => g[0] !== 'order' && !eq(pick(a, g), pick(b, g)))
 }
 
 export function sameList(a: TodoList | undefined, b: TodoList | undefined): boolean {
@@ -75,11 +102,19 @@ export function merge(local: Model, base: Model, remote: Model, dirty: Dirty): M
   const L = new Map(local.todos.map((t) => [t.id, t]))
   const B = new Map(base.todos.map((t) => [t.id, t]))
   const R = new Map(remote.todos.map((t) => [t.id, t]))
+  const Ll = new Map(local.lists.map((x) => [x.id, x]))
+  const Bl = new Map(base.lists.map((x) => [x.id, x]))
+  const Rl = new Map(remote.lists.map((x) => [x.id, x]))
+  /** A list deleted on this device and not yet committed. */
+  const deletedHere = (listId: string) => dirty.lists.has(listId) && !Ll.has(listId)
+  /** A list GitHub no longer has. */
+  const goneThere = (listId: string) => Bl.has(listId) && !Rl.has(listId)
   const todos: Todo[] = []
   const cleanTodos = new Set<string>()
   const conflicts: string[] = []
 
-  for (const id of new Set([...L.keys(), ...R.keys()])) {
+  // Ids this device changed are visited too, so one deleted here and on GitHub is marked clean.
+  for (const id of new Set([...L.keys(), ...R.keys(), ...dirty.todos.keys()])) {
     const l = L.get(id)
     const b = B.get(id)
     const r = R.get(id)
@@ -93,6 +128,16 @@ export function merge(local: Model, base: Model, remote: Model, dirty: Dirty): M
       if (l) todos.push(l)
       continue
     }
+    if (!l && b && deletedHere(b.listId)) {
+      // Deleted here with its list: a change made elsewhere that this device hadn't seen keeps it,
+      // without a conflict of its own (the list's notice tells). A reorder alone doesn't count.
+      if (!r) cleanTodos.add(id)
+      else if (changedBeyondOrder(b, r)) {
+        todos.push(copy(r))
+        cleanTodos.add(id)
+      }
+      continue
+    }
     if (!l) {
       // Deleted here, changed on GitHub: the later of the two stands.
       const deletedAt = dirty.todos.get(id) ?? ''
@@ -101,6 +146,13 @@ export function merge(local: Model, base: Model, remote: Model, dirty: Dirty): M
         conflicts.push(id)
       }
       if (!r || r.updatedAt > deletedAt) cleanTodos.add(id)
+      continue
+    }
+    if (!r && b && goneThere(b.listId)) {
+      // Deleted on GitHub with its list, changed here: the change keeps it, unless it was only a reorder.
+      // The list's notice tells, so there is no conflict of its own.
+      if (changedBeyondOrder(b, l)) todos.push(l)
+      else cleanTodos.add(id)
       continue
     }
     if (!r) {
@@ -115,15 +167,14 @@ export function merge(local: Model, base: Model, remote: Model, dirty: Dirty): M
     if (sameTodo(merged.todo, r)) cleanTodos.add(id)
   }
 
-  const Ll = new Map(local.lists.map((x) => [x.id, x]))
-  const Bl = new Map(base.lists.map((x) => [x.id, x]))
-  const Rl = new Map(remote.lists.map((x) => [x.id, x]))
   const used = new Set(todos.map((t) => t.listId))
+  const countIn = (listId: string) => todos.filter((t) => t.listId === listId).length
   const lists: TodoList[] = []
   const cleanLists = new Set<string>()
   const relist: string[] = []
+  const notices: ListNotice[] = []
 
-  for (const id of new Set([...Ll.keys(), ...Rl.keys()])) {
+  for (const id of new Set([...Ll.keys(), ...Rl.keys(), ...dirty.lists.keys()])) {
     const l = Ll.get(id)
     const b = Bl.get(id)
     const r = Rl.get(id)
@@ -133,12 +184,32 @@ export function merge(local: Model, base: Model, remote: Model, dirty: Dirty): M
         // Gone from GitHub while a to-do here still files into it: write it back.
         lists.push(l)
         relist.push(id)
+        if (b) notices.push({ list: l, kind: 'revived', count: countIn(id), left: 0 })
       }
       continue
     }
-    if (!l) continue
+    if (!l) {
+      // Deleted here. A to-do GitHub changed or added since keeps GitHub's list; otherwise the delete
+      // stands, even over a rename made elsewhere.
+      if (r && used.has(id)) {
+        lists.push({ ...r })
+        cleanLists.add(id)
+        const kept = new Set(todos.map((t) => t.id))
+        let left = 0
+        for (const [tid, at] of dirty.todos) if (at !== null && B.get(tid)?.listId === id && !kept.has(tid)) left++
+        notices.push({ list: r, kind: 'kept', count: countIn(id), left })
+      } else if (!r) cleanLists.add(id)
+      continue
+    }
     if (!r) {
+      // Gone from GitHub: only a to-do changed here keeps it, never a rename or ink change alone.
+      if (b && !used.has(id)) {
+        cleanLists.add(id)
+        notices.push({ list: l, kind: 'changeLost', count: 0, left: 0 })
+        continue
+      }
       lists.push(l)
+      if (b) notices.push({ list: l, kind: 'revived', count: countIn(id), left: 0 })
       continue
     }
     const out = { ...l }
@@ -163,5 +234,5 @@ export function merge(local: Model, base: Model, remote: Model, dirty: Dirty): M
     cleanLists.delete(x.id)
   }
 
-  return { lists, todos, cleanTodos, cleanLists, relist, conflicts }
+  return { lists, todos, cleanTodos, cleanLists, relist, conflicts, notices }
 }

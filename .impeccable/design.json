@@ -617,7 +617,7 @@
       "name": "Quiet Button",
       "kind": "button",
       "refersTo": "button-quiet",
-      "description": "Secondary actions (Cancel, Delete, Close, New list, Clear done): no visible border until hover, when the perforation grey appears.",
+      "description": "Secondary actions (Cancel, Delete, Close, New list, Clear done, Keep): no visible border until hover, when the perforation grey appears.",
       "html": "<button class=\"ds-btn-quiet\">Close <kbd class=\"ds-kbd\">esc</kbd></button>",
       "css": ".ds-btn-quiet { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 12px; border: 1px solid transparent; border-radius: 0; background: transparent; color: var(--ink, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size: 0.9375rem; font-weight: 500; cursor: pointer; transition: background-color 160ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-quiet:hover { border-color: var(--rule, #a9a9b1); background: var(--pad-3, #e8e8e3); } .ds-btn-quiet:active { background: var(--line, #e3e3e0); } .ds-btn-quiet:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; } .ds-btn-quiet .ds-kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border: 1px solid currentColor; border-radius: 0; font: inherit; font-size: 0.75rem; font-weight: 600; line-height: 1; }"
     },
@@ -750,7 +750,7 @@
     "donts": [
       "Don't draw a round or boxed checkbox at rest; the only box is the 1px Perforation Grey outline of the cell on hover.",
       "Don't identify lists with anonymous coloured dots or by colour alone.",
-      "Don't add swipe actions or gutter verbs beyond ×, > and <; Tags and Delete live in the opened row and on their keys.",
+      "Don't add swipe actions or gutter verbs beyond ×, > and <; Tags and the to-do's Delete live in the opened row and on their keys. A list is deleted from its heading, Shift D or the palette, never from a row.",
       "Don't set text in a highlighter colour, or put light ink on a highlighter.",
       "Don't use orange anywhere inside the pad.",
       "Don't add shadows or rounded corners.",

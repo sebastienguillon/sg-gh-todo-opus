@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from './Icon.svelte'
   import Signifier from './Signifier.svelte'
-  import { pad2, store } from './store.svelte'
+  import { label, pad2, store } from './store.svelte'
   import type { TodoList } from './types'
   import { ui } from './ui.svelte'
 
@@ -19,6 +19,7 @@
 
   let dialog: HTMLDialogElement
   let input = $state<HTMLInputElement>()
+  let ask = $state<HTMLElement>()
   let query = $state('')
   let active = $state(0)
   let skipRestore = false
@@ -31,6 +32,26 @@
     return /^\d+$/.test(q) ? String(l.index).startsWith(q.replace(/^0(?=\d)/, '')) : l.name.toLowerCase().includes(q.toLowerCase())
   }
   let subject = $derived(ui.palette?.todoId ? store.find(ui.palette.todoId) : undefined)
+  /** In delete mode, the list whose delete is being asked about. */
+  let doomed = $derived(mode === 'delete' && ui.palette?.listId ? store.listById.get(ui.palette.listId) : undefined)
+  let doomedCounts = $derived(doomed ? store.countsIn(doomed.id) : { open: 0, done: 0 })
+  /** Where new to-dos go once the doomed list, the capture list, is gone. */
+  let nextCapture = $derived(doomed && store.inbox()?.id === doomed.id ? store.listsInOrder.find((l) => l.id !== doomed.id) : undefined)
+
+  function countsText(listId: string): string {
+    const { open, done } = store.countsIn(listId)
+    if (open && done) return `${open} open · ${done} done`
+    if (open) return `${open} open`
+    return done ? `${done} done` : 'empty'
+  }
+
+  /** A command shows for a query of 3 or more letters that starts it or one of its words. */
+  function commandMatches(text: string, q: string): boolean {
+    if (!q) return true
+    const t = text.toLowerCase()
+    const w = q.toLowerCase()
+    return w.length >= 3 && (t.startsWith(w) || t.split(/\s+/).some((word) => word.startsWith(w)))
+  }
 
   let items = $derived.by((): Item[] => {
     const q = query.trim()
@@ -62,6 +83,20 @@
           meta: `${store.openCount.get(l.id) ?? 0} open`,
           run: () => ui.renameList(l.id),
           restore: false,
+        }))
+    }
+    if (mode === 'delete') {
+      return store.listsInOrder
+        .filter((l) => matches(l, q))
+        .map((l) => ({
+          key: l.id,
+          kind: 'list',
+          text: l.name,
+          num: pad2(l.index),
+          ink: l.ink,
+          meta: countsText(l.id),
+          run: () => ui.deleteList(l.id),
+          restore: true,
         }))
     }
     if (mode === 'tag') {
@@ -104,19 +139,21 @@
         restore: false,
       }
     })
-    const commands: Item[] = q
-      ? []
-      : [
-          { key: 'new', kind: 'command', text: 'Log a task', meta: 'n', run: () => document.getElementById('capture')?.focus(), restore: false },
-          { key: 'today', kind: 'command', text: 'Go to Today', meta: 'g t', run: () => ui.jumpToToday(), restore: false },
-          { key: 'rename', kind: 'command', text: 'Rename a list', meta: 'r', run: () => {}, restore: false },
-          { key: 'help', kind: 'command', text: 'Keyboard shortcuts', meta: '?', run: () => ui.openHelp(), restore: false },
-        ]
+    const allCommands: Item[] = [
+      { key: 'new', kind: 'command', text: 'Log a task', meta: 'n', run: () => document.getElementById('capture')?.focus(), restore: false },
+      { key: 'today', kind: 'command', text: 'Go to Today', meta: 'g t', run: () => ui.jumpToToday(), restore: false },
+      { key: 'rename', kind: 'command', text: 'Rename a list', meta: 'r', run: () => {}, restore: false },
+      { key: 'delete', kind: 'command', text: 'Delete a list', meta: '⇧ D', run: () => {}, restore: false },
+      { key: 'help', kind: 'command', text: 'Keyboard shortcuts', meta: '?', run: () => ui.openHelp(), restore: false },
+    ]
+    // The only list can't be deleted, so the command hides.
+    const commands = allCommands.filter((c) => (c.key !== 'delete' || store.lists.length > 1) && commandMatches(c.text, q))
     const outside: Item[] =
       q && store.tagFilter
         ? [{ key: 'unfilter', kind: 'command', text: `Search outside #${store.tagFilter}`, meta: 'clears the filter', run: () => store.setTagFilter(null), restore: false }]
         : []
-    return [...commands, ...todos, ...lists, ...outside]
+    // With a query, what it finds comes first and matching commands follow, so Enter opens the top match.
+    return q ? [...todos, ...lists, ...commands, ...outside] : [...commands, ...todos, ...lists, ...outside]
   })
 
   let heading = $derived(
@@ -126,13 +163,20 @@
         ? 'Show only a tag'
         : mode === 'rename'
           ? 'Rename a list'
-          : 'Search or jump',
+          : mode === 'delete'
+            ? 'Delete a list'
+            : 'Search or jump',
   )
+
+  /** Nothing is preselected for a delete: Enter does nothing until a list is typed, arrowed to or tapped. */
+  function firstActive(): number {
+    return mode === 'delete' && !query.trim() ? -1 : 0
+  }
 
   $effect(() => {
     if (ui.palette && !dialog.open) {
       query = ''
-      active = 0
+      active = ui.palette.mode === 'delete' ? -1 : 0
       skipRestore = false
       dialog.showModal()
       input?.focus()
@@ -144,7 +188,12 @@
   $effect(() => {
     // A new query starts from its top result, so the active option (and its id) follows what was typed.
     void query
-    active = 0
+    active = firstActive()
+  })
+
+  $effect(() => {
+    // The ask takes focus on its sentence, not on a button: an Enter meant for something else can't delete.
+    if (doomed && ask) ask.focus()
   })
 
   /** Option ids are derived from the item, never its position, so the announced option tracks the results. */
@@ -152,19 +201,24 @@
     return `opt-${item.kind}-${encodeURIComponent(item.key).replace(/[^\w-]/g, '_')}`
   }
 
-  let activeItem = $derived(items[Math.min(active, items.length - 1)])
+  let activeItem = $derived(active < 0 ? undefined : items[Math.min(active, items.length - 1)])
   let status = $derived(
     items.length ? `${items.length} ${items.length === 1 ? 'result' : 'results'}` : query ? `Nothing matches ${query}` : '',
   )
 
   function choose(item: Item | undefined) {
     if (!item) return
-    if (item.kind === 'command' && item.key === 'rename') {
+    if (item.kind === 'command' && (item.key === 'rename' || item.key === 'delete')) {
       // Pick the list next, in the same palette.
-      ui.palette = { mode: 'rename', todoId: null }
+      ui.palette = { mode: item.key === 'delete' ? 'delete' : 'rename', todoId: null }
       query = ''
-      active = 0
+      active = item.key === 'delete' ? -1 : 0
       input?.focus()
+      return
+    }
+    if (mode === 'delete' && item.kind === 'list' && store.countsIn(item.key).open) {
+      // Open to-dos would go with it: ask first, in the same palette.
+      ui.palette = { mode: 'delete', todoId: null, listId: item.key }
       return
     }
     if (item.key === 'unfilter') {
@@ -179,6 +233,14 @@
     ui.palette = null
     dialog.close()
     item.run()
+  }
+
+  function confirmDelete() {
+    const id = doomed?.id
+    if (!id) return
+    ui.palette = null
+    dialog.close()
+    ui.deleteList(id)
   }
 
   function onclose() {
@@ -198,7 +260,7 @@
       scrollActive()
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
-      active = (active - 1 + items.length) % Math.max(1, items.length)
+      active = active < 0 ? items.length - 1 : (active - 1 + items.length) % Math.max(1, items.length)
       scrollActive()
     } else if (e.key === 'Enter') {
       e.preventDefault()
@@ -212,6 +274,22 @@
 </script>
 
 <dialog bind:this={dialog} class="sheet palette" aria-labelledby="palette-h" {onclose}>
+  {#if doomed}
+    <div class="ask" style:--list-ink="var(--list-{doomed.ink})">
+      <h2 id="palette-h" class="ask-h">Delete <span class="num">{pad2(doomed.index)}</span> {doomed.name}?</h2>
+      <div class="ask-text" id="ask-text" tabindex="-1" bind:this={ask}>
+        <p>
+          Its <strong>{doomedCounts.open} open {doomedCounts.open === 1 ? 'to-do' : 'to-dos'}</strong>
+          {doomedCounts.open === 1 ? 'goes' : 'go'} with it{#if doomedCounts.done}, and {doomedCounts.done} done{/if}.
+        </p>
+        {#if nextCapture}<p>New to-dos will go to {label(nextCapture)}.</p>{/if}
+      </div>
+      <div class="ask-actions">
+        <button class="btn" aria-describedby="ask-text" onclick={confirmDelete}>Delete list</button>
+        <button class="btn quiet" aria-describedby="ask-text" onclick={() => (ui.palette = null)}>Keep</button>
+      </div>
+    </div>
+  {:else}
   <div class="top">
     <h2 id="palette-h">{heading}</h2>
     <div class="search">
@@ -226,7 +304,7 @@
         aria-controls="palette-list"
         aria-activedescendant={activeItem ? optionId(activeItem) : undefined}
         aria-autocomplete="list"
-        placeholder={mode === 'move' || mode === 'rename' ? 'Type a number or a name' : mode === 'tag' ? 'Type a tag' : 'Type a to-do, a list or a number'}
+        placeholder={mode === 'move' || mode === 'rename' || mode === 'delete' ? 'Type a number or a name' : mode === 'tag' ? 'Type a tag' : 'Type a to-do, a list or a number'}
         autocomplete="off"
         onkeydown={keydown}
       />
@@ -261,6 +339,7 @@
   </ul>
   {#if !items.length}
     <p class="none" aria-hidden="true">Nothing matches “{query}”.</p>
+  {/if}
   {/if}
 </dialog>
 
@@ -366,8 +445,47 @@
     color: var(--ink-2);
   }
 
+  /* The ask: in ink, the open count in bold, an outlined Delete list beside a quiet Keep. */
+  .ask {
+    display: grid;
+    gap: 12px;
+    padding: 14px 16px 16px;
+  }
+
+  .ask-h {
+    margin: 0;
+    color: var(--ink);
+    font-size: var(--t-sub);
+    font-weight: 700;
+    white-space: normal;
+  }
+
+  .ask-h .num {
+    margin-right: 0;
+  }
+
+  .ask-text {
+    display: grid;
+    gap: 4px;
+    line-height: 1.4;
+  }
+
+  /* It holds focus only to be read out first; a ring would make the sentence look like a field. */
+  .ask-text:focus {
+    outline: none;
+  }
+
+  .ask-actions {
+    display: flex;
+    gap: 8px;
+  }
+
   @media (max-width: 767px) {
     .opt {
+      min-height: 44px;
+    }
+
+    .ask-actions .btn {
       min-height: 44px;
     }
   }

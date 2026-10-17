@@ -17,6 +17,27 @@
   } as const
 
   let pending = $derived(store.pending.length)
+  /** One line per pending file, except that a deleted list's line takes in its to-dos'. */
+  let lines = $derived.by(() => {
+    const folderOf = (path: string) => path.slice(0, path.indexOf('/'))
+    const deleted = new Map<string, number>()
+    for (const c of store.pending) if (c.kind === 'list' && !store.listById.has(c.id)) deleted.set(folderOf(c.path), 0)
+    for (const c of store.pending) {
+      const folder = folderOf(c.path)
+      if (c.kind === 'removed' && deleted.has(folder)) deleted.set(folder, deleted.get(folder)! + 1)
+    }
+    const out: { verb: string; path: string; note?: string }[] = []
+    for (const c of store.pending) {
+      const folder = folderOf(c.path)
+      if (!deleted.has(folder) || (c.kind !== 'removed' && c.kind !== 'list')) {
+        out.push({ verb: VERBS[c.kind], path: c.path })
+      } else if (c.kind === 'list') {
+        const n = deleted.get(folder)!
+        out.push({ verb: 'Deleted list', path: `${folder}/`, note: n ? `${n} ${n === 1 ? 'to-do' : 'to-dos'}` : undefined })
+      }
+    }
+    return out
+  })
   let demo = $derived(store.mode === 'demo')
   let connected = $derived(store.mode === 'connected')
   let branch = $derived(store.remote.connection?.branch)
@@ -51,7 +72,7 @@
     {:else if store.sync.kind === 'offline'}
       You're offline. Changes are kept on this device and sent when you're back.
     {:else if store.sync.kind === 'conflict'}
-      A file changed on GitHub and here at once. The latest edit was kept.
+      {store.sync.message ?? 'A file changed on GitHub and here at once. The latest edit was kept.'}
     {:else if store.sync.kind === 'saving'}
       Saving {pending} {pending === 1 ? 'change' : 'changes'}…
     {:else if demo}
@@ -63,14 +84,14 @@
     {/if}
   </p>
 
-  {#if store.pending.length}
+  {#if lines.length}
     <h3>Pending changes</h3>
     <ul class="changes">
-      {#each store.pending.slice(-6).reverse() as change, i (i)}
-        <li><span class="verb">{VERBS[change.kind]}</span> <code>{change.path}</code></li>
+      {#each lines.slice(-6).reverse() as line, i (i)}
+        <li><span class="verb">{line.verb}</span> <code>{line.path}</code>{#if line.note} · {line.note}{/if}</li>
       {/each}
     </ul>
-    {#if store.pending.length > 6}<p class="more">and {store.pending.length - 6} more</p>{/if}
+    {#if lines.length > 6}<p class="more">and {lines.length - 6} more</p>{/if}
   {/if}
 
   <div class="local">

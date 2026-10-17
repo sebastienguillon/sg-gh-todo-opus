@@ -13,7 +13,7 @@
   import TagDialog from './lib/TagDialog.svelte'
   import Toast from './lib/Toast.svelte'
   import TodayLog from './lib/TodayLog.svelte'
-  import { focusedTodoId, focusRestored, focusRow, ui } from './lib/ui.svelte'
+  import { focusedTodoId, focusRow, ui } from './lib/ui.svelte'
 
   const phoneQuery = matchMedia('(max-width: 767px)')
   const MODIFIERS = ['Shift', 'Alt', 'AltGraph', 'Control', 'Meta', 'CapsLock', 'Dead']
@@ -85,10 +85,8 @@
     return m ? m[1] : null
   }
 
-  async function undo() {
-    const id = store.undo()
-    await tick()
-    if (id) focusRestored(id)
+  function undo() {
+    void ui.afterUndo(store.undo(), false)
   }
 
   function onkeydown(e: KeyboardEvent) {
@@ -102,7 +100,7 @@
     const typing = target.closest('input:not([type="checkbox"]), textarea, select, [contenteditable="true"]')
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z' && !typing && store.toast?.undo) {
       e.preventDefault()
-      void undo()
+      undo()
       return
     }
     if (typing) return
@@ -124,6 +122,17 @@
 
     const id = focusedTodoId()
     const onRow = target.matches?.('[data-row-focus]')
+    if (e.shiftKey && !e.altKey && e.key.toLowerCase() === 'd') {
+      // Delete the list of the row or heading in focus; with neither, pick one in the palette.
+      // A held key deletes nothing more: focus lands in the next list after a delete.
+      e.preventDefault()
+      if (e.repeat) return
+      const section = target.closest<HTMLElement>('section.list')
+      const listId = id ? store.find(id)?.listId : section?.id.replace(/^list-/, '')
+      if (listId) ui.requestDeleteList(listId)
+      else ui.openDeletePicker()
+      return
+    }
     switch (e.key) {
       case 'j':
       case 'ArrowDown':
@@ -178,11 +187,12 @@
       case 'u':
         if (store.toast?.undo) {
           e.preventDefault()
-          void undo()
+          undo()
         }
         break
       case 'Enter':
-        if (id && onRow) {
+        // A held Enter (say, on the ask's Delete list) mustn't go on to open the row focus lands on.
+        if (id && onRow && !e.repeat) {
           e.preventDefault()
           ui.toggleExpanded(`${target.closest('#today') ? 'today' : 'list'}:${id}`)
         }
@@ -279,6 +289,15 @@
     }
   })
 
+  // ---- state that pointed at a list or to-do a sync took away -------------------
+
+  $effect(() => {
+    const gone = (key: string | null) => !!key && !store.find(key.slice(key.indexOf(':') + 1))
+    if (ui.renaming && !store.listById.has(ui.renaming)) ui.renaming = null
+    if (gone(ui.expanded)) ui.expanded = null
+    if (gone(ui.tray)) ui.tray = null
+  })
+
   // ---- where am I: the Index marks the list at the top of the page ----------
 
   $effect(() => {
@@ -309,8 +328,12 @@
   <div class="conflict" role="alert">
     <Icon name="alert" />
     <p>
-      <strong>Conflict.</strong> <code>{store.sync.path}</code> changed on GitHub and on this device at the same time. The
-      latest edit was kept.
+      {#if store.sync.message}
+        {store.sync.message}
+      {:else}
+        <strong>Conflict.</strong> <code>{store.sync.path}</code> changed on GitHub and on this device at the same time. The
+        latest edit was kept.
+      {/if}
     </p>
     <button class="btn" onclick={() => store.dismissConflict()}>Dismiss</button>
   </div>

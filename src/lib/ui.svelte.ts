@@ -1,7 +1,8 @@
 import { tick } from 'svelte'
 import { store } from './store.svelte'
+import type { UndoTarget } from './types'
 
-export type PaletteMode = 'search' | 'move' | 'tag' | 'rename'
+export type PaletteMode = 'search' | 'move' | 'tag' | 'rename' | 'delete'
 
 const RAIL_KEY = 'gh-todo:rail'
 
@@ -19,7 +20,8 @@ function smooth(): ScrollBehavior {
 
 /** Screen-level state: which overlay is open, which row is expanded. */
 class UI {
-  palette = $state<{ mode: PaletteMode; todoId: string | null } | null>(null)
+  /** `listId`: in `delete` mode, the list whose delete is being asked about. */
+  palette = $state<{ mode: PaletteMode; todoId: string | null; listId?: string | null } | null>(null)
   dateFor = $state<string | null>(null)
   tagsFor = $state<string | null>(null)
   expanded = $state<string | null>(null)
@@ -154,6 +156,71 @@ class UI {
     this.activeList = listId
     await tick()
     document.getElementById(`list-${listId}`)?.scrollIntoView({ block: 'start', behavior: smooth() })
+  }
+
+  /** Delete a list: the only one is refused, one with open to-dos asks first, any other goes now. */
+  requestDeleteList(listId: string) {
+    if (!store.listById.has(listId)) return
+    if (store.lists.length < 2) {
+      store.refuseDeleteList(listId)
+      return
+    }
+    if (store.countsIn(listId).open) {
+      this.openPalette('delete')
+      this.palette = { mode: 'delete', todoId: null, listId }
+      return
+    }
+    this.deleteList(listId)
+  }
+
+  /** The palette's list picker for deleting, or the refusal when there is only one list. */
+  openDeletePicker() {
+    if (store.lists.length < 2) {
+      if (store.lists[0]) store.refuseDeleteList(store.lists[0].id)
+      return
+    }
+    this.openPalette('delete')
+  }
+
+  /** Focus leaves the list's section and its Index entry before they go, then the list is deleted. */
+  deleteList(listId: string) {
+    const section = document.getElementById(`list-${listId}`)
+    const inList = (el: Element | null) =>
+      !!el && (!!section?.contains(el) || !!el.closest(`[href="#list-${CSS.escape(listId)}"]`))
+    if (inList(document.activeElement) || inList(this.#returnFocus)) {
+      const near = (from: Element | null, forward: boolean): HTMLElement | null => {
+        let el = from && (forward ? from.nextElementSibling : from.previousElementSibling)
+        while (el && !el.matches('section.list')) el = forward ? el.nextElementSibling : el.previousElementSibling
+        return el ? (el.querySelector<HTMLElement>('[data-row-focus]') ?? el.querySelector<HTMLElement>('h2')) : null
+      }
+      const target = near(section, true) ?? near(section, false) ?? document.getElementById('today-h')
+      if (inList(this.#returnFocus)) this.#returnFocus = target
+      if (inList(document.activeElement)) {
+        target?.focus({ preventScroll: true })
+        target?.scrollIntoView({ block: 'nearest' })
+      }
+    }
+    const ofList = (key: string | null) => !!key && store.find(key.slice(key.indexOf(':') + 1))?.listId === listId
+    if (this.renaming === listId) this.renaming = null
+    if (ofList(this.expanded)) this.expanded = null
+    if (ofList(this.tray)) this.tray = null
+    store.deleteList(listId)
+  }
+
+  /** After an undo: the restored row, or the restored list's heading; from the toast, back to the log. */
+  async afterUndo(target: UndoTarget, fromToast: boolean) {
+    await tick()
+    if (target && 'todo' in target) focusRestored(target.todo)
+    else if (target && 'list' in target) {
+      const heading = document.getElementById(`h-${target.list}`)
+      if (!heading) {
+        // Hidden by a tag filter: nothing of it to show.
+        this.focusLog()
+        return
+      }
+      document.getElementById(`list-${target.list}`)?.scrollIntoView({ block: 'start', behavior: smooth() })
+      heading.focus({ preventScroll: true })
+    } else if (fromToast) this.focusLog()
   }
 
   jumpToIndex(index: number): boolean {

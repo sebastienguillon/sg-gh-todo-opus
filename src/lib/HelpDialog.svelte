@@ -14,10 +14,11 @@
     [['g', '07'], 'Jump to list 07'],
     [['g', 't'], 'Jump to Today'],
     [['r'], 'Rename the list'],
+    [['Shift', 'D'], 'Delete the list'],
     [['⌘', 'K'], 'Search or jump'],
     [['#'], 'Show only a tag'],
     [['Alt', '↑'], 'Move a row up or down'],
-    [['Delete'], 'Delete'],
+    [['Delete'], 'Delete the row'],
     [['u'], 'Undo a delete, a clear or a rename'],
     [['Esc'], 'Close, or clear the tag filter'],
   ]

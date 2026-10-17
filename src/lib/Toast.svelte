@@ -1,14 +1,10 @@
 <script lang="ts">
-  import { tick } from 'svelte'
   import Icon from './Icon.svelte'
   import { store } from './store.svelte'
-  import { focusRestored, ui } from './ui.svelte'
+  import { ui } from './ui.svelte'
 
-  async function undo() {
-    const id = store.undo()
-    await tick()
-    if (id) focusRestored(id)
-    else ui.focusLog()
+  function undo() {
+    void ui.afterUndo(store.undo(), true)
   }
 
   function dismiss() {

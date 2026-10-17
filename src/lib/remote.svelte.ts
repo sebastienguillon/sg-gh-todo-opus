@@ -8,13 +8,14 @@
 
 import { formatTime } from './dates'
 import { GitHub, GitHubError, type Connection, type FileChange } from './github'
-import { merge, type Dirty, type Merged, type Model } from './merge'
+import { merge, type Dirty, type ListNotice, type Merged, type Model } from './merge'
 import {
   blobSha,
   fileOf,
   folderOf,
   isDataPath,
   LIST_FILE,
+  listFolderDrops,
   readList,
   readTodo,
   README,
@@ -61,6 +62,8 @@ export interface Host {
   lastSavedAt: string | null
   /** Pending changes up to this `seq` are in a commit on its way; later edits must not fold into them. */
   sealed: number
+  /** No commit before this time (ms): a list delete waits while its undo is offered. */
+  readonly commitHold: number
   adopt(merged: Merged): void
   /** Drop pending changes up to `seq`: they are on GitHub. */
   settle(seq: number): void
@@ -94,9 +97,9 @@ export function modelOf(base: Base): Model {
 }
 
 export function dirtyOf(pending: PendingChange[]): Dirty {
-  const dirty: Dirty = { todos: new Map(), lists: new Set() }
+  const dirty: Dirty = { todos: new Map(), lists: new Map() }
   for (const c of pending) {
-    if (c.kind === 'list') dirty.lists.add(c.id)
+    if (c.kind === 'list') dirty.lists.set(c.id, c.path)
     else dirty.todos.set(c.id, c.kind === 'removed' ? c.at : null)
   }
   return dirty
@@ -137,13 +140,73 @@ const COMMIT_VERBS: Record<ChangeKind, string> = {
   list: 'Save list',
 }
 
-function commitMessage(batch: PendingChange[]): string {
+function plural(n: number, word: string): string {
+  return `${n} ${n === 1 ? word : `${word}s`}`
+}
+
+/**
+ * One line per file a change wrote, or per deleted list: "Delete list “Home” and its 24 to-dos", with
+ * that folder's deletions folded in. Changes the commit writes nothing for (an undo's identical
+ * re-adds, a list that never reached GitHub) are left out.
+ */
+function commitMessage(
+  batch: PendingChange[],
+  files: Record<string, BaseFile | null>,
+  listExists: (id: string) => boolean,
+  pathsOf: (id: string) => string[],
+): string {
   const last = new Map<string, PendingChange>()
   for (const c of batch) last.set(`${c.kind === 'list' ? 'list' : 'todo'}:${c.id}`, c)
-  const items = [...last.values()]
-  const line = (c: PendingChange) => `${COMMIT_VERBS[c.kind]} “${c.title}”`
+  const planned = Object.keys(files)
+  // Match folders with their slash, so `home/` doesn't take in `home-2/`.
+  const inFolder = (folder: string) => planned.filter((p) => p.startsWith(`${folder}/`))
+  const deleted = new Map<string, number>()
+  for (const c of last.values()) {
+    if (c.kind !== 'list' || listExists(c.id)) continue
+    const folder = folderOf(c.path)
+    deleted.set(folder, inFolder(folder).filter((p) => files[p] === null && fileOf(p) !== LIST_FILE).length)
+  }
+  const writes = (c: PendingChange) => {
+    if (c.kind === 'list') return listExists(c.id) ? c.path in files : inFolder(folderOf(c.path)).length > 0
+    // A deleted list's to-dos fold into its line, unless the file goes from another folder (moved in, uncommitted).
+    if (c.kind === 'removed' && deleted.has(folderOf(c.path)) && pathsOf(c.id).every((p) => folderOf(p) === folderOf(c.path))) return false
+    return (
+      c.path in files ||
+      pathsOf(c.id).some((p) => p in files) ||
+      planned.some((p) => {
+        const f = files[p]
+        return !!f && 'todo' in f && f.todo.id === c.id
+      })
+    )
+  }
+  let items = [...last.values()].filter(writes)
+  if (!items.length) items = [...last.values()]
+  const line = (c: PendingChange) => {
+    if (c.kind === 'list' && !listExists(c.id)) {
+      const n = deleted.get(folderOf(c.path)) ?? 0
+      return `Delete list “${c.title}”${n ? ` and its ${plural(n, 'to-do')}` : ''}`
+    }
+    return `${COMMIT_VERBS[c.kind]} “${c.title}”`
+  }
   if (items.length === 1) return line(items[0])
   return `${items.length} changes\n\n${items.map((c) => `- ${line(c)}`).join('\n')}`
+}
+
+/** The banner after a merge where a list delete met a change made elsewhere. */
+function noticeText(notices: ListNotice[]): string {
+  const [n] = notices
+  const name = `${String(n.list.index).padStart(2, '0')} ${n.list.name}`
+  let text: string
+  if (n.kind === 'kept') {
+    text = `${name} was kept for ${plural(n.count, 'to-do')} changed or added on another device.`
+    if (n.left) text += n.left === 1 ? ' The other one stays deleted.' : ` The other ${n.left} stay deleted.`
+  } else if (n.kind === 'revived') {
+    text = `${name} was deleted on another device. It was kept for ${n.count === 1 ? 'the to-do' : `the ${n.count} to-dos`} changed here.`
+  } else {
+    text = `${name} was deleted on another device, so the change made to it here wasn't kept.`
+  }
+  const more = notices.length - 1
+  return more ? `${text} ${plural(more, 'other list')} met a delete the same way.` : text
 }
 
 // ---- first run -----------------------------------------------------------------
@@ -328,7 +391,12 @@ export class Remote {
     if (!this.#gh) return
     const now = Date.now()
     if (!this.#firstPendingAt) this.#firstPendingAt = now
-    const at = Math.max(Math.min(now + SETTLE_MS, this.#firstPendingAt + MAX_WAIT_MS), this.#lastCommitAt + COMMIT_GAP_MS, this.#retryAt)
+    const at = Math.max(
+      Math.min(now + SETTLE_MS, this.#firstPendingAt + MAX_WAIT_MS),
+      this.#lastCommitAt + COMMIT_GAP_MS,
+      this.#retryAt,
+      this.#host.commitHold,
+    )
     clearTimeout(this.#timer)
     if (Number.isFinite(at)) this.#timer = setTimeout(() => void this.#run(true), at - now)
     if (!navigator.onLine) this.#set({ kind: 'offline' })
@@ -390,6 +458,11 @@ export class Remote {
       commit = false
       this.#again = true
     }
+    if (commit && Date.now() < this.#host.commitHold) {
+      // A list delete's undo is on offer: keep reading, commit once it's gone.
+      commit = false
+      this.#again = true
+    }
     this.#busy = true
     try {
       await this.#cycle(gh, commit)
@@ -425,6 +498,11 @@ export class Remote {
         this.base.etag = head.etag
       }
       if (!commit || !this.#host.pending.length) return
+      if (Date.now() < this.#host.commitHold) {
+        // A list was deleted while this cycle was reading: its undo is on offer, so commit later.
+        this.#again = true
+        return
+      }
       if (await this.#commit(gh, branch)) return
       if (attempt >= TRIES) throw new GitHubError('stale', 'The branch kept moving.')
       this.base.etag = null
@@ -439,7 +517,10 @@ export class Remote {
     this.base = next
     host.adopt(result)
     const clash = result.conflicts[0]
-    if (clash) {
+    if (result.notices.length) {
+      // A list kept or dropped over a delete says more than a to-do's conflict, so it takes the banner.
+      host.sync = { kind: 'conflict', path: `${result.notices[0].list.slug}/`, message: noticeText(result.notices) }
+    } else if (clash) {
       const t = host.todos.find((x) => x.id === clash)
       host.sync = { kind: 'conflict', id: clash, path: this.pathsOf(clash)[0] ?? (t ? host.pathOf(t) : clash) }
     }
@@ -456,6 +537,8 @@ export class Remote {
     host.sealed = seq
     this.#firstPendingAt = 0
     const plan = this.#plan(dirtyOf(batch))
+    const present = new Set(host.lists.map((l) => l.id))
+    const message = commitMessage(batch, plan.files, (id) => present.has(id), (id) => this.pathsOf(id))
     const paths = Object.keys(plan.files)
     if (!paths.length) {
       host.sealed = 0
@@ -472,7 +555,7 @@ export class Remote {
         }),
       )
       const changes: FileChange[] = paths.map((p) => ({ path: p, content: plan.files[p] ? plan.contents[p] : null }))
-      done = await gh.commit(branch, base.head, base.tree, changes, commitMessage(batch))
+      done = await gh.commit(branch, base.head, base.tree, changes, message)
     } catch (e) {
       host.sealed = 0
       if (e instanceof GitHubError && e.kind === 'stale') return false
@@ -528,9 +611,11 @@ export class Remote {
       put(`${l.slug}/${LIST_FILE}`, writeList(snap), { sha: null, list: snap })
     }
 
-    for (const id of dirty.lists) {
+    const deleted: string[] = []
+    for (const [id, path] of dirty.lists) {
       const l = lists.get(id)
       if (l) putList(l)
+      else deleted.push(folderOf(path))
     }
     for (const id of dirty.todos.keys()) {
       const t = todos.get(id)
@@ -552,6 +637,12 @@ export class Remote {
       owner.set(path, id)
       put(path, writeTodo(snap), { sha: null, todo: snap })
       for (const p of paths) if (p !== path) drop(p)
+    }
+    for (const folder of deleted) {
+      const { drops, keepListFile } = listFolderDrops(base.files, files, folder)
+      drops.forEach(drop)
+      if (keepListFile) console.warn(`To Do: a to-do is still filed in the deleted list ${folder}/; its _list.md stays.`)
+      else drop(`${folder}/${LIST_FILE}`)
     }
     return { files, contents }
   }

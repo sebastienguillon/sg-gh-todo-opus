@@ -39,6 +39,22 @@ export function fileOf(path: string): string {
   return path.slice(path.lastIndexOf('/') + 1)
 }
 
+/**
+ * A list deleted on this device takes its whole folder: every to-do file left in it (stale hand copies
+ * included), then its `_list.md`, so it can't come back as a list named after the folder. A to-do
+ * still written into the folder by the same commit keeps the `_list.md`.
+ */
+export function listFolderDrops(
+  baseFiles: Record<string, unknown>,
+  planned: Record<string, unknown>,
+  folder: string,
+): { drops: string[]; keepListFile: boolean } {
+  const isTodo = (p: string) => folderOf(p) === folder && fileOf(p) !== LIST_FILE
+  const keepListFile = Object.entries(planned).some(([p, f]) => f !== null && isTodo(p))
+  const drops = Object.keys(baseFiles).filter((p) => isTodo(p) && !(p in planned))
+  return { drops, keepListFile }
+}
+
 /** The file names a to-do may have in a folder: its title, or its title and id when two share a title. */
 export function todoNames(t: Todo, folder: string): [plain: string, unique: string] {
   const slug = slugify(t.title)

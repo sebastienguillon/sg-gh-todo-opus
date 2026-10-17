@@ -4,7 +4,7 @@ import type { Connection } from './github'
 import type { Merged } from './merge'
 import { modelOf, openRepo, Remote, type Base, type Host } from './remote.svelte'
 import { inkFor, LIST_FILE, slugify, todoNames } from './repo'
-import type { ChangeKind, DayISO, Flash, PendingChange, SyncState, Todo, TodoList } from './types'
+import type { ChangeKind, DayISO, Flash, PendingChange, SyncState, Todo, TodoList, UndoTarget } from './types'
 
 /** Demo lists, on a device that chose to look around before connecting. */
 const DEMO_KEY = 'gh-todo:v1'
@@ -17,6 +17,8 @@ const REPO_KEY = 'gh-todo:repo:v1'
 export const TAG_WORD = /^#[\p{L}\p{M}\p{N}_-]+$/u
 const FLASH_MS = 1600
 const SYNC_DEBOUNCE_MS = 1500
+/** A list delete's commit waits at most this long for its undo. */
+const DELETE_HOLD_MS = 30_000
 
 interface Saved {
   lists: TodoList[]
@@ -114,8 +116,13 @@ class Store implements Host {
   lastSavedAt = $state<string | null>(null)
   /** Polite live-region text for screen readers. */
   announcement = $state('')
-  toast = $state<{ id: number; message: string; undo?: () => string | null } | null>(null)
+  /** `holdUntil`: no commit before then (ms), so undoing a list delete never reaches GitHub. */
+  toast = $state<{ id: number; message: string; undo?: () => UndoTarget; holdUntil?: number } | null>(null)
   #toastPaused = false
+  /** While a toast's undo is on offer: to-dos it would bring back that another device has deleted since. */
+  #goneElsewhere = new Set<string>()
+  /** While a list delete's undo is on offer: its folder, so a new list doesn't take it. */
+  #undoSlugs = new Set<string>()
   /** Lists folded in the main column, by id. */
   openDone = $state<Record<string, boolean>>({})
 
@@ -169,6 +176,10 @@ class Store implements Host {
     }
     setInterval(tick, 60_000)
     document.addEventListener('visibilitychange', tick)
+    document.addEventListener('visibilitychange', () => {
+      // Leaving the page lets a held list delete go now; the undo stays on offer.
+      if (document.visibilityState === 'hidden' && this.toast?.holdUntil) this.#releaseHold()
+    })
   }
 
   // ---- reading -------------------------------------------------------------
@@ -211,6 +222,14 @@ class Store implements Host {
   })
 
   totalOpen = $derived(this.todos.filter((t) => !t.done).length)
+
+  /** Open and done to-dos in a list, whatever the tag filter. */
+  countsIn(listId: string): { open: number; done: number } {
+    let open = 0
+    let done = 0
+    for (const t of this.todos) if (t.listId === listId) t.done ? done++ : open++
+    return { open, done }
+  }
 
   allTags = $derived.by(() => {
     const counts = new Map<string, number>()
@@ -370,10 +389,12 @@ class Store implements Host {
     this.#record('removed', t)
     this.#announce(`Deleted ${t.title}. Press U to undo.`)
     this.#showToast(`Deleted “${t.title}”`, () => {
+      // Already back (kept by a merge), or deleted on another device since: nothing to restore.
+      if (this.find(t.id) || this.#goneElsewhere.has(t.id)) return null
       this.todos.splice(Math.min(at, this.todos.length), 0, t)
       this.#record('added', t)
       this.#announce(`Restored ${t.title}`)
-      return t.id
+      return { todo: t.id }
     })
   }
 
@@ -399,9 +420,10 @@ class Store implements Host {
     const list = this.listById.get(listId)
     this.#announce(`Cleared ${gone.length} done in ${list?.name ?? 'list'}. Press U to undo.`)
     this.#showToast(`Cleared ${gone.length} done in ${list?.name ?? 'list'}`, () => {
-      this.todos.push(...gone)
-      for (const t of gone) this.#record('added', t)
-      this.#announce(`Restored ${gone.length} done in ${list?.name ?? 'list'}`)
+      const back = gone.filter((t) => !this.find(t.id) && !this.#goneElsewhere.has(t.id))
+      this.todos.push(...back)
+      for (const t of back) this.#record('added', t)
+      this.#announce(`Restored ${back.length} done in ${list?.name ?? 'list'}`)
       return null
     })
   }
@@ -410,9 +432,14 @@ class Store implements Host {
     const clean = name.trim()
     if (!clean) return null
     const index = Math.max(0, ...this.lists.map((l) => l.index)) + 1
-    // A list is a folder in the data repo, so its id is its folder name.
+    // A list is a folder in the data repo, so its id is its folder name. A deleted list's folder stays
+    // taken until its delete is on GitHub and can't be undone.
+    const taken = (s: string) =>
+      this.lists.some((l) => l.id === s || l.slug === s) ||
+      this.#undoSlugs.has(s) ||
+      this.pending.some((c) => c.kind === 'list' && c.id === s)
     let slug = slugify(clean)
-    for (let n = 2; this.lists.some((l) => l.id === slug || l.slug === slug); n++) slug = `${slugify(clean)}-${n}`
+    for (let n = 2; taken(slug); n++) slug = `${slugify(clean)}-${n}`
     const list: TodoList = { id: slug, slug, index, name: clean, ink: inkFor(index) }
     this.lists.push(list)
     this.#recordList(list)
@@ -439,6 +466,88 @@ class Store implements Host {
       return null
     })
     return true
+  }
+
+  /**
+   * A list and every to-do in it, open and done. The other lists keep their numbers, and the only list
+   * stays. The commit waits while the undo is on offer, so an undo never reaches GitHub.
+   */
+  deleteList(id: string): boolean {
+    const at = this.lists.findIndex((l) => l.id === id)
+    if (at < 0 || this.lists.length < 2) return false
+    const list = this.lists[at]
+    const wasCapture = this.inbox().id === id
+    const gone = this.todos.filter((t) => t.listId === id)
+    // GitHub's copy at the time, so an undo can tell a rename made elsewhere meanwhile.
+    const file = this.remote.base.files[`${list.slug}/${LIST_FILE}`]
+    const before = file && 'list' in file ? { ...file.list } : null
+    // Recorded while the list is still here, so each path names its real folder.
+    for (const t of gone) this.#push(this.#change('removed', t))
+    this.todos = this.todos.filter((t) => t.listId !== id)
+    this.lists.splice(at, 1)
+    delete this.openDone[id]
+    this.#push(this.#listChange(list))
+    this.#persistNow()
+
+    const withTodos = gone.length ? ` and its ${gone.length} ${gone.length === 1 ? 'to-do' : 'to-dos'}` : ''
+    const moved = wasCapture ? `. New to-dos go to ${label(this.inbox())}` : ''
+    const message = `Deleted list ${label(list)}${withTodos}${moved}`
+    this.#announce(`${message}. Press U to undo.`)
+    this.#showToast(
+      message,
+      () => {
+        let target = this.listById.get(id)
+        let renumbered = false
+        if (!target) {
+          const restored = { ...list }
+          // Renamed or re-inked on another device since the delete: keep that device's fields.
+          const now = this.remote.base.files[`${list.slug}/${LIST_FILE}`]
+          if (before && now && 'list' in now) {
+            for (const k of ['index', 'name', 'ink'] as const) {
+              if (now.list[k] !== before[k]) (restored as Record<string, unknown>)[k] = now.list[k]
+            }
+          }
+          if (this.lists.some((l) => l.index === restored.index)) {
+            restored.index = Math.max(0, ...this.lists.map((l) => l.index)) + 1
+            renumbered = true
+          }
+          this.lists.splice(Math.min(at, this.lists.length), 0, restored)
+          this.#push(this.#listChange(restored))
+          target = restored
+        }
+        // Already back (kept by a merge), or deleted on another device since: those stay as they are.
+        const back = gone.filter((t) => !this.find(t.id) && !this.#goneElsewhere.has(t.id))
+        const skipped = gone.filter((t) => this.#goneElsewhere.has(t.id)).length
+        for (const t of back) {
+          this.todos.push(t)
+          this.#push(this.#change('added', t))
+        }
+        this.#persistNow()
+        this.#scheduleSync()
+        const n = back.length ? `${back.length} ${back.length === 1 ? 'to-do' : 'to-dos'}` : ''
+        let text = renumbered
+          ? `Restored list ${target.name} as ${pad2(target.index)}${n ? `, with its ${n}` : ''}`
+          : `Restored list ${label(target)}${n ? ` and its ${n}` : ''}`
+        if (skipped) text += `. ${skipped} ${skipped === 1 ? 'was' : 'were'} deleted on another device`
+        this.#announce(`${text}.`)
+        return { list: target.id }
+      },
+      this.mode === 'connected' ? Date.now() + DELETE_HOLD_MS : undefined,
+    )
+    this.#undoSlugs.add(list.slug)
+    // After the toast, so sync sees its hold.
+    this.#scheduleSync()
+    return true
+  }
+
+  /** The only list can't be deleted; say why. */
+  refuseDeleteList(id: string) {
+    const list = this.listById.get(id)
+    if (!list) return
+    const text = `${label(list)} is the only list. Add another before deleting it.`
+    this.#announce(text)
+    // An undo still on offer (the delete that left one list) matters more than the refusal's slip.
+    if (!this.toast?.undo) this.#showToast(text)
   }
 
   setTagFilter(tag: string | null) {
@@ -535,6 +644,11 @@ class Store implements Host {
 
   /** Take in a merge with what GitHub holds. */
   adopt(m: Merged) {
+    if (this.toast?.undo) {
+      // Deleted here and on another device too: an undo must not bring those back.
+      const merged = new Set(m.todos.map((t) => t.id))
+      for (const c of this.pending) if (c.kind === 'removed' && m.cleanTodos.has(c.id) && !merged.has(c.id)) this.#goneElsewhere.add(c.id)
+    }
     this.todos = reconcile(this.todos, m.todos)
     this.lists = reconcile(this.lists, m.lists)
     this.pending = this.pending.filter((c) => !(c.kind === 'list' ? m.cleanLists.has(c.id) : m.cleanTodos.has(c.id)))
@@ -560,23 +674,30 @@ class Store implements Host {
   }
 
   dismissToast() {
-    clearTimeout(this.#toastTimer)
     this.#toastPaused = false
-    this.toast = null
+    this.#hideToast()
   }
 
-  /** Runs the toast's undo; returns the restored to-do id, if any. */
-  undo(): string | null {
+  /** Runs the toast's undo; returns what it restored, for focus. */
+  undo(): UndoTarget {
     const undo = this.toast?.undo
     if (!undo) return null
-    this.dismissToast()
-    return undo()
+    this.#toastPaused = false
+    // The undo reads what the toast's window gathered, so it runs before the toast goes.
+    const restored = undo()
+    this.#hideToast()
+    return restored
   }
 
   pauseToast(paused: boolean) {
     this.#toastPaused = paused
     clearTimeout(this.#toastTimer)
-    if (!paused && this.toast) this.#toastTimer = setTimeout(() => (this.toast = null), 4000)
+    if (!paused && this.toast) this.#toastTimer = setTimeout(() => this.#hideToast(), 4000)
+  }
+
+  /** No commit before this time (ms): a list delete waits while its undo is on offer. */
+  get commitHold(): number {
+    return this.toast?.holdUntil ?? 0
   }
 
   // ---- internals -----------------------------------------------------------
@@ -706,10 +827,26 @@ class Store implements Host {
     queueMicrotask(() => (this.announcement = text))
   }
 
-  #showToast(message: string, undo?: () => string | null) {
+  #showToast(message: string, undo?: () => UndoTarget, holdUntil?: number) {
+    // The toast it replaces takes its undo, and its commit hold, with it.
+    if (this.toast) this.#hideToast()
+    this.toast = { id: Date.now(), message, undo, holdUntil }
+    if (!this.#toastPaused) this.#toastTimer = setTimeout(() => this.#hideToast(), 8000)
+  }
+
+  #hideToast() {
     clearTimeout(this.#toastTimer)
-    this.toast = { id: Date.now(), message, undo }
-    if (!this.#toastPaused) this.#toastTimer = setTimeout(() => (this.toast = null), 8000)
+    const held = !!this.toast?.holdUntil
+    this.toast = null
+    this.#goneElsewhere.clear()
+    this.#undoSlugs.clear()
+    if (held) this.#releaseHold()
+  }
+
+  /** A held list delete may go now: sync recomputes when to commit. */
+  #releaseHold() {
+    if (this.toast) this.toast.holdUntil = 0
+    if (this.mode === 'connected' && this.pending.length) this.remote.schedule()
   }
 }
 

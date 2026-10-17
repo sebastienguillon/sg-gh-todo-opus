@@ -28,7 +28,7 @@ export interface Todo {
   updatedAt: string
 }
 
-/** What happened to a to-do, or `list` for a list's own file. */
+/** What happened to a to-do, or `list` for a list's own file: written, or deleted when the list is gone from this device. */
 export type ChangeKind = 'added' | 'edited' | 'moved' | 'rescheduled' | 'done' | 'reopened' | 'removed' | 'list'
 
 /** A change made on this device and not yet committed to the data repo. */
@@ -49,8 +49,14 @@ export type SyncState =
   | { kind: 'saving' }
   | { kind: 'offline' }
   | { kind: 'failed'; message: string; fix?: 'retry' | 'reconnect' }
-  /** `path` is the file as it is on GitHub; `id` the to-do it holds, when known. */
-  | { kind: 'conflict'; path: string; id?: string }
+  /**
+   * `path` is the file as it is on GitHub; `id` the to-do it holds, when known. `message` replaces the
+   * usual wording, for a list kept or dropped after a delete on another device.
+   */
+  | { kind: 'conflict'; path: string; id?: string; message?: string }
+
+/** What an undo brought back, so focus can go to it. */
+export type UndoTarget = { todo: string } | { list: string } | null
 
 /** The momentary rapid-log mark a row shows right after an action. */
 export type Flash = '>' | '<'
