@@ -8,6 +8,13 @@ Two (or more) simulated devices run the To Do app's real sync code against an in
 | `harness.mjs` | Starts the mock (port 5299), the app's Vite dev server (port 5298, `VITE_GITHUB_API=http://localhost:5299`) and Chrome. `device(name)` opens one device. |
 | `smoke.mjs` | The smoke test: seed, two devices, add/check off, offline edits, a same-field conflict, a ref-update race. Prints PASS/FAIL per check and exits 1 on any failure. |
 | `probes.mjs` | Reproductions of app behaviours found while building the harness (see the end of this file). |
+| `run-all.mjs` | Runs every suite at once, each on its own ports, and reports; logs go to `logs/`. |
+| `delete-multi-1.mjs`, `delete-multi-2.mjs`, `delete-single.mjs` | List deletion: every delete-versus-change case on two devices in both sync orders, offline, hand edits, and the single-device cases (undo inside and after the commit hold, a reload before the commit, a delete during a commit in flight). |
+| `persist.mjs` | An edit followed at once by a reload, a closed tab, a hidden page then a crash, in demo and connected mode, two tabs, and a new connection saved under its repo's name (plan problems 1 and 1b). |
+| `etag.mjs` | The ETag a device keeps is always its head's: after a pull, an own commit, a reload, a refused ref update, an upgrade from an older build, and a force-push back to the parent (problem 3). |
+| `stale.mjs` | Lagging branch reads naming a head the device moved past: ignored once, without reverting, losing a pending change or a failed band (problem 4). `STALE_S7=1` adds a slow case. |
+| `sync-faults.mjs` | A save whose ref update answer is lost, fails, or whose check after it fails, is rate limited or refused, and a failure before the ref update (problem 5). |
+| `conflict.mjs` | The conflict notice against every status change (offline, an edit offline, a failed save and Retry, a token replaced, Dismiss while offline), a list notice, the band word order, the `?sync=` review states alone and combined, and Reconnect surviving a trip offline (plan problems 2 and 2b). |
 
 Nothing here talks to api.github.com: the app's API base is the mock, and every device context also aborts any request to `https://api.github.com/`, recorded in `h.realGitHubHits`. Tokens are dummies, `test-token-<device>`.
 
@@ -22,6 +29,7 @@ node smoke.mjs        # one suite on its own, about 50 s
 HEADED=1 node smoke.mjs     # watch the two windows
 VERBOSE=1 node smoke.mjs    # mock requests, vite output, page console
 node probes.mjs       # about 40 s
+node conflict.mjs     # about 50 s; persist.mjs, etag.mjs and stale.mjs take under 90 s, sync-faults.mjs about 3 min
 node mock-github.mjs [--port 5299] [--seed seed.json] [--log]   # the mock on its own
 ```
 
@@ -84,7 +92,7 @@ Endpoint names, used in counters, the log and faults: `repo`, `getRef`, `getTree
 | Helper | Does |
 | --- | --- |
 | `a.store(fn, arg)` | Runs `(store, arg) => …` in the page against the app's own store singleton and returns a JSON copy. `fn` is sent as source text, so it can't close over Node variables; pass `arg`. |
-| `a.snapshot({full})` | `{mode, online, lists: [{id, index, name, ink}], todos: [{id, listId, title, done}], pending: [{kind, id, title, path, seq}], sync, head, lastCheckedAt}`. Sorted, so two devices compare with `deepStrictEqual`. `full: true` returns every field. |
+| `a.snapshot({full})` | `{mode, online, lists: [{id, index, name, ink}], todos: [{id, listId, title, done}], pending: [{kind, id, title, path, seq}], sync, conflict, head, lastCheckedAt}`. Sorted, so two devices compare with `deepStrictEqual`. `full: true` returns every field of lists and to-dos. `conflict` is the banner; see below. |
 | `a.sync({timeout, allowFailed})` | Asks GitHub now and waits until the device has nothing pending and no cycle running. It throws if the device is offline or shows `failed`; with `allowFailed`, it returns the snapshot instead. |
 | `a.waitSaved()` | Waits for the app's own schedule without asking for anything. |
 | `a.waitFor(fn, arg)` | Waits for `fn(store, arg)` to be truthy. |
@@ -99,6 +107,16 @@ Endpoint names, used in counters, the log and faults: `repo`, `getRef`, `getTree
 | `a.page`, `a.context` | The Playwright objects. |
 
 `todoFile(t)` and `listFile(l)` are copies of `writeTodo` and `writeList` in `src/lib/repo.ts`, for seeds and expected contents. `slugify` is a copy of the app's.
+
+### Reading the conflict banner
+
+Read the banner from `snapshot().conflict`, never from `sync.kind`. It is `{path, id?, message?}`, or `null` when no banner shows: `path` is the file (or `folder/` for a list notice) as it is on GitHub, `id` the to-do when known, and `message` a list notice's own wording.
+
+It reads the same on both shapes of the app. Since fix 2 of the sync-fixes plan, the notice is `store.conflict` and `store.sync` is never of kind `'conflict'`. Before it, the notice was a `store.sync` of kind `'conflict'`, which any status change could replace.
+
+- "No banner": `!snap.conflict`.
+- "Shows saved", in the sense the band says saved: `snap.sync.kind === 'saved' && !snap.conflict`. Since fix 2, `sync.kind` can be `'saved'` while a banner shows, and the band then says "conflict".
+- Inside the page, in a function passed to `a.store()` or `a.waitFor()`, call `window.__e2e.conflict()` for the same value, for example `A.waitFor(() => !!window.__e2e.conflict())`.
 
 ## How `sync()` knows the device is done
 
@@ -131,12 +149,16 @@ Endpoint names, used in counters, the log and faults: `repo`, `getRef`, `getTree
   - Not modelled: rate limits (inject them with faults), token scopes, `truncated` trees, and the delays of real GitHub.
   - Commit and tree shas are git-correct: tree hashing was checked against `git write-tree`, and blob shas against `git hash-object`. The app's `blobSha` therefore matches, and a device never re-downloads what it wrote. The smoke checks this.
 
-## App behaviours worth a look (reproduced by `probes.mjs`)
+## App behaviours found while building the harness
 
-Found against the app's working tree of 2026-10-17: HEAD `d2e87f8ad` plus the uncommitted list-delete work.
+`probes.mjs` reproduces each one. On today's app it prints "not seen" for the first four; the fifth checks that a lost answer leaves no duplicate commit, and prints "CONFIRMED … handled well". Found against the app of 2026-10-17 (HEAD `d2e87f8ad` plus the list-delete work), and fixed on 2026-10-18:
 
-1. **An edit closed or reloaded within 300 ms is lost.** The store writes localStorage 300 ms after an edit (`store.svelte.ts`, `#persist`), and nothing flushes on `pagehide` or `visibilitychange`. The edit is in neither localStorage nor a commit: a capture followed by closing the tab or app at once disappears.
-2. **Going offline wipes an undismissed conflict notice.** The store's `offline` listener sets `sync = {kind: 'offline'}` directly (`store.svelte.ts`, about line 169), bypassing the remote's rule that nothing but the user covers a conflict. Back online, it shows "saved".
-3. **A ref read staler than the last one the device saw makes it adopt the older commit.** Another device's edit visibly reverts until the next read. `#cycle` pulls any head whose sha differs from its base, older or not. Data stays safe, because the ref update is fast-forward only and the next read heals it. This only matters if GitHub ever serves such reads; simulated with `lag: 2`.
-4. **The stored ETag lags the head.** `#cycle` sets `base.etag` after `#pull` has already persisted the base, and a commit never updates it. The first read after a reload is therefore usually a full 200, not a free 304, unless an edit persisted the base after the last read.
-5. **Handled well:** a ref update that landed but whose answer was lost (a 502 after the write). The device shows "failed" and keeps the change. On retry it pulls its own commit, sees the change is already there and drops it: no duplicate commit. The user sees "GitHub did not answer" for up to 30 s, though the save landed.
+1. **An edit closed or reloaded within 300 ms was lost.** The store now saves at once on `pagehide` and when the page turns hidden, if a save is waiting. Guarded by `persist.mjs`, which also covers a new connection that was saved under an empty repo name.
+2. **Going offline wiped an undismissed conflict notice.** The notice is now `store.conflict`, apart from the sync state, and a token GitHub refuses keeps showing Reconnect across a trip offline. Guarded by `conflict.mjs`.
+3. **A branch read staler than the last one seen made the device adopt the older commit.** A read naming a head the device moved past less than a minute ago is now ignored once. Guarded by `stale.mjs`.
+4. **The stored ETag lagged the head.** It is now always the ETag of the head held (null right after an own commit), and an ETag saved by an older build is dropped on load. Guarded by `etag.mjs`.
+5. **A save whose answer was lost showed "failed" for 30 s.** The device now reads the branch once after a lost answer and counts the save as landed only if the branch names the commit just made. Guarded by `sync-faults.mjs`.
+
+Still open, and not covered: several tabs saving over each other (the last to save wins), a crash while the page is visible within 300 ms of an edit, a title or note still focused when the app closes, `localStorage` filling up, and request timeouts.
+
+The setup screen has its own live region, so `h.device()` can't attach its same-instance probe there; `persist.mjs` drives the setup form without attaching, and attaches after the reload.

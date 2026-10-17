@@ -125,7 +125,7 @@ async function invariants({ seededFolderNames = [], allowConflict = false } = {}
   for (const s of snaps) {
     check(`invariant: ${s.name} has nothing pending`, s.snap.pending.length === 0, s.snap.pending)
     check(`invariant: ${s.name} sync is not failed`, s.snap.sync.kind !== 'failed', s.snap.sync)
-    if (!allowConflict) check(`invariant: ${s.name} shows no conflict banner`, s.snap.sync.kind !== 'conflict', s.snap.sync)
+    if (!allowConflict) check(`invariant: ${s.name} shows no conflict banner`, !s.snap.conflict, { conflict: s.snap.conflict, sync: s.snap.sync })
     const ids = new Set(s.snap.lists.map((l) => l.id))
     check(`invariant: ${s.name} has no duplicate list ids`, ids.size === s.snap.lists.length, s.snap.lists.map((l) => l.id))
     const homeless = s.snap.todos.filter((t) => !ids.has(t.listId))
@@ -210,7 +210,7 @@ try {
     check('the repo is the seed minus the list', same(files, without(SEED, [...HOME_TODOS, 'home/_list.md'])), Object.keys(files))
     const b = await B.sync()
     check('B sees the list gone, with its to-dos', !b.lists.some((l) => l.id === 'home') && !b.todos.some((t) => t.listId === 'home'), b)
-    check('B has no conflict banner', b.sync.kind !== 'conflict', b.sync)
+    check('B has no conflict banner', !b.conflict, { conflict: b.conflict, sync: b.sync })
     await invariants()
   })
 

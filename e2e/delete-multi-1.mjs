@@ -309,18 +309,19 @@ async function run(h, S, order) {
       check(`${tag}: A hasn't committed while its toast is up`, (await h.commits()).length === commits0 + 1 && (await h.commits()).at(-1).by === 'B', (await h.commits()).map((c) => [c.by, c.message]))
       // A reads while held: it pulls B's commit and merges, but doesn't commit.
       await A.store((s) => s.remote.check())
-      await A.waitFor((s, sha) => s.remote.base.head === sha && s.sync.kind === 'conflict', bHead, { what: "A pulls B's commit", timeout: 15_000 })
-      const during = await A.store((s) => ({ toast: !!s.toast, hold: s.commitHold - Date.now(), sync: s.sync, pending: s.pending.map((c) => `${c.kind} ${c.id}`) }))
+      await A.waitFor((s, sha) => s.remote.base.head === sha && !!window.__e2e.conflict(), bHead, { what: "A pulls B's commit", timeout: 15_000 })
+      const during = await A.store((s) => ({ toast: !!s.toast, hold: s.commitHold - Date.now(), sync: s.sync, conflict: window.__e2e.conflict(), pending: s.pending.map((c) => `${c.kind} ${c.id}`) }))
       info(`A during the hold: ${JSON.stringify(during)}`)
       check(`${tag}: A pulled B's commit during the hold, still shows the toast, and made no commit`, during.toast && during.hold > 0 && (await h.commits()).length === commits0 + 1, during)
-      check(`${tag}: A shows the "kept" banner as soon as it merges, during the hold`, same(during.sync, { kind: 'conflict', path: 'home/', message: S.banner.kept }), during.sync)
+      check(`${tag}: A shows the "kept" banner as soon as it merges, during the hold`, same(during.conflict, { path: 'home/', message: S.banner.kept }), during.conflict)
       await A.store((s) => s.dismissToast())
       await A.sync()
       afterSecond = await A.snapshot()
       await B.sync()
       await A.sync()
     }
-    info(`after ${first.name}'s sync: ${first.name} shows ${afterFirst.sync.kind}; after ${second.name}'s merge: ${second.name} shows ${afterSecond.sync.kind}${afterSecond.sync.message ? ` "${afterSecond.sync.message}"` : ''}`)
+    const shows = (x) => (x.conflict ? `conflict${x.conflict.message ? ` "${x.conflict.message}"` : ''}` : x.sync.kind)
+    info(`after ${first.name}'s sync: ${first.name} shows ${shows(afterFirst)}; after ${second.name}'s merge: ${second.name} shows ${shows(afterSecond)}`)
 
     // ---- commits ----
     const commits = (await h.commits()).slice(commits0)
@@ -388,16 +389,16 @@ async function run(h, S, order) {
     check(`${tag}: the repo is exactly as expected (inbox and work untouched except as the scenario says)`, diff.length === 0, diff)
 
     // ---- banners ----
-    const aSync = aEnd.sync
-    const bSync = bEnd.sync
+    const aBanner = aEnd.conflict
+    const bBanner = bEnd.conflict
     if (!S.banner) {
-      check(`${tag}: no banner on either device`, aSync.kind !== 'conflict' && bSync.kind !== 'conflict', { a: aSync, b: bSync })
+      check(`${tag}: no banner on either device`, !aBanner && !bBanner, { a: aBanner, b: bBanner })
     } else if (!late) {
-      check(`${tag}: B shows the "revived" banner on home/`, same(bSync, { kind: 'conflict', path: 'home/', message: S.banner.revived }), { got: bSync, want: S.banner.revived })
-      check(`${tag}: A shows no banner`, aSync.kind !== 'conflict', aSync)
+      check(`${tag}: B shows the "revived" banner on home/`, same(bBanner, { path: 'home/', message: S.banner.revived }), { got: bBanner, want: S.banner.revived })
+      check(`${tag}: A shows no banner`, !aBanner, aBanner)
     } else {
-      check(`${tag}: A shows the "kept" banner on home/`, same(aSync, { kind: 'conflict', path: 'home/', message: S.banner.kept }), { got: aSync, want: S.banner.kept })
-      check(`${tag}: B shows no banner`, bSync.kind !== 'conflict', bSync)
+      check(`${tag}: A shows the "kept" banner on home/`, same(aBanner, { path: 'home/', message: S.banner.kept }), { got: aBanner, want: S.banner.kept })
+      check(`${tag}: B shows no banner`, !bBanner, bBanner)
     }
   } finally {
     await A.close()

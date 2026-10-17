@@ -134,6 +134,13 @@ function initScript({ key, connection, api }) {
     if (localStorage.getItem(key) === null) localStorage.setItem(key, JSON.stringify(connection))
   } catch {}
   const e2e = (window.__e2e = { started: 0, inflight: 0, ended: 0, refStarted: 0, lastStatus: null, lastActivity: Date.now(), cycles: 0, log: [], store: null })
+  // The conflict notice as {path, id?, message?}, or null. It reads the same on both apps: since fix 2
+  // the notice is `store.conflict`; before it, it was a `store.sync` of kind 'conflict'.
+  e2e.conflict = () => {
+    const s = e2e.store
+    const c = s?.conflict ?? (s?.sync?.kind === 'conflict' ? s.sync : null)
+    return c ? JSON.parse(JSON.stringify({ path: c.path, id: c.id, message: c.message })) : null
+  }
   const original = window.fetch.bind(window)
   window.fetch = async (input, init) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
@@ -224,6 +231,8 @@ function snapshotScript(full) {
     todos,
     pending: s.pending.map((c) => ({ kind: c.kind, id: c.id, title: c.title, path: c.path, seq: c.seq })),
     sync: plain(s.sync),
+    // The banner: read it here, not from `sync`, which never says 'conflict' once fix 2 is in.
+    conflict: window.__e2e.conflict(),
     head: s.remote.base?.head ?? null,
     lastCheckedAt: s.remote.lastCheckedAt,
   }

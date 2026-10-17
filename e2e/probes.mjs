@@ -35,11 +35,13 @@ try {
   await A.sync()
   await B.offline(false)
   let b = await B.sync()
-  const had = b.sync.kind
+  // The banner is snapshot.conflict; the band word follows it unless offline or failed.
+  const shows = (x) => (x.conflict ? 'conflict' : x.sync.kind)
+  const had = shows(b)
   await B.offline(true)
   await B.offline(false)
   b = await B.sync()
-  say(had === 'conflict' && b.sync.kind !== 'conflict', `B showed "${had}", went offline and back, now shows "${b.sync.kind}" (never dismissed)`)
+  say(had === 'conflict' && !b.conflict, `B showed "${had}", went offline and back, now shows "${shows(b)}" (never dismissed)`)
 
   console.log('\n-- 3. The ref moved but the answer was lost (502 after the write)')
   await A.sync()

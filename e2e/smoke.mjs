@@ -91,7 +91,7 @@ try {
   let t = Date.now()
   a = await A.sync()
   console.log(`      A.sync() took ${Date.now() - t} ms`)
-  check('A has nothing pending after sync, and shows saved', a.pending.length === 0 && a.sync.kind === 'saved', { pending: a.pending, sync: a.sync })
+  check('A has nothing pending after sync, and shows saved', a.pending.length === 0 && a.sync.kind === 'saved' && !a.conflict, { pending: a.pending, sync: a.sync, conflict: a.conflict })
 
   let commits = await h.commits()
   let last = commits.at(-1)
@@ -168,10 +168,10 @@ try {
   check('A committed its title first', (await h.commits()).at(-1).message === 'Edit “Buy oat milk”', (await h.commits()).at(-1).message)
   await B.offline(false)
   b = await B.sync()
-  check('B, merging second, shows the conflict for that to-do', b.sync.kind === 'conflict' && b.sync.id === milk.id, b.sync)
-  check('the conflict names the file as it is on GitHub', b.sync.path === 'inbox/buy-oat-milk.md', b.sync.path)
+  check('B, merging second, shows the conflict for that to-do', b.conflict?.id === milk.id, { conflict: b.conflict, sync: b.sync })
+  check('the conflict names the file as it is on GitHub', b.conflict?.path === 'inbox/buy-oat-milk.md', b.conflict)
   a = await A.sync()
-  check('A, which had nothing pending, shows no conflict', a.sync.kind === 'saved', a.sync)
+  check('A, which had nothing pending, shows no conflict', a.sync.kind === 'saved' && !a.conflict, { sync: a.sync, conflict: a.conflict })
   a = await A.snapshot({ full: true })
   b = await B.snapshot({ full: true })
   check('A and B converge after the conflict', same(model(a), model(b)), { a: model(a), b: model(b) })
@@ -182,7 +182,7 @@ try {
   check('B committed the winning title on top of A', commits.at(-1).by === 'B' && commits.at(-1).message === 'Edit “Buy almond milk”' && commits.at(-1).parents[0] === commits.at(-2).sha, commits.slice(-2).map((c) => [c.by, c.message]))
   await B.store((s) => s.dismissConflict())
   b = await B.snapshot()
-  check('dismissing the conflict on B returns it to saved', b.sync.kind === 'saved', b.sync)
+  check('dismissing the conflict on B returns it to saved', b.sync.kind === 'saved' && !b.conflict, { sync: b.sync, conflict: b.conflict })
 
   // ---- 5. a race: A's ref update held while B commits ----
   section("5. race: A's ref update is held in flight while B commits; A must re-read, merge and retry")
@@ -207,7 +207,7 @@ try {
   b = await B.snapshot({ full: true })
   check('A and B converge after the race', same(model(a), model(b)), { a: model(a), b: model(b) })
   check('both race edits are kept', a.todos.find((x) => x.id === 't-stamps01')?.done === true && a.todos.find((x) => x.id === 't-bank0001')?.done === false)
-  check('A is saved, with nothing pending', a.sync.kind === 'saved' && a.pending.length === 0, { sync: a.sync, pending: a.pending })
+  check('A is saved, with nothing pending', a.sync.kind === 'saved' && !a.conflict && a.pending.length === 0, { sync: a.sync, conflict: a.conflict, pending: a.pending })
 
   // ---- 6. the whole repo, and the run's hygiene ----
   section('6. final repo and hygiene')
