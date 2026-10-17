@@ -60,7 +60,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    height: 28px;
+    min-height: 28px;
     padding: 0 6px 0 10px;
     border: 1px solid currentColor;
     background: transparent;
@@ -69,8 +69,8 @@
   }
 
   .undo kbd {
-    min-width: 18px;
-    height: 18px;
+    min-width: calc(18rem / 18);
+    height: calc(18rem / 18);
   }
 
   .undo:hover {

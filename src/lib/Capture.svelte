@@ -80,7 +80,9 @@
     display: grid;
     place-items: center;
     width: 32px;
-    height: 40px;
+    /* As tall as the field beside it (a 1.4 line, 6px padding, 1px border), so the bullet stays
+       on its line. */
+    height: max(40px, calc(1.4rem + 14px));
     margin-left: 8px;
     color: var(--ink-3);
   }
@@ -103,7 +105,7 @@
     min-height: 20px;
     color: var(--ink-2);
     font-size: var(--t-meta);
-    line-height: 20px;
+    line-height: calc(20 / 14.625);
   }
 
   .hint span {
@@ -113,8 +115,8 @@
   }
 
   .hint kbd {
-    min-width: 18px;
-    height: 18px;
+    min-width: calc(18rem / 18);
+    height: calc(18rem / 18);
   }
 
   .where {

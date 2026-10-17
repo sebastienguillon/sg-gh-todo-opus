@@ -257,7 +257,7 @@
   .q {
     flex: 1;
     min-width: 0;
-    height: 40px;
+    min-height: 40px;
     border: 0;
     background: transparent;
     font-size: var(--t-sub);

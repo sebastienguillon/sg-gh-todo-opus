@@ -124,9 +124,9 @@
   }
 
   .empty {
-    padding: 6px var(--edge) 6px var(--gutter);
+    padding: 4px var(--edge) 4px var(--gutter);
     color: var(--ink-2);
-    line-height: 20px;
+    line-height: calc(24 / 18);
   }
 
   .perforation {
@@ -144,7 +144,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    height: var(--row);
+    min-height: var(--row);
     padding: 0 8px;
     border: 0;
     background: none;

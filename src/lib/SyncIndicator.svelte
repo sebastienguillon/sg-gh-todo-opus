@@ -115,7 +115,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    height: 32px;
+    min-height: 32px;
     padding: 0 10px;
     border: 1px solid transparent;
     background: transparent;
@@ -134,7 +134,7 @@
   }
 
   .retry {
-    height: 28px;
+    min-height: 28px;
     padding: 0 12px;
     border: 1px solid currentColor;
     background: var(--on-alarm);

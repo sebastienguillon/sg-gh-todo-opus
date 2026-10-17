@@ -268,15 +268,15 @@
   .steps li {
     display: grid;
     grid-template-columns: var(--gutter) minmax(0, 1fr);
-    padding: 6px var(--edge) 6px 0;
-    line-height: 20px;
+    padding: 4px var(--edge) 4px 0;
+    line-height: calc(24 / 18);
   }
 
   .mark {
     display: grid;
     place-items: center;
     width: 32px;
-    height: 20px;
+    height: var(--body-line);
     margin-left: 8px;
   }
 
@@ -285,6 +285,7 @@
     margin-top: 2px;
     font-size: var(--t-meta);
     font-weight: 500;
+    line-height: calc(24 / 14.625);
   }
 
   code {
@@ -329,7 +330,7 @@
     margin-top: 6px;
     color: var(--ink-2);
     font-size: var(--t-meta);
-    line-height: 20px;
+    line-height: calc(20 / 14.625);
   }
 
   .status {

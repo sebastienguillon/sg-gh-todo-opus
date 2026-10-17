@@ -275,7 +275,7 @@
   .under {
     position: absolute;
     inset: 0 0 auto;
-    height: 44px;
+    min-height: 44px;
     display: none;
     justify-content: space-between;
     align-items: stretch;
@@ -310,11 +310,20 @@
 
   .row {
     --row-h: var(--row);
+    /* Space above and below a title's first line: 4px here, 10px on a phone's 44px row. */
+    --inset: calc((var(--row-h) - 24px) / 2);
+    /* Meta text on a 20px line sits this much lower to share the title's baseline: 4px at the
+       default size, more as the reader's text grows. */
+    --meta-drop: calc(4rem / 18);
     --index-w: 0px;
     --list-w: 0px;
     position: relative;
     display: grid;
-    grid-template-columns: var(--gutter) var(--index-w) minmax(0, 1fr) var(--list-w) var(--margin-col);
+    /* The index and date columns widen past their px widths only when the reader's larger text
+       needs it. */
+    grid-template-columns:
+      var(--gutter) minmax(var(--index-w), max-content) minmax(0, 1fr) var(--list-w)
+      minmax(var(--margin-col), max-content);
     align-items: start;
     min-height: var(--row-h);
     background: var(--pad);
@@ -361,7 +370,9 @@
     position: absolute;
     inset: 0 auto 0 0;
     width: calc(var(--gutter) - 20px);
-    background: radial-gradient(circle, var(--dot) 0.9px, transparent 1.4px) 0 8px / 16px 16px;
+    /* Offset so the bullet, centred on the title's first line, sits on a dot. */
+    background: radial-gradient(circle, var(--dot) 0.9px, transparent 1.4px) 0
+      calc(var(--inset) + var(--body-line) / 2 - 8px) / 16px 16px;
     pointer-events: none;
   }
 
@@ -374,7 +385,7 @@
     display: grid;
     place-items: center;
     width: 32px;
-    height: 32px;
+    height: calc(2 * var(--inset) + var(--body-line));
     color: var(--ink);
     cursor: pointer;
   }
@@ -406,7 +417,7 @@
     align-self: flex-start;
     align-items: center;
     gap: 3px;
-    height: var(--row);
+    height: calc(2 * var(--inset) + var(--body-line));
     margin-left: 8px;
     opacity: 0;
     transition: opacity var(--fast) var(--ease-out);
@@ -447,13 +458,13 @@
   .index {
     grid-column: 2;
     align-self: start;
-    height: var(--row-h);
-    padding: 0;
+    padding: calc(var(--inset) + var(--meta-drop)) 8px var(--inset) 0;
     border: 0;
     background: none;
     color: var(--list-ink);
     font-weight: 700;
     font-size: var(--t-meta);
+    line-height: calc(20 / 14.625);
     text-align: left;
     letter-spacing: 0.02em;
   }
@@ -464,10 +475,11 @@
     flex-wrap: wrap;
     align-items: baseline;
     column-gap: 10px;
-    row-gap: 0;
+    /* A line of tags (20px) plus this gap keeps the 24px step of a wrapped title. */
+    row-gap: 4px;
     min-width: 0;
-    padding-block: 6px;
-    line-height: 20px;
+    padding-block: var(--inset);
+    line-height: calc(24 / 18);
   }
 
   .title {
@@ -476,7 +488,7 @@
     background: none;
     text-align: left;
     font-size: var(--t-body);
-    line-height: 20px;
+    line-height: calc(24 / 18);
     overflow-wrap: anywhere;
     cursor: text;
   }
@@ -484,14 +496,14 @@
   .title-edit {
     flex: 1 1 280px;
     min-width: 0;
-    height: 20px;
+    height: var(--body-line);
     padding: 0;
     border: 0;
     border-bottom: 1px solid var(--ink);
     border-radius: 0;
     background: transparent;
     font-size: var(--t-body);
-    line-height: 20px;
+    line-height: calc(24 / 18);
   }
 
   .title-edit:focus-visible {
@@ -516,6 +528,7 @@
     background: none;
     color: var(--ink-2);
     font-size: var(--t-meta);
+    line-height: calc(20 / 14.625);
   }
 
   .tag:hover {
@@ -531,11 +544,11 @@
   /* Today rows name their list in its ink, so 17 lists on 12 inks stay identifiable. */
   .list-name {
     grid-column: 4;
-    padding: 6px 0 0 16px;
+    padding: calc(var(--inset) + var(--meta-drop)) 0 0 16px;
     color: var(--list-ink);
     font-size: var(--t-meta);
     font-weight: 600;
-    line-height: 20px;
+    line-height: calc(20 / 14.625);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -546,6 +559,7 @@
     color: var(--list-ink);
     font-size: var(--t-meta);
     font-weight: 600;
+    line-height: calc(20 / 14.625);
   }
 
   .due {
@@ -554,8 +568,8 @@
     justify-content: flex-end;
     align-items: center;
     gap: 8px;
-    padding: 6px var(--edge) 0 0;
-    line-height: 20px;
+    padding: calc(var(--inset) + var(--meta-drop)) var(--edge) 0 0;
+    line-height: calc(20 / 14.625);
     font-size: var(--t-meta);
     color: var(--ink-2);
     white-space: nowrap;
@@ -633,7 +647,7 @@
   @media (max-width: 767px) {
     .row {
       --row-h: 44px;
-      grid-template-columns: 44px var(--index-w) minmax(0, 1fr) auto;
+      grid-template-columns: 44px minmax(var(--index-w), max-content) minmax(0, 1fr) auto;
     }
 
     .row.in-today {
@@ -654,21 +668,14 @@
 
     .gutter::before {
       width: 40px;
-      background-position: 0 14px;
     }
 
     .sig {
       width: 40px;
-      height: 44px;
     }
 
     .hints {
       display: none;
-    }
-
-    .body {
-      row-gap: 4px;
-      padding-block: 12px;
     }
 
     .tag {
@@ -678,13 +685,9 @@
       margin-block: -2px;
     }
 
-    .index {
-      line-height: 44px;
-    }
-
     .due {
       grid-column: 4;
-      padding: 12px 16px 0 10px;
+      padding: calc(var(--inset) + var(--meta-drop)) 16px 0 10px;
     }
 
     .under {

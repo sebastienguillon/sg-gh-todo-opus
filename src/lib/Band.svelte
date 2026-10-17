@@ -104,7 +104,7 @@
     align-items: center;
     gap: 10px;
     width: min(420px, 40vw);
-    height: 32px;
+    min-height: 32px;
     padding: 0 8px 0 10px;
     border: 1px solid currentColor;
     background: color-mix(in srgb, var(--pad) 88%, var(--orange));
@@ -134,7 +134,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    height: 32px;
+    min-height: 32px;
     padding: 0 10px;
     border: 1px solid transparent;
     background: transparent;

@@ -58,10 +58,14 @@
 
   /* Type scale (1.2) */
   --t-meta: 0.8125rem;
-  --t-body: 0.9375rem;
+  --t-body: 1rem;
   --t-sub: 1.125rem;
   --t-head: 1.625rem;
   --t-display: 2.5rem;
+
+  /* A box that holds a line of text is written as its default px over 18 (the default root),
+     in rem, so it grows with the reader's text setting. This is one body line in a row: 24px. */
+  --body-line: calc(24rem / 18);
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --fast: 160ms;
@@ -114,6 +118,9 @@
 }
 
 html {
+  /* The root em: 18px at the browser's default 16px, and larger when the reader asks for larger
+     text. Every font size is a rem of it. */
+  font-size: 112.5%;
   -webkit-text-size-adjust: 100%;
   scroll-padding-top: calc(var(--band) + 16px);
   scrollbar-color: var(--rule) var(--pad);
@@ -292,8 +299,8 @@ a {
 kbd {
   display: inline-grid;
   place-items: center;
-  min-width: 20px;
-  height: 20px;
+  min-width: calc(20rem / 18);
+  height: calc(20rem / 18);
   padding: 0 4px;
   border: 1px solid currentColor;
   font: inherit;

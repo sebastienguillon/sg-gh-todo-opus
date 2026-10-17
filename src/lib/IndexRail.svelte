@@ -194,8 +194,8 @@
   }
 
   .hint kbd {
-    min-width: 18px;
-    height: 18px;
+    min-width: calc(18rem / 18);
+    height: calc(18rem / 18);
   }
 
   @media (max-width: 767px) {

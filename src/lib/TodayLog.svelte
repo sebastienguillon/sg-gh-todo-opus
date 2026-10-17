@@ -113,9 +113,9 @@
   }
 
   .calm {
-    padding: 6px var(--edge) 6px var(--gutter);
+    padding: 4px var(--edge) 4px var(--gutter);
     color: var(--ink-2);
-    line-height: 20px;
+    line-height: calc(24 / 18);
   }
 
   @media (max-width: 767px) {
