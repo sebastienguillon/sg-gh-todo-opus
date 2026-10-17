@@ -211,8 +211,19 @@ export class GitHub {
     return { commit: body.commit.sha, tree: body.commit.tree.sha }
   }
 
-  /** Every change in one commit (Git Data API). A branch that moved meanwhile throws `stale`. */
-  async commit(branch: string, parent: string, baseTree: string, changes: FileChange[], message: string): Promise<{ commit: string; tree: string }> {
+  /**
+   * Every change in one commit (Git Data API). A branch that moved meanwhile throws `stale`. When the
+   * ref update's answer is lost (a 5xx or a dropped connection), one read of the branch tells whether
+   * it landed; `etag` is from the read `parent` came from, so that read is a free 304 if it didn't.
+   */
+  async commit(
+    branch: string,
+    parent: string,
+    baseTree: string,
+    changes: FileChange[],
+    message: string,
+    etag: string | null = null,
+  ): Promise<{ commit: string; tree: string }> {
     const tree = await this.#json<{ sha: string }>(`${this.#repoPath}/git/trees`, {
       method: 'POST',
       body: JSON.stringify({
@@ -228,10 +239,21 @@ export class GitHub {
       method: 'POST',
       body: JSON.stringify({ message, tree: tree.sha, parents: [parent] }),
     })
-    await this.#request(`${this.#repoPath}/git/refs/heads/${branch.split('/').map(encodeURIComponent).join('/')}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ sha: commit.sha, force: false }),
-    })
+    try {
+      await this.#request(`${this.#repoPath}/git/refs/heads/${branch.split('/').map(encodeURIComponent).join('/')}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ sha: commit.sha, force: false }),
+      })
+    } catch (e) {
+      if (!(e instanceof GitHubError && (e.kind === 'server' || e.kind === 'network'))) throw e
+      // Only the exact commit just made counts as landed. A rate limit or a refused token on this read
+      // says more than the lost answer; any other failure of it leaves the lost answer to report.
+      const now = await this.head(branch, etag).catch((x: unknown) => {
+        if (x instanceof GitHubError && ['rate', 'auth', 'forbidden', 'missing'].includes(x.kind)) throw x
+        return null
+      })
+      if (!now?.changed || now.sha !== commit.sha) throw e
+    }
     return { commit: commit.sha, tree: tree.sha }
   }
 }

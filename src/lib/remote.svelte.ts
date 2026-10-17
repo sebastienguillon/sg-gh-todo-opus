@@ -601,10 +601,12 @@ export class Remote {
         }),
       )
       const changes: FileChange[] = paths.map((p) => ({ path: p, content: plan.files[p] ? plan.contents[p] : null }))
-      done = await gh.commit(branch, base.head, base.tree, changes, message)
+      done = await gh.commit(branch, base.head, base.tree, changes, message, base.etag)
     } catch (e) {
       host.sealed = 0
       if (e instanceof GitHubError && e.kind === 'stale') return false
+      // It may have landed after all: keep the gap, so a retry reads first and commits after it.
+      if (e instanceof GitHubError && (e.kind === 'server' || e.kind === 'network')) this.#lastCommitAt = Date.now()
       throw e
     }
     host.sealed = 0
