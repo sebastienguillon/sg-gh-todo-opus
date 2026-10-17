@@ -30,6 +30,8 @@ interface SavedRepo extends Saved {
   repo: string
   pending: PendingChange[]
   base: Base
+  /** The base's ETag is its head's (see `Base.etag`). Saves from before may hold an older commit's. */
+  etagOfHead?: true
 }
 
 /** `setup`: the first-run screen; `demo`: demo data, nothing synced; `connected`: synced with a repo. */
@@ -144,6 +146,9 @@ class Store implements Host {
     const connection = read<Connection>(CONNECTION_KEY)
     const savedRepo = connection ? read<SavedRepo>(REPO_KEY) : null
     const saved = connection && savedRepo?.repo === repoLabel(connection) ? savedRepo : null
+    // An ETag saved by an older build may be an older commit's, and a 304 against it could hide a branch
+    // reset to that commit: drop it, and the first read is a full one.
+    if (saved && !saved.etagOfHead) saved.base.etag = null
     this.remote = new Remote(this, saved?.base ?? null)
     const forced = connection ? null : forcedSync()
     this.#forced = forced?.sync ?? null
@@ -841,6 +846,7 @@ class Store implements Host {
       lastSavedAt: this.lastSavedAt,
       pending: $state.snapshot(this.pending),
       base: this.remote.base,
+      etagOfHead: true,
     } satisfies SavedRepo)
   }
 
