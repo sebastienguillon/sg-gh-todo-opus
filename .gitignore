@@ -26,3 +26,5 @@ dist-ssr
 # Local Claude settings and the Impeccable decision-page server state
 .claude/settings.local.json
 .impeccable/questions/
+
+.devtoken
