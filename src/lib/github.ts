@@ -27,6 +27,9 @@ export type ErrorKind =
   | 'server' // 5xx
 
 export class GitHubError extends Error {
+  /** Thrown after a commit's ref update was sent: the save may have landed. */
+  refSent = false
+
   constructor(
     readonly kind: ErrorKind,
     message: string,
@@ -248,8 +251,12 @@ export class GitHub {
       if (!(e instanceof GitHubError && (e.kind === 'server' || e.kind === 'network'))) throw e
       // Only the exact commit just made counts as landed. A rate limit or a refused token on this read
       // says more than the lost answer; any other failure of it leaves the lost answer to report.
+      e.refSent = true
       const now = await this.head(branch, etag).catch((x: unknown) => {
-        if (x instanceof GitHubError && ['rate', 'auth', 'forbidden', 'missing'].includes(x.kind)) throw x
+        if (x instanceof GitHubError && ['rate', 'auth', 'forbidden', 'missing'].includes(x.kind)) {
+          x.refSent = true
+          throw x
+        }
         return null
       })
       if (!now?.changed || now.sha !== commit.sha) throw e

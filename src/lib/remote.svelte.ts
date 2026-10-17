@@ -605,8 +605,9 @@ export class Remote {
     } catch (e) {
       host.sealed = 0
       if (e instanceof GitHubError && e.kind === 'stale') return false
-      // It may have landed after all: keep the gap, so a retry reads first and commits after it.
-      if (e instanceof GitHubError && (e.kind === 'server' || e.kind === 'network')) this.#lastCommitAt = Date.now()
+      // The ref update went out and may have landed after all: keep the gap, so a retry reads first and
+      // commits after it. A failure before that (the tree or the commit) can't have moved the branch.
+      if (e instanceof GitHubError && e.refSent) this.#lastCommitAt = Date.now()
       throw e
     }
     host.sealed = 0
