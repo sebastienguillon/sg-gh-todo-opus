@@ -1,6 +1,5 @@
 <script lang="ts">
   import { describeDue } from './dates'
-  import { slugify } from './demo'
   import Icon from './Icon.svelte'
   import Signifier from './Signifier.svelte'
   import { pad2, store } from './store.svelte'
@@ -26,7 +25,7 @@
   let expanded = $derived(ui.expanded === key)
   let trayOpen = $derived(ui.tray === key)
   let conflict = $derived(
-    store.sync.kind === 'conflict' && !!list && store.sync.path === `${list.slug}/${slugify(todo.title)}.md`,
+    store.sync.kind === 'conflict' && (store.sync.id ? store.sync.id === todo.id : store.sync.path === store.pathOf(todo)),
   )
   let described = $derived(
     [

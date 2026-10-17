@@ -28,23 +28,29 @@ export interface Todo {
   updatedAt: string
 }
 
-export type ChangeKind = 'added' | 'edited' | 'moved' | 'rescheduled' | 'done' | 'reopened' | 'removed'
+/** What happened to a to-do, or `list` for a list's own file. */
+export type ChangeKind = 'added' | 'edited' | 'moved' | 'rescheduled' | 'done' | 'reopened' | 'removed' | 'list'
 
 /** A change made on this device and not yet committed to the data repo. */
 export interface PendingChange {
   kind: ChangeKind
+  /** The to-do's id, or the list's for `list`. */
+  id: string
   /** Repo path of the file, e.g. `home/fix-dripping-kitchen-tap.md`. */
   path: string
   title: string
   at: string
+  /** Increasing per device, so a commit can drop exactly the changes it carried. */
+  seq: number
 }
 
 export type SyncState =
   | { kind: 'saved'; at: string | null }
   | { kind: 'saving' }
   | { kind: 'offline' }
-  | { kind: 'failed'; message: string }
-  | { kind: 'conflict'; path: string }
+  | { kind: 'failed'; message: string; fix?: 'retry' | 'reconnect' }
+  /** `path` is the file as it is on GitHub; `id` the to-do it holds, when known. */
+  | { kind: 'conflict'; path: string; id?: string }
 
 /** The momentary rapid-log mark a row shows right after an action. */
 export type Flash = '>' | '<'

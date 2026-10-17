@@ -1,11 +1,13 @@
-// Synthetic demonstration data, seeded on a device that has no to-dos yet.
-// None of it is real. It exists so the screen can be judged at its real
-// volume (17 lists, ~200 to-dos) before GitHub sync is connected.
+// Synthetic demonstration data, seeded only on a device that chose to look
+// around before connecting a repo (or opened with `?demo`). None of it is
+// real. It exists so the screen can be judged at its real volume (17 lists,
+// ~200 to-dos); a connected device never sees it.
 //
 // Each entry: `[x ]title [#tag…] [@offset]`. A leading `x ` marks it done;
 // `@-2` means due two days ago, `@0` today, `@4` in four days.
 
 import { addDays } from './dates'
+import { slugify } from './repo'
 import type { DayISO, Todo, TodoList } from './types'
 
 const SEED: [name: string, entries: string[]][] = [
@@ -219,17 +221,6 @@ const NOTES: Record<string, string> = {
   'Renew passport photo appointment': 'Booth at the post office takes cards now. Bring the old passport.',
   'Reply to landlord about boiler service': 'They proposed Tue or Thu morning. Thu works better.',
   'Review PR for the parser rewrite': 'Focus on the error recovery path and the benchmark numbers.',
-}
-
-export function slugify(text: string): string {
-  return text
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/&/g, ' and ')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60) || 'untitled'
 }
 
 export function demoData(today: DayISO, now = new Date()): { lists: TodoList[]; todos: Todo[] } {

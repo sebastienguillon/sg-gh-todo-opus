@@ -1,8 +1,18 @@
 import { describeDue, parseDay, todayISO } from './dates'
-import { demoData, slugify } from './demo'
+import { demoData } from './demo'
+import type { Connection } from './github'
+import type { Merged } from './merge'
+import { modelOf, openRepo, Remote, type Base, type Host } from './remote.svelte'
+import { inkFor, LIST_FILE, slugify, todoNames } from './repo'
 import type { ChangeKind, DayISO, Flash, PendingChange, SyncState, Todo, TodoList } from './types'
 
-const STORAGE_KEY = 'gh-todo:v1'
+/** Demo lists, on a device that chose to look around before connecting. */
+const DEMO_KEY = 'gh-todo:v1'
+const DEMO_CHOSEN_KEY = 'gh-todo:demo'
+/** This device's token and data repo. Never leaves the device except to api.github.com. */
+const CONNECTION_KEY = 'gh-todo:github'
+/** The connected repo's lists, pending changes and last-read commit, so work survives reloads offline. */
+const REPO_KEY = 'gh-todo:repo:v1'
 /** A `#tag` word: letters in any script, digits, `_` and `-`. */
 export const TAG_WORD = /^#[\p{L}\p{M}\p{N}_-]+$/u
 const FLASH_MS = 1600
@@ -13,6 +23,15 @@ interface Saved {
   todos: Todo[]
   lastSavedAt: string | null
 }
+
+interface SavedRepo extends Saved {
+  repo: string
+  pending: PendingChange[]
+  base: Base
+}
+
+/** `setup`: the first-run screen; `demo`: demo data, nothing synced; `connected`: synced with a repo. */
+export type Mode = 'setup' | 'demo' | 'connected'
 
 /** What a row looked like just before an action, kept for one beat so the mark can be seen. */
 interface Hold {
@@ -27,21 +46,44 @@ export interface Parsed {
   due: DayISO | null | undefined
 }
 
-function readSaved(): Saved | null {
+function read<T>(key: string): T | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as Saved) : null
+    const raw = localStorage.getItem(key)
+    return raw ? (JSON.parse(raw) as T) : null
   } catch {
     return null
   }
 }
 
-function writeSaved(data: Saved) {
+function write(key: string, data: unknown) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    localStorage.setItem(key, typeof data === 'string' ? data : JSON.stringify(data))
   } catch {
     // Storage can be full or blocked; the screen keeps working from memory.
   }
+}
+
+function forget(key: string) {
+  try {
+    localStorage.removeItem(key)
+  } catch {
+    // Nothing to remove.
+  }
+}
+
+function repoLabel(c: Connection): string {
+  return `${c.owner}/${c.repo}`
+}
+
+/** Keep each row's object (and its place in Svelte's keyed lists) when its content is replaced. */
+function reconcile<T extends { id: string }>(current: T[], next: T[]): T[] {
+  const byId = new Map(current.map((x) => [x.id, x]))
+  return next.map((n) => {
+    const mine = byId.get(n.id)
+    if (!mine || mine === n) return n
+    if (JSON.stringify(mine) !== JSON.stringify(n)) Object.assign(mine, n)
+    return mine
+  })
 }
 
 function uid(): string {
@@ -57,7 +99,10 @@ function forcedSync(): SyncState | null {
   return null
 }
 
-class Store {
+class Store implements Host {
+  mode = $state<Mode>('setup')
+  /** The setup screen, opened over the app to connect from the demo or replace a token. */
+  setupOpen = $state(false)
   lists = $state<TodoList[]>([])
   todos = $state<Todo[]>([])
   today = $state<DayISO>(todayISO())
@@ -74,21 +119,33 @@ class Store {
   /** Lists folded in the main column, by id. */
   openDone = $state<Record<string, boolean>>({})
 
+  readonly remote: Remote
+  sealed = 0
+  #seq = 0
   #forced: SyncState | null = null
   #syncTimer: ReturnType<typeof setTimeout> | undefined
   #persistTimer: ReturnType<typeof setTimeout> | undefined
   #toastTimer: ReturnType<typeof setTimeout> | undefined
 
   constructor() {
-    const saved = readSaved()
-    const seed = saved ?? { ...demoData(this.today), lastSavedAt: null }
-    this.lists = seed.lists
-    this.todos = seed.todos
-    this.lastSavedAt = seed.lastSavedAt
-    this.sync = { kind: 'saved', at: seed.lastSavedAt }
-    if (!saved) this.#persistNow()
+    const connection = read<Connection>(CONNECTION_KEY)
+    const savedRepo = connection ? read<SavedRepo>(REPO_KEY) : null
+    const saved = connection && savedRepo?.repo === repoLabel(connection) ? savedRepo : null
+    this.remote = new Remote(this, saved?.base ?? null)
+    this.#forced = connection ? null : forcedSync()
 
-    this.#forced = forcedSync()
+    if (connection) {
+      this.mode = 'connected'
+      this.lists = saved?.lists ?? []
+      this.todos = saved?.todos ?? []
+      this.pending = saved?.pending ?? []
+      this.lastSavedAt = saved?.lastSavedAt ?? null
+      this.#seq = Math.max(0, ...this.pending.map((c) => c.seq))
+    } else if (this.#forced || new URLSearchParams(location.search).has('demo') || read(DEMO_CHOSEN_KEY)) {
+      this.#loadDemo()
+    }
+    this.sync = this.pending.length ? { kind: 'saving' } : { kind: 'saved', at: this.lastSavedAt }
+
     if (this.#forced) {
       this.sync = this.#forced
       if (this.#forced.kind !== 'conflict') {
@@ -97,7 +154,11 @@ class Store {
       }
     }
 
-    window.addEventListener('online', () => this.#scheduleSync())
+    if (connection) this.remote.start(connection)
+
+    window.addEventListener('online', () => {
+      if (this.mode === 'demo') this.#scheduleSync()
+    })
     window.addEventListener('offline', () => {
       clearTimeout(this.#syncTimer)
       if (!this.#forced) this.sync = { kind: 'offline' }
@@ -233,6 +294,7 @@ class Store {
   add(text: string, fallbackListId?: string): Todo | null {
     const parsed = this.parse(text)
     if (!parsed.title) return null
+    this.#ensureList()
     const listId = parsed.listId ?? fallbackListId ?? this.inbox().id
     const stamp = new Date().toISOString()
     const todo: Todo = {
@@ -324,6 +386,7 @@ class Store {
     const other = rows[i + direction]
     if (!other) return
     ;[t.order, other.order] = [other.order, t.order]
+    this.#record('edited', other)
     this.#record('edited', t)
     this.#announce(`Moved ${direction < 0 ? 'up' : 'down'}: ${t.title}, ${i + direction + 1} of ${rows.length}`)
   }
@@ -347,9 +410,12 @@ class Store {
     const clean = name.trim()
     if (!clean) return null
     const index = Math.max(0, ...this.lists.map((l) => l.index)) + 1
-    const list: TodoList = { id: `l-${uid()}`, slug: slugify(clean), index, name: clean, ink: ((index - 1) % 12) + 1 }
+    // A list is a folder in the data repo, so its id is its folder name.
+    let slug = slugify(clean)
+    for (let n = 2; this.lists.some((l) => l.id === slug || l.slug === slug); n++) slug = `${slugify(clean)}-${n}`
+    const list: TodoList = { id: slug, slug, index, name: clean, ink: inkFor(index) }
     this.lists.push(list)
-    this.#persist()
+    this.#recordList(list)
     this.#announce(`New list ${label(list)}`)
     return list
   }
@@ -362,13 +428,114 @@ class Store {
   /** The latest edit was already kept; acknowledging the conflict only clears the banner. */
   dismissConflict() {
     this.#forced = null
-    this.sync = { kind: 'saved', at: this.lastSavedAt }
+    this.sync = this.mode === 'connected' && this.pending.length ? { kind: 'saving' } : { kind: 'saved', at: this.lastSavedAt }
   }
 
   retrySync() {
     this.#forced = null
+    if (this.mode === 'connected') {
+      if (this.sync.kind === 'failed' && this.sync.fix === 'reconnect') this.openSetup()
+      else this.remote.retry()
+      return
+    }
     if (this.pending.length) this.#scheduleSync()
     else this.sync = { kind: 'saved', at: this.lastSavedAt }
+  }
+
+  // ---- connecting ----------------------------------------------------------
+
+  /**
+   * Check the token, read the repo, and switch this device over to it. Throws a
+   * `SetupError` for the setup screen. The same repo again (a replaced token)
+   * keeps everything on the device, pending changes included.
+   */
+  async connect(token: string, repoText: string, step: (text: string) => void) {
+    const { connection, base } = await openRepo(token, repoText, step)
+    const same = this.mode === 'connected' && this.remote.repoName.toLowerCase() === repoLabel(connection).toLowerCase()
+    if (!same) {
+      if (this.mode === 'connected') this.remote.stop()
+      this.remote.base = base
+      const model = modelOf(base)
+      this.lists = model.lists
+      this.todos = model.todos
+      this.pending = []
+      this.lastSavedAt = null
+      this.tagFilter = null
+      this.openDone = {}
+      this.#forced = null
+    }
+    this.mode = 'connected'
+    this.setupOpen = false
+    write(CONNECTION_KEY, connection)
+    forget(DEMO_CHOSEN_KEY)
+    this.sync = this.pending.length ? { kind: 'saving' } : { kind: 'saved', at: this.lastSavedAt }
+    this.#ensureList()
+    this.#persistNow()
+    this.remote.start(connection)
+  }
+
+  /** Forget the token and the lists on this device. The repo keeps everything it has. */
+  disconnect() {
+    this.remote.stop()
+    forget(CONNECTION_KEY)
+    forget(REPO_KEY)
+    this.lists = []
+    this.todos = []
+    this.pending = []
+    this.lastSavedAt = null
+    this.tagFilter = null
+    this.sync = { kind: 'saved', at: null }
+    this.mode = 'setup'
+    this.setupOpen = false
+  }
+
+  useDemo() {
+    write(DEMO_CHOSEN_KEY, '1')
+    this.#loadDemo()
+    this.setupOpen = false
+  }
+
+  openSetup() {
+    this.setupOpen = true
+  }
+
+  closeSetup() {
+    if (this.mode !== 'setup') this.setupOpen = false
+  }
+
+  /** The repo path a to-do has, or will have once committed. */
+  pathOf(t: Todo): string {
+    const folder = this.listById.get(t.listId)?.slug ?? t.listId
+    const [plain, unique] = todoNames(t, folder)
+    return this.remote.pathsOf(t.id).find((p) => p === plain || p === unique) ?? plain
+  }
+
+  // ---- from sync -----------------------------------------------------------
+
+  /** Take in a merge with what GitHub holds. */
+  adopt(m: Merged) {
+    this.todos = reconcile(this.todos, m.todos)
+    this.lists = reconcile(this.lists, m.lists)
+    this.pending = this.pending.filter((c) => !(c.kind === 'list' ? m.cleanLists.has(c.id) : m.cleanTodos.has(c.id)))
+    for (const id of m.relist) {
+      const list = this.lists.find((l) => l.id === id)
+      if (list) this.#push(this.#listChange(list))
+    }
+    if (!this.lists.length) {
+      this.lists.push({ id: 'inbox', slug: 'inbox', index: 1, name: 'Inbox', ink: 1 })
+      this.#push(this.#listChange(this.lists[0]))
+    }
+  }
+
+  /** Changes up to `seq` are committed. */
+  settle(seq: number) {
+    this.pending = this.pending.filter((c) => c.seq > seq)
+    this.lastSavedAt = new Date().toISOString()
+    this.#persistNow()
+  }
+
+  persist() {
+    this.#persistNow()
   }
 
   dismissToast() {
@@ -412,18 +579,67 @@ class Store {
   }
 
   #change(kind: ChangeKind, t: Todo): PendingChange {
-    const list = this.listById.get(t.listId)
-    return { kind, path: `${list?.slug ?? 'inbox'}/${slugify(t.title)}.md`, title: t.title, at: new Date().toISOString() }
+    return { kind, id: t.id, path: this.pathOf(t), title: t.title, at: new Date().toISOString(), seq: ++this.#seq }
+  }
+
+  #listChange(l: TodoList): PendingChange {
+    return { kind: 'list', id: l.id, path: `${l.slug}/${LIST_FILE}`, title: l.name, at: new Date().toISOString(), seq: ++this.#seq }
+  }
+
+  /** One pending entry per file: a later change replaces an earlier one that isn't on its way to GitHub yet. */
+  #push(c: PendingChange) {
+    const isList = c.kind === 'list'
+    const mine = (p: PendingChange) => p.id === c.id && (p.kind === 'list') === isList
+    const at = this.pending.findLastIndex((p) => mine(p) && p.seq > this.sealed)
+    if (at >= 0) {
+      const prev = this.pending[at]
+      this.pending.splice(at, 1)
+      if (prev.kind === 'added') {
+        // Added and deleted before it ever reached GitHub: nothing left to send.
+        if (c.kind === 'removed' && !this.remote.pathsOf(c.id).length && !this.pending.some(mine)) return
+        if (c.kind !== 'removed') c = { ...c, kind: 'added' }
+      }
+    }
+    this.pending.push(c)
   }
 
   #record(kind: ChangeKind, t: Todo) {
-    this.pending.push(this.#change(kind, t))
+    this.#push(this.#change(kind, t))
     this.#persist()
     this.#scheduleSync()
   }
 
+  #recordList(l: TodoList) {
+    this.#push(this.#listChange(l))
+    this.#persist()
+    this.#scheduleSync()
+  }
+
+  /** Captures file into the first list, so there always is one. */
+  #ensureList() {
+    if (this.lists.length) return
+    const inbox: TodoList = { id: 'inbox', slug: 'inbox', index: 1, name: 'Inbox', ink: 1 }
+    this.lists.push(inbox)
+    if (this.mode === 'connected') this.#recordList(inbox)
+  }
+
+  #loadDemo() {
+    const saved = read<Saved>(DEMO_KEY)
+    const seed = saved ?? { ...demoData(this.today), lastSavedAt: null }
+    this.lists = seed.lists
+    this.todos = seed.todos
+    this.lastSavedAt = seed.lastSavedAt
+    this.sync = { kind: 'saved', at: seed.lastSavedAt }
+    this.mode = 'demo'
+    if (!saved) this.#persistNow()
+  }
+
   #scheduleSync() {
     if (this.#forced) return
+    if (this.mode === 'connected') {
+      this.remote.schedule()
+      return
+    }
     clearTimeout(this.#syncTimer)
     if (!navigator.onLine) {
       this.sync = { kind: 'offline' }
@@ -435,7 +651,7 @@ class Store {
         this.sync = { kind: 'offline' }
         return
       }
-      // GitHub sync is not connected yet: changes settle on this device.
+      // Demo data: nothing is sent anywhere, so changes settle on this device.
       this.pending = []
       this.lastSavedAt = new Date().toISOString()
       this.sync = { kind: 'saved', at: this.lastSavedAt }
@@ -449,7 +665,19 @@ class Store {
   }
 
   #persistNow() {
-    writeSaved({ lists: $state.snapshot(this.lists), todos: $state.snapshot(this.todos), lastSavedAt: this.lastSavedAt })
+    clearTimeout(this.#persistTimer)
+    const lists = $state.snapshot(this.lists)
+    const todos = $state.snapshot(this.todos)
+    if (this.mode === 'demo') write(DEMO_KEY, { lists, todos, lastSavedAt: this.lastSavedAt } satisfies Saved)
+    if (this.mode !== 'connected') return
+    write(REPO_KEY, {
+      repo: this.remote.repoName,
+      lists,
+      todos,
+      lastSavedAt: this.lastSavedAt,
+      pending: $state.snapshot(this.pending),
+      base: this.remote.base,
+    } satisfies SavedRepo)
   }
 
   #announce(text: string) {
