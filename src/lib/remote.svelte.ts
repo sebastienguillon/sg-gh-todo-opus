@@ -39,13 +39,22 @@ const COMMIT_GAP_MS = 10_000
 const RECHECK_MS = 10_000
 /** Tries for one batch when the branch keeps moving under it. */
 const TRIES = 3
+/**
+ * A branch read naming a head this device moved past less than this long ago is taken, once, for a
+ * lagging copy of the branch rather than news. A second read naming it is believed: a hand
+ * force-push back to it, say.
+ */
+const STALE_MS = 60_000
 
 /** What the repo held at the last commit this device read or wrote. */
 export interface Base {
   head: string | null
   /** Root tree of `head`. */
   tree: string | null
-  /** ETag of the last branch read. */
+  /**
+   * ETag of a branch read that answered `head`, or null. Never another commit's: a 304 against it
+   * must mean the branch is still at `head`, or a reset back to an older commit would go unseen.
+   */
   etag: string | null
   /** Every list and to-do file at `head`, parsed, with its blob id when known. */
   files: Record<string, BaseFile>
@@ -334,6 +343,8 @@ export class Remote {
   #retryAt = 0
   /** A failure only a new token can fix: it shows again each time the device is back online. */
   #blocked: SyncState | null = null
+  /** Heads this device moved past, by pull or commit, with when: a read naming one is behind. */
+  #past = new Map<string, number>()
 
   constructor(host: Host, base: Base | null) {
     this.#host = host
@@ -384,6 +395,7 @@ export class Remote {
     this.connection = null
     this.lastCheckedAt = null
     this.base = emptyBase()
+    this.#past.clear()
   }
 
   /** Repo paths holding a to-do, as of the last commit read or written. */
@@ -421,6 +433,21 @@ export class Remote {
     clearTimeout(this.#retryTimer)
     if (this.#host.sync.kind === 'failed') this.#host.sync = { kind: 'saving' }
     void this.#run(true)
+  }
+
+  /** The base moves on from `head`: remember it for a while, so a read naming it is known to be behind. */
+  #movedFrom(head: string | null) {
+    const now = Date.now()
+    for (const [sha, at] of this.#past) if (now - at > STALE_MS) this.#past.delete(sha)
+    if (head) this.#past.set(head, now)
+  }
+
+  /** A head this device was at moments ago: the read is behind. Only once per head; after that it's believed. */
+  #behind(sha: string): boolean {
+    const at = this.#past.get(sha)
+    if (at === undefined || Date.now() - at > STALE_MS) return false
+    this.#past.set(sha, -Infinity)
+    return true
   }
 
   #onOnline = () => {
@@ -497,10 +524,20 @@ export class Remote {
     const branch = this.connection!.branch
     for (let attempt = 1; ; attempt++) {
       const head = await gh.head(branch, this.base.etag)
-      if (head.changed) {
-        if (head.sha !== this.base.head) await this.#pull(gh, head.sha)
+      if (gh !== this.#gh) return
+      if (head.changed && head.sha === this.base.head) {
+        // The head held (an own commit, or a read without an ETag): keep this read's ETag, so the
+        // next read, even after a reload, is a free 304.
+        if (head.etag !== this.base.etag) {
+          this.base.etag = head.etag
+          this.#host.persist()
+        }
+      } else if (head.changed && !this.#behind(head.sha)) {
+        // Another device's commit: take it in. A head this device moved past moments ago is skipped, once:
+        // it comes from a lagging copy of the branch, and taking it in would undo commits here and could
+        // pass a pending change off as on GitHub. Its ETag isn't kept, so the next read asks again.
+        await this.#pull(gh, head.sha, head.etag)
         if (gh !== this.#gh) return
-        this.base.etag = head.etag
       }
       if (!commit || !this.#host.pending.length) return
       if (Date.now() < this.#host.commitHold) {
@@ -514,11 +551,15 @@ export class Remote {
     }
   }
 
-  async #pull(gh: GitHub, sha: string) {
-    const next = await readRepo(gh, sha, this.base, this.base.etag)
+  async #pull(gh: GitHub, sha: string, etag: string | null) {
+    const next = await readRepo(gh, sha, this.base, etag)
     if (gh !== this.#gh) return
     const host = this.#host
     const result = merge({ lists: host.lists, todos: host.todos }, modelOf(this.base), modelOf(next), dirtyOf(host.pending))
+    // Back to a head left long enough ago to be believed: the branch was rewound, and what this
+    // device knew of its history no longer holds.
+    if (this.#past.has(sha)) this.#past.clear()
+    else this.#movedFrom(this.base.head)
     this.base = next
     host.adopt(result)
     const clash = result.conflicts[0]
@@ -573,8 +614,11 @@ export class Remote {
       if (f) base.files[p] = f
       else delete base.files[p]
     }
+    this.#movedFrom(base.head)
     base.head = done.commit
     base.tree = done.tree
+    // The ETag held is the parent's: the next read is a full one, and keeps the new head's.
+    base.etag = null
     this.#index()
     this.#lastCommitAt = Date.now()
     host.settle(seq)
