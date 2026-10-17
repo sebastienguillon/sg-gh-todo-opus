@@ -48,7 +48,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 ## Open decisions
 
-- Product name. The header carries none for now.
+- Where the name "To Do" appears on screen. Today it is only the page title; the band carries no name.
 - Where notes and tags are edited: inline expand, a side panel, or a phone sheet.
 - Whether the `x > <` hints show on every overdue row or only on the focused one.
 - Whether list numbers stay stable when lists are added or reordered.

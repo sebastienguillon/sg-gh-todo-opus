@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Svelte + Vite + TypeScript, managed with pnpm. Shipped as a static, installable web app (PWA) on GitHub Pages from this repository (`sebastienguillon/sg-gh-todo-opus`). There is no app server.
+Svelte + Vite + TypeScript, managed with pnpm. Shipped as a static, installable web app (PWA) on GitHub Pages from this repository (`sebastienguillon/sg-gh-todo-opus`), served from **its own custom subdomain** (not yet chosen) rather than the shared `sebastienguillon.github.io`. There is no app server.
 
 ## Users
 
@@ -30,6 +30,7 @@ The data never lives in a vendor database or on an app server. It is a set of pl
 
 - **Two repositories.** This repo holds the app code and serves it through GitHub Pages. A separate private data repo holds the to-dos. The data repo's name is not decided yet.
 - **Device access.** On first launch, each device asks for a fine-grained personal access token limited to the data repo, with Contents read and write only. The token is stored only on that device. Each device has its own token, so a lost device can be revoked on its own. The app has no login of its own.
+- **Own origin.** Browser storage is per origin, and every GitHub Pages site on the account shares `sebastienguillon.github.io`. So To Do is served from its own custom subdomain, through a GitHub Pages custom domain (a `CNAME` file, DNS pointing at GitHub Pages, HTTPS enforced). That keeps its token storage apart from any other site the owner publishes. Real tokens are entered only on that subdomain, never on the github.io address. Serving from a domain root means the Vite build `base` becomes `/` instead of `/sg-gh-todo-opus/`.
 - **Transport.** The browser talks to the GitHub REST/GraphQL API (api.github.com). The git endpoints on github.com don't allow cross-origin requests, so the app has no in-browser git clone.
 - **Everyday use.** Quick capture and check-off throughout the day on the phone and at the desk. Edits made on one device show up on the others after the next sync.
 
@@ -57,14 +58,18 @@ The data never lives in a vendor database or on an app server. It is a set of pl
 - **Terms of Service:** a GitHub login may be used by only one person. The app must never ship with embedded credentials or be shared with other people on one account. If it ever becomes multi-user, each user brings their own account and data repo.
 
 **Open decisions:**
-- Product name. `sg-gh-todo-opus` is only the repository name.
 - Data repo name and file format details (front-matter fields, file naming).
 - Sync and poll intervals, and how the app shows pending, synced and failed states.
 - Whether this code repo stays public. GitHub Pages on a free plan needs a public repo, and no secrets live in the code.
+- Which custom subdomain To Do is served from. The owner will name it.
+
+## Brand Commitments
+
+- **Name:** To Do. `sg-gh-todo-opus` is only the repository name.
 
 ## Evidence on Hand
 
-This is a new project: no code, content, assets, logo or copy exist yet. The only reference material is the feasibility discussion summarized above.
+The main screen is built (see DESIGN.md) and runs on synthetic demo data (`src/lib/demo.ts`). No real to-dos, logo or marketing copy exist yet.
 
 ## Product Principles
 

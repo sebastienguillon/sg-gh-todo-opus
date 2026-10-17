@@ -1,5 +1,5 @@
 ---
-name: sg-gh-todo-opus
+name: To Do
 description: A rapid-log to-do list in black fineliner on a dotPad, under an orange cover band.
 colors:
   orange: "#f0691e"
@@ -212,7 +212,7 @@ components:
     padding: "0 6px 0 14px"
 ---
 
-# Design System: sg-gh-todo-opus
+# Design System: To Do
 
 ## Overview
 
