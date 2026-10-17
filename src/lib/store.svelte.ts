@@ -605,8 +605,9 @@ class Store implements Host {
     forget(DEMO_CHOSEN_KEY)
     this.sync = this.pending.length ? { kind: 'saving' } : { kind: 'saved', at: this.lastSavedAt }
     this.#ensureList()
-    this.#persistNow()
+    // Started first, so the save is filed under the repo's name; the next open reads it back.
     this.remote.start(connection)
+    this.#persistNow()
   }
 
   /** Forget the token and the lists on this device. The repo keeps everything it has. */
