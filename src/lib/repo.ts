@@ -294,6 +294,8 @@ export const README = `# To Do data
 
 This private repository holds the lists of the To Do app. The app reads and writes it through the GitHub API, and you can edit the files by hand too.
 
+The default branch is \`master\`, never \`main\`.
+
 - Each folder is a list. Its \`${LIST_FILE}\` holds the list's \`index\` (its two-digit number), \`name\` and \`ink\` (colour 1–12).
 - Every other \`.md\` file in a folder is one to-do. Its YAML front-matter holds \`id\`, \`title\`, \`tags\`, \`due\`, \`done\`, \`doneAt\`, \`order\`, \`createdAt\` and \`updatedAt\`; the Markdown body is the to-do's note.
 

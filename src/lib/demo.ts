@@ -108,7 +108,7 @@ const SEED: [name: string, entries: string[]][] = [
     'Sketch the plugin API #design',
     'Fix the README badge links',
     'Benchmark the new parser against v0.3 #code',
-    'x Rename the default branch to main',
+    'x Protect the default branch',
     'x Add a CONTRIBUTING file',
   ]],
   ['Admin & taxes', [

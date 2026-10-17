@@ -76,7 +76,7 @@
   <div class="local">
     {#if connected}
       <p>
-        Synced with <strong>{store.remote.repoName}</strong> on GitHub{branch === 'main' ? '' : `, branch ${branch}`}.
+        Synced with <strong>{store.remote.repoName}</strong> on GitHub{branch === 'master' ? '' : `, branch ${branch}`}.
         {#if store.remote.lastCheckedAt}Checked for changes at {formatTime(store.remote.lastCheckedAt)}.{/if}
       </p>
       {#if confirming}

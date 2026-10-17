@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Svelte + Vite + TypeScript, managed with pnpm. Shipped as a static, installable web app (PWA) on GitHub Pages from this repository (`sebastienguillon/sg-gh-todo-opus`), served from **its own hostname, `do.sebastienguillon.com`**, rather than the shared `sebastienguillon.github.io`. There is no app server. A GitHub Actions workflow (`.github/workflows/deploy.yml`) checks, builds and deploys every push to `main`.
+Svelte + Vite + TypeScript, managed with pnpm. Shipped as a static, installable web app (PWA) on GitHub Pages from this repository (`sebastienguillon/sg-gh-todo-opus`), served from **its own hostname, `do.sebastienguillon.com`**, rather than the shared `sebastienguillon.github.io`. There is no app server. A GitHub Actions workflow (`.github/workflows/deploy.yml`) checks, builds and deploys every push to `master`.
 
 ## Users
 
@@ -28,7 +28,8 @@ The data never lives in a vendor database or on an app server. It is a set of pl
 
 ## Operating Context
 
-- **Two repositories.** This repo holds the app code and serves it through GitHub Pages. A separate private data repo holds the to-dos. The data repo's name is not decided yet.
+- **Two repositories.** `sebastienguillon/sg-gh-todo-opus` holds the app code and serves it through GitHub Pages. A separate private data repo, `sebastienguillon/gh-todo-data`, holds the to-dos.
+- **Default branch.** In both repos the default branch is `master`, never `main`.
 - **Device access.** On first launch, each device asks for a fine-grained personal access token limited to the data repo, with Contents read and write only. The setup screen links to GitHub's token form pre-filled with that permission (only the repo has to be picked by hand), checks the token with one call to the repo, refuses classic tokens and public repos, and starts an empty repo with a README. The token is stored only on that device (`localStorage`). Each device has its own token, so a lost device can be revoked on its own. The app has no login of its own. A device can also look around with demo data first; demo data is never seeded once a repo is connected.
 - **Own origin.** Browser storage is per origin, and every GitHub Pages site on the account shares `sebastienguillon.github.io`. So To Do is served from `do.sebastienguillon.com`, a GitHub Pages custom domain (set in the repo's Pages settings, recorded in `public/CNAME`; DNS is a CNAME from `do` to `sebastienguillon.github.io`; HTTPS enforced). Nothing else is served from that hostname. That keeps its token storage apart from any other site the owner publishes. On any github.io address the setup screen explains the risk and refuses to store a token. The Vite build `base` is `/`.
 - **Content Security Policy.** A meta tag in `index.html` limits scripts, styles and fonts to the app's own origin, images to it and `data:`, and network calls to `https://api.github.com`. The dev server loosens it for its injected styles, HMR websocket and an optional local test API (`vite.config.ts`). A meta policy can't set `frame-ancestors`, and GitHub Pages can't send headers.
@@ -67,7 +68,6 @@ The data never lives in a vendor database or on an app server. It is a set of pl
 - **Terms of Service:** a GitHub login may be used by only one person. The app must never ship with embedded credentials or be shared with other people on one account. If it ever becomes multi-user, each user brings their own account and data repo.
 
 **Open decisions:**
-- Data repo name.
 - Archiving completed to-dos before a folder nears GitHub's ~3,000-entry limit.
 - Several tabs or windows of To Do on one device each sync on their own, and the last to save its local state wins in `localStorage`.
 - Whether this code repo stays public. GitHub Pages on a free plan needs a public repo, and no secrets live in the code.
