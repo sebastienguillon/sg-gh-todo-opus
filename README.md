@@ -166,7 +166,7 @@ It can also go in a `.env.development.local` file, which git ignores and which `
 On a device with no repo connected, two URL flags help review the screen without a real repo. Both are ignored once a repo is connected.
 
 - `?demo` opens the demo data straight away, without the setup screen and without remembering the choice.
-- `?sync=failed`, `?sync=conflict` and `?sync=offline` open the demo data with the sync indicator pinned in that state. `failed` and `offline` also show two sample pending changes; `conflict` names `home/fix-dripping-kitchen-tap.md`. In the failed and conflict states, Retry or dismissing the conflict releases the pin.
+- `?sync=failed` and `?sync=offline` open the demo data with the sync indicator pinned in that state and two sample pending changes; in the failed state, Retry releases the pin. `?sync=conflict` shows the conflict banner, naming `home/fix-dripping-kitchen-tap.md`, until it is dismissed. They combine, as in `?sync=offline&sync=conflict`, to show both at once.
 
 For example, http://localhost:5173/?sync=conflict.
 

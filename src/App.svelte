@@ -324,14 +324,14 @@
 
 <Band {isPhone} />
 
-{#if store.sync.kind === 'conflict'}
+{#if store.conflict}
   <div class="conflict" role="alert">
     <Icon name="alert" />
     <p>
-      {#if store.sync.message}
-        {store.sync.message}
+      {#if store.conflict.message}
+        {store.conflict.message}
       {:else}
-        <strong>Conflict.</strong> <code>{store.sync.path}</code> changed on GitHub and on this device at the same time. The
+        <strong>Conflict.</strong> <code>{store.conflict.path}</code> changed on GitHub and on this device at the same time. The
         latest edit was kept.
       {/if}
     </p>
@@ -396,7 +396,7 @@
     padding-bottom: 120px;
   }
 
-  /* In the flow under the band, not over the rail; the band keeps saying "conflict" after it scrolls away. */
+  /* In the flow under the band, not over the rail; the band keeps saying "conflict" after it scrolls away, unless offline or failed. */
   .conflict {
     display: flex;
     align-items: center;
@@ -404,6 +404,11 @@
     padding: 8px 12px 8px 16px;
     background: var(--alarm);
     color: var(--on-alarm);
+  }
+
+  /* Under a failed band, also alarm ink: a hairline keeps the two apart. */
+  :global(.band.alarm) + .conflict {
+    box-shadow: inset 0 1px color-mix(in srgb, var(--on-alarm) 25%, transparent);
   }
 
   .conflict p {

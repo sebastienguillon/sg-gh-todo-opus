@@ -25,7 +25,7 @@
   let expanded = $derived(ui.expanded === key)
   let trayOpen = $derived(ui.tray === key)
   let conflict = $derived(
-    store.sync.kind === 'conflict' && (store.sync.id ? store.sync.id === todo.id : store.sync.path === store.pathOf(todo)),
+    !!store.conflict && (store.conflict.id ? store.conflict.id === todo.id : store.conflict.path === store.pathOf(todo)),
   )
   let described = $derived(
     [

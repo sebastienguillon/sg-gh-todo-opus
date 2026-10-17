@@ -26,7 +26,7 @@ import {
   writeList,
   writeTodo,
 } from './repo'
-import type { ChangeKind, PendingChange, SyncState, Todo, TodoList } from './types'
+import type { ChangeKind, Conflict, PendingChange, SyncState, Todo, TodoList } from './types'
 
 const POLL_MS = 60_000
 /** Wait for a burst of edits to end before committing… */
@@ -59,6 +59,8 @@ export interface Host {
   readonly todos: Todo[]
   readonly pending: PendingChange[]
   sync: SyncState
+  /** A merge's notice; only the user clears it. */
+  conflict: Conflict | null
   lastSavedAt: string | null
   /** Pending changes up to this `seq` are in a commit on its way; later edits must not fold into them. */
   sealed: number
@@ -399,8 +401,8 @@ export class Remote {
     )
     clearTimeout(this.#timer)
     if (Number.isFinite(at)) this.#timer = setTimeout(() => void this.#run(true), at - now)
-    if (!navigator.onLine) this.#set({ kind: 'offline' })
-    else if (this.#host.sync.kind !== 'failed') this.#set({ kind: 'saving' })
+    if (!navigator.onLine) this.#host.sync = { kind: 'offline' }
+    else if (this.#host.sync.kind !== 'failed') this.#host.sync = { kind: 'saving' }
   }
 
   /** Ask GitHub for changes now. */
@@ -435,12 +437,6 @@ export class Remote {
     }
   }
 
-  /** Saving and saved never cover a conflict notice; the user dismisses it. */
-  #set(state: SyncState) {
-    if (this.#host.sync.kind === 'conflict' && (state.kind === 'saving' || state.kind === 'saved')) return
-    this.#host.sync = state
-  }
-
   async #run(commit: boolean) {
     const gh = this.#gh
     if (!gh) return
@@ -449,7 +445,7 @@ export class Remote {
       return
     }
     if (!navigator.onLine) {
-      this.#set({ kind: 'offline' })
+      this.#host.sync = { kind: 'offline' }
       return
     }
     if (Date.now() < this.#retryAt) return
@@ -474,7 +470,7 @@ export class Remote {
         this.#again = true
       } else {
         this.#firstPendingAt = 0
-        this.#set({ kind: 'saved', at: this.#host.lastSavedAt })
+        this.#host.sync = { kind: 'saved', at: this.#host.lastSavedAt }
       }
     } catch (e) {
       if (gh === this.#gh) this.#fail(e)
@@ -519,10 +515,10 @@ export class Remote {
     const clash = result.conflicts[0]
     if (result.notices.length) {
       // A list kept or dropped over a delete says more than a to-do's conflict, so it takes the banner.
-      host.sync = { kind: 'conflict', path: `${result.notices[0].list.slug}/`, message: noticeText(result.notices) }
+      host.conflict = { path: `${result.notices[0].list.slug}/`, message: noticeText(result.notices) }
     } else if (clash) {
       const t = host.todos.find((x) => x.id === clash)
-      host.sync = { kind: 'conflict', id: clash, path: this.pathsOf(clash)[0] ?? (t ? host.pathOf(t) : clash) }
+      host.conflict = { id: clash, path: this.pathsOf(clash)[0] ?? (t ? host.pathOf(t) : clash) }
     }
     host.persist()
   }
@@ -650,7 +646,7 @@ export class Remote {
   #fail(e: unknown) {
     const err = e instanceof GitHubError ? e : new GitHubError('invalid', e instanceof Error ? e.message : String(e))
     if (err.kind === 'network' && !navigator.onLine) {
-      this.#set({ kind: 'offline' })
+      this.#host.sync = { kind: 'offline' }
       return
     }
     // A missed check with nothing waiting to be saved stays quiet; the next check tries again.
@@ -696,6 +692,6 @@ export class Remote {
         void this.#run(true)
       }, delay)
     }
-    this.#set({ kind: 'failed', message, fix })
+    this.#host.sync = { kind: 'failed', message, fix }
   }
 }

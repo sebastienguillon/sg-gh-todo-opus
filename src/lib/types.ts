@@ -49,11 +49,17 @@ export type SyncState =
   | { kind: 'saving' }
   | { kind: 'offline' }
   | { kind: 'failed'; message: string; fix?: 'retry' | 'reconnect' }
-  /**
-   * `path` is the file as it is on GitHub; `id` the to-do it holds, when known. `message` replaces the
-   * usual wording, for a list kept or dropped after a delete on another device.
-   */
-  | { kind: 'conflict'; path: string; id?: string; message?: string }
+
+/**
+ * What a merge has to tell: it stands until the user dismisses it, whatever sync does meanwhile.
+ * `path` is the file as it is on GitHub; `id` the to-do it holds, when known. `message` replaces the
+ * usual wording, for a list kept or dropped after a delete on another device.
+ */
+export interface Conflict {
+  path: string
+  id?: string
+  message?: string
+}
 
 /** What an undo brought back, so focus can go to it. */
 export type UndoTarget = { todo: string } | { list: string } | null

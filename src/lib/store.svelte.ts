@@ -4,7 +4,7 @@ import type { Connection } from './github'
 import type { Merged } from './merge'
 import { modelOf, openRepo, Remote, type Base, type Host } from './remote.svelte'
 import { inkFor, LIST_FILE, slugify, todoNames } from './repo'
-import type { ChangeKind, DayISO, Flash, PendingChange, SyncState, Todo, TodoList, UndoTarget } from './types'
+import type { ChangeKind, Conflict, DayISO, Flash, PendingChange, SyncState, Todo, TodoList, UndoTarget } from './types'
 
 /** Demo lists, on a device that chose to look around before connecting. */
 const DEMO_KEY = 'gh-todo:v1'
@@ -92,13 +92,17 @@ function uid(): string {
   return Math.random().toString(36).slice(2, 10)
 }
 
-function forcedSync(): SyncState | null {
-  // Review aid: `?sync=failed|conflict|offline` pins the indicator in that state.
-  const value = new URLSearchParams(location.search).get('sync')
-  if (value === 'failed') return { kind: 'failed', message: 'GitHub did not answer. Your changes are kept on this device.' }
-  if (value === 'conflict') return { kind: 'conflict', path: 'home/fix-dripping-kitchen-tap.md' }
-  if (value === 'offline') return { kind: 'offline' }
-  return null
+function forcedSync(): { sync: SyncState | null; conflict: Conflict | null } | null {
+  // Review aid: `?sync=failed|offline` pins the indicator in that state, `?sync=conflict` shows the
+  // conflict banner until dismissed, and `?sync=offline&sync=conflict` shows both at once.
+  const values = new URLSearchParams(location.search).getAll('sync')
+  const sync: SyncState | null = values.includes('failed')
+    ? { kind: 'failed', message: 'GitHub did not answer. Your changes are kept on this device.' }
+    : values.includes('offline')
+      ? { kind: 'offline' }
+      : null
+  const conflict = values.includes('conflict') ? { path: 'home/fix-dripping-kitchen-tap.md' } : null
+  return sync || conflict ? { sync, conflict } : null
 }
 
 class Store implements Host {
@@ -113,6 +117,8 @@ class Store implements Host {
   holds = $state<Record<string, Hold>>({})
   pending = $state<PendingChange[]>([])
   sync = $state<SyncState>({ kind: 'saved', at: null })
+  /** A merge's conflict or list notice: it stands, whatever sync does, until the user dismisses it. */
+  conflict = $state<Conflict | null>(null)
   lastSavedAt = $state<string | null>(null)
   /** Polite live-region text for screen readers. */
   announcement = $state('')
@@ -139,7 +145,8 @@ class Store implements Host {
     const savedRepo = connection ? read<SavedRepo>(REPO_KEY) : null
     const saved = connection && savedRepo?.repo === repoLabel(connection) ? savedRepo : null
     this.remote = new Remote(this, saved?.base ?? null)
-    this.#forced = connection ? null : forcedSync()
+    const forced = connection ? null : forcedSync()
+    this.#forced = forced?.sync ?? null
 
     if (connection) {
       this.mode = 'connected'
@@ -148,17 +155,16 @@ class Store implements Host {
       this.pending = saved?.pending ?? []
       this.lastSavedAt = saved?.lastSavedAt ?? null
       this.#seq = Math.max(0, ...this.pending.map((c) => c.seq))
-    } else if (this.#forced || new URLSearchParams(location.search).has('demo') || read(DEMO_CHOSEN_KEY)) {
+    } else if (forced || new URLSearchParams(location.search).has('demo') || read(DEMO_CHOSEN_KEY)) {
       this.#loadDemo()
     }
     this.sync = this.pending.length ? { kind: 'saving' } : { kind: 'saved', at: this.lastSavedAt }
 
+    if (forced?.conflict) this.conflict = forced.conflict
     if (this.#forced) {
       this.sync = this.#forced
-      if (this.#forced.kind !== 'conflict') {
-        const sample = this.todos.filter((t) => !t.done).slice(1, 3)
-        this.pending = sample.map((t) => this.#change('edited', t))
-      }
+      const sample = this.todos.filter((t) => !t.done).slice(1, 3)
+      this.pending = sample.map((t) => this.#change('edited', t))
     }
 
     if (connection) this.remote.start(connection)
@@ -562,8 +568,7 @@ class Store implements Host {
 
   /** The latest edit was already kept; acknowledging the conflict only clears the banner. */
   dismissConflict() {
-    this.#forced = null
-    this.sync = this.mode === 'connected' && this.pending.length ? { kind: 'saving' } : { kind: 'saved', at: this.lastSavedAt }
+    this.conflict = null
   }
 
   retrySync() {
@@ -597,6 +602,7 @@ class Store implements Host {
       this.lastSavedAt = null
       this.tagFilter = null
       this.openDone = {}
+      this.conflict = null
       this.#forced = null
     }
     this.mode = 'connected'
@@ -621,6 +627,7 @@ class Store implements Host {
     this.lastSavedAt = null
     this.tagFilter = null
     this.sync = { kind: 'saved', at: null }
+    this.conflict = null
     this.mode = 'setup'
     this.setupOpen = false
   }

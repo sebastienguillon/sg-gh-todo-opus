@@ -42,13 +42,15 @@
   let connected = $derived(store.mode === 'connected')
   let branch = $derived(store.remote.connection?.branch)
   let confirming = $state(false)
+  /** Offline and failed take the band's word; the conflict banner stays under it meanwhile. */
+  let urgent = $derived(store.sync.kind === 'offline' || store.sync.kind === 'failed')
   let text = $derived.by(() => {
     const s = store.sync
-    if (demo && (s.kind === 'saving' || s.kind === 'saved')) return compact ? 'demo' : 'demo data'
-    if (s.kind === 'saving') return compact ? 'saving' : `saving · ${pending} pending`
     if (s.kind === 'offline') return compact ? 'offline' : `offline · ${pending} kept here`
     if (s.kind === 'failed') return compact ? 'not saved' : `Sync failed · ${pending} kept here`
-    if (s.kind === 'conflict') return 'conflict'
+    if (store.conflict) return 'conflict'
+    if (demo) return compact ? 'demo' : 'demo data'
+    if (s.kind === 'saving') return compact ? 'saving' : `saving · ${pending} pending`
     return s.at ? (compact ? 'saved' : `saved ${formatTime(s.at)}`) : 'saved'
   })
 </script>
@@ -66,13 +68,18 @@
 
 <div id="sync-details" class="details" popover ontoggle={(e) => e.newState === 'closed' && (confirming = false)}>
   <h2>Sync</h2>
+  {#snippet conflictLine()}
+    {#if store.conflict}
+      <p class="status">{store.conflict.message ?? 'A file changed on GitHub and here at once. The latest edit was kept.'}</p>
+    {/if}
+  {/snippet}
+  <!-- What the band's word says comes first. -->
+  {#if !urgent}{@render conflictLine()}{/if}
   <p class="status">
     {#if store.sync.kind === 'failed'}
       {store.sync.message}
     {:else if store.sync.kind === 'offline'}
       You're offline. Changes are kept on this device and sent when you're back.
-    {:else if store.sync.kind === 'conflict'}
-      {store.sync.message ?? 'A file changed on GitHub and here at once. The latest edit was kept.'}
     {:else if store.sync.kind === 'saving'}
       Saving {pending} {pending === 1 ? 'change' : 'changes'}…
     {:else if demo}
@@ -83,6 +90,7 @@
       Everything saved.
     {/if}
   </p>
+  {#if urgent}{@render conflictLine()}{/if}
 
   {#if lines.length}
     <h3>Pending changes</h3>
