@@ -332,6 +332,8 @@ export class Remote {
   #lastCheck = 0
   #failures = 0
   #retryAt = 0
+  /** A failure only a new token can fix: it shows again each time the device is back online. */
+  #blocked: SyncState | null = null
 
   constructor(host: Host, base: Base | null) {
     this.#host = host
@@ -359,6 +361,7 @@ export class Remote {
     this.#gh = new GitHub(connection.token, connection.owner, connection.repo)
     this.#retryAt = 0
     this.#failures = 0
+    this.#blocked = null
     if (first) {
       addEventListener('online', this.#onOnline)
       addEventListener('focus', this.#onFocus)
@@ -402,6 +405,7 @@ export class Remote {
     clearTimeout(this.#timer)
     if (Number.isFinite(at)) this.#timer = setTimeout(() => void this.#run(true), at - now)
     if (!navigator.onLine) this.#host.sync = { kind: 'offline' }
+    else if (this.#blocked) this.#host.sync = this.#blocked
     else if (this.#host.sync.kind !== 'failed') this.#host.sync = { kind: 'saving' }
   }
 
@@ -413,6 +417,7 @@ export class Remote {
   retry() {
     this.#retryAt = 0
     this.#failures = 0
+    this.#blocked = null
     clearTimeout(this.#retryTimer)
     if (this.#host.sync.kind === 'failed') this.#host.sync = { kind: 'saving' }
     void this.#run(true)
@@ -448,7 +453,11 @@ export class Remote {
       this.#host.sync = { kind: 'offline' }
       return
     }
-    if (Date.now() < this.#retryAt) return
+    if (Date.now() < this.#retryAt) {
+      // Waiting out a failure: one that needs a new token says so again, not offline or saving.
+      if (this.#blocked) this.#host.sync = this.#blocked
+      return
+    }
     if (commit && Date.now() < this.#lastCommitAt + COMMIT_GAP_MS) {
       // Too soon after the last commit: check now, commit when the gap is over.
       commit = false
@@ -692,6 +701,8 @@ export class Remote {
         void this.#run(true)
       }, delay)
     }
-    this.#host.sync = { kind: 'failed', message, fix }
+    const failed: SyncState = { kind: 'failed', message, fix }
+    this.#blocked = fix === 'reconnect' ? failed : null
+    this.#host.sync = failed
   }
 }
