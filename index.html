@@ -2,6 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Only this origin's own files run, and only api.github.com is called. The dev server loosens this (vite.config.ts). -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src https://api.github.com; manifest-src 'self'; base-uri 'none'; form-action 'none'"
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#F0691E" media="(prefers-color-scheme: light)" />

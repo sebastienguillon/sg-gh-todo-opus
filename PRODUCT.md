@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Svelte + Vite + TypeScript, managed with pnpm. Shipped as a static, installable web app (PWA) on GitHub Pages from this repository (`sebastienguillon/sg-gh-todo-opus`), served from **its own custom subdomain** (not yet chosen) rather than the shared `sebastienguillon.github.io`. There is no app server.
+Svelte + Vite + TypeScript, managed with pnpm. Shipped as a static, installable web app (PWA) on GitHub Pages from this repository (`sebastienguillon/sg-gh-todo-opus`), served from **its own hostname, `do.sebastienguillon.com`**, rather than the shared `sebastienguillon.github.io`. There is no app server. A GitHub Actions workflow (`.github/workflows/deploy.yml`) checks, builds and deploys every push to `main`.
 
 ## Users
 
@@ -30,7 +30,8 @@ The data never lives in a vendor database or on an app server. It is a set of pl
 
 - **Two repositories.** This repo holds the app code and serves it through GitHub Pages. A separate private data repo holds the to-dos. The data repo's name is not decided yet.
 - **Device access.** On first launch, each device asks for a fine-grained personal access token limited to the data repo, with Contents read and write only. The setup screen links to GitHub's token form pre-filled with that permission (only the repo has to be picked by hand), checks the token with one call to the repo, refuses classic tokens and public repos, and starts an empty repo with a README. The token is stored only on that device (`localStorage`). Each device has its own token, so a lost device can be revoked on its own. The app has no login of its own. A device can also look around with demo data first; demo data is never seeded once a repo is connected.
-- **Own origin.** Browser storage is per origin, and every GitHub Pages site on the account shares `sebastienguillon.github.io`. So To Do is served from its own custom subdomain, through a GitHub Pages custom domain (a `CNAME` file, DNS pointing at GitHub Pages, HTTPS enforced). That keeps its token storage apart from any other site the owner publishes. Real tokens are entered only on that subdomain, never on the github.io address. Serving from a domain root means the Vite build `base` becomes `/` instead of `/sg-gh-todo-opus/`.
+- **Own origin.** Browser storage is per origin, and every GitHub Pages site on the account shares `sebastienguillon.github.io`. So To Do is served from `do.sebastienguillon.com`, a GitHub Pages custom domain (set in the repo's Pages settings, recorded in `public/CNAME`; DNS is a CNAME from `do` to `sebastienguillon.github.io`; HTTPS enforced). Nothing else is served from that hostname. That keeps its token storage apart from any other site the owner publishes. On any github.io address the setup screen explains the risk and refuses to store a token. The Vite build `base` is `/`.
+- **Content Security Policy.** A meta tag in `index.html` limits scripts, styles and fonts to the app's own origin, images to it and `data:`, and network calls to `https://api.github.com`. The dev server loosens it for its injected styles, HMR websocket and an optional local test API (`vite.config.ts`). A meta policy can't set `frame-ancestors`, and GitHub Pages can't send headers.
 - **Transport.** The browser talks to the GitHub REST/GraphQL API (api.github.com). The git endpoints on github.com don't allow cross-origin requests, so the app has no in-browser git clone.
 - **Everyday use.** Quick capture and check-off throughout the day on the phone and at the desk. Edits made on one device show up on the others after the next sync.
 
@@ -70,7 +71,6 @@ The data never lives in a vendor database or on an app server. It is a set of pl
 - Archiving completed to-dos before a folder nears GitHub's ~3,000-entry limit.
 - Several tabs or windows of To Do on one device each sync on their own, and the last to save its local state wins in `localStorage`.
 - Whether this code repo stays public. GitHub Pages on a free plan needs a public repo, and no secrets live in the code.
-- Which custom subdomain To Do is served from. The owner will name it.
 
 ## Brand Commitments
 

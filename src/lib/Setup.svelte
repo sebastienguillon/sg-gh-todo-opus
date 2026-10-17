@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { todayISO } from './dates'
   import Icon from './Icon.svelte'
-  import { parseRepo, SetupError } from './remote.svelte'
+  import { HOME, parseRepo, SetupError, sharedOrigin } from './remote.svelte'
   import Signifier from './Signifier.svelte'
   import { store } from './store.svelte'
 
@@ -18,8 +18,8 @@
   let repoInput = $state<HTMLInputElement>()
   let tokenInput = $state<HTMLInputElement>()
 
-  // Every Pages site on the account shares that origin, and with it this browser storage.
-  const sharedOrigin = location.hostname.endsWith('.github.io')
+  // Every Pages site on the account shares a github.io origin, and with it this browser storage.
+  const shared = sharedOrigin()
 
   function device(): string {
     const ua = navigator.userAgent
@@ -96,12 +96,13 @@
     {/if}
   </div>
 
-  {#if sharedOrigin}
-    <p class="warn" role="note">
+  {#if shared}
+    <p class="warn" role="alert">
       <Icon name="alert" />
       <span>
-        This copy of To Do is served from <strong>{location.hostname}</strong>, whose browser storage every Pages site on the account
-        shares. Enter a real token only on To Do's own address.
+        To Do won't store a token here. Every GitHub Pages site on the account shares <strong>{location.hostname}</strong>, and its
+        browser storage with it, so any of them could read the token. Open To Do at
+        <a href={HOME}>{HOME.replace('https://', '')}</a> instead.
       </span>
     </p>
   {/if}
@@ -144,6 +145,7 @@
       autocapitalize="none"
       spellcheck="false"
       readonly={replacing}
+      disabled={shared}
       aria-invalid={error?.field === 'repo' || undefined}
       aria-describedby={error?.field === 'repo' ? 'setup-error' : undefined}
     />
@@ -154,6 +156,7 @@
       bind:this={tokenInput}
       bind:value={token}
       type="password"
+      disabled={shared}
       class="field big"
       placeholder="github_pat_…"
       autocomplete="off"
@@ -173,7 +176,7 @@
     </div>
 
     <div class="actions">
-      <button type="submit" class="btn primary" disabled={busy}>{busy ? 'Connecting…' : replacing ? 'Use this token' : 'Connect'}</button>
+      <button type="submit" class="btn primary" disabled={busy || shared}>{busy ? 'Connecting…' : replacing ? 'Use this token' : 'Connect'}</button>
       {#if store.mode === 'setup'}
         <button type="button" class="btn quiet" disabled={busy} onclick={() => store.useDemo()}>Look around with demo data</button>
       {:else}
@@ -309,6 +312,12 @@
   .big[readonly] {
     border-color: var(--rule);
     color: var(--ink-2);
+  }
+
+  .big:disabled {
+    border-color: var(--rule);
+    color: var(--ink-3);
+    cursor: not-allowed;
   }
 
   .big[aria-invalid='true'] {

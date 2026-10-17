@@ -148,6 +148,17 @@ function commitMessage(batch: PendingChange[]): string {
 
 // ---- first run -----------------------------------------------------------------
 
+/** Where To Do is served. */
+export const HOME = 'https://do.sebastienguillon.com'
+
+/**
+ * A github.io host is shared by every Pages site on the account, and so is its
+ * browser storage: any of them could read a token stored there.
+ */
+export function sharedOrigin(hostname = location.hostname): boolean {
+  return hostname === 'github.io' || hostname.endsWith('.github.io')
+}
+
 export class SetupError extends Error {
   constructor(
     message: string,
@@ -195,6 +206,7 @@ function setupError(e: unknown, repo: string, stage: 'repo' | 'read' | 'write'):
  * if it has no commits yet). Throws a `SetupError` worded for the setup screen.
  */
 export async function openRepo(token: string, repoText: string, step: (text: string) => void): Promise<{ connection: Connection; base: Base }> {
+  if (sharedOrigin()) throw new SetupError(`To Do doesn't store a token on ${location.hostname}. Open it at ${HOME.replace('https://', '')} instead.`)
   const t = token.trim()
   const ref = parseRepo(repoText)
   if (!ref) throw new SetupError('Write the repo as owner/name, for example you/todo-data.', 'repo')
