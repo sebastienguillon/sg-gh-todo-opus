@@ -30,6 +30,8 @@ class UI {
   railOpen = $state(readRail())
   /** Phone: the row whose swipe tray (> and <) is open. */
   tray = $state<string | null>(null)
+  /** The list picked in the Index, with g + number or from the palette: marked in the Index, and where
+      capture files a task that has no `>`. Going to Today clears it, back to the Inbox. */
   activeList = $state<string | null>(null)
   /** Whether the day heading is on screen; the phone bar shows the date only once it has scrolled away. */
   headingVisible = $state(true)
@@ -126,6 +128,7 @@ class UI {
 
   async jumpToToday() {
     await this.#closeSheet()
+    this.activeList = null
     window.scrollTo({ top: 0, behavior: smooth() })
     const target =
       document.querySelector<HTMLElement>('#today [data-row-focus]') ?? document.querySelector<HTMLElement>('#today-h')
