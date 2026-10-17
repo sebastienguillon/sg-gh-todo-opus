@@ -177,9 +177,14 @@ class Store implements Host {
     setInterval(tick, 60_000)
     document.addEventListener('visibilitychange', tick)
     document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'hidden') return
+      // The page may not come back (an app closed on a phone sends only this): save the last edit now.
+      this.#flush()
       // Leaving the page lets a held list delete go now; the undo stays on offer.
-      if (document.visibilityState === 'hidden' && this.toast?.holdUntil) this.#releaseHold()
+      if (this.toast?.holdUntil) this.#releaseHold()
     })
+    // A reload, a navigation or a closed tab.
+    window.addEventListener('pagehide', () => this.#flush())
   }
 
   // ---- reading -------------------------------------------------------------
@@ -806,8 +811,17 @@ class Store implements Host {
     this.#persistTimer = setTimeout(() => this.#persistNow(), 300)
   }
 
+  /**
+   * Write now what the 300 ms save still holds. A tab with nothing waiting writes nothing, so it can't
+   * put stale state over another tab's save; one with a change waiting overwrites it, as its timer would.
+   */
+  #flush() {
+    if (this.#persistTimer !== undefined) this.#persistNow()
+  }
+
   #persistNow() {
     clearTimeout(this.#persistTimer)
+    this.#persistTimer = undefined
     const lists = $state.snapshot(this.lists)
     const todos = $state.snapshot(this.todos)
     if (this.mode === 'demo') write(DEMO_KEY, { lists, todos, lastSavedAt: this.lastSavedAt } satisfies Saved)

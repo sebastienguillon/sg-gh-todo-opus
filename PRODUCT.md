@@ -55,7 +55,7 @@ The data never lives in a vendor database or on an app server. It is a set of pl
 - The app reads the whole repo with one recursive Git Trees call, then fetches only the files whose blob id changed, a hundred per GraphQL call.
 
 **Sync model (built):**
-- Local-first. Changes apply to the UI immediately and sync in the background. A queue of pending changes (one entry per file) holds them, survives reloads and offline stretches, and is kept in `localStorage` with the last commit read.
+- Local-first. Changes apply to the UI immediately and sync in the background. A queue of pending changes (one entry per file) holds them, survives reloads and offline stretches, and is kept in `localStorage` with the last commit read. The device saves 300 ms after an edit, and at once when the page is hidden or closed, so a change made just before closing the app is kept.
 - One file per to-do, so edits to different to-dos on different devices never conflict. Each to-do stores its own sort position, so reordering doesn't rewrite a shared list.
 - Writes: once edits settle (1.5 s, at most 8 s), all pending changes go into one commit through the Git Data API (tree, commit, then a fast-forward-only ref update). At most one commit every 10 s, and at least 1 s between write requests. A list delete's commit waits while its undo is on offer (up to 30 s), so an undo never reaches GitHub.
 - Reads: the branch ref is polled with `If-None-Match` every 60 s while the app is visible, and on focus or return to the tab. GitHub doesn't count 304 "not modified" replies against the rate limit.
@@ -72,7 +72,7 @@ The data never lives in a vendor database or on an app server. It is a set of pl
 **Open decisions:**
 - Archiving completed to-dos before a folder nears GitHub's ~3,000-entry limit.
 - Whether a deleted list should go to an archive folder instead of being deleted (decide with the question above). For now the git history is the archive.
-- Several tabs or windows of To Do on one device each sync on their own, and the last to save its local state wins in `localStorage`.
+- Several tabs or windows of To Do on one device each sync on their own, and the last to save its local state wins in `localStorage`. A change saved by a tab that closes before committing can be overwritten by another open tab's next save.
 
 ## Brand Commitments
 
