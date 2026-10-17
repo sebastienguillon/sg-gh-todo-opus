@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Today</title>
+<style>
+:root{--k:#111111;--w:#FAFAF8;--red:#EE352E;--yel:#FCCC0A;--rule:#DDDDD8;--g2:#5C5C5C;--g3:#9A9A9A;--sel:#EEEEE9;--slate:#A7A9AC}
+*{box-sizing:border-box}
+html,body{width:1440px;height:900px;overflow:hidden;margin:0}
+body{background:var(--w);color:var(--k);font:400 15px/20px "Helvetica Neue",Helvetica,"TeX Gyre Heros",Arial,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+::selection{background:var(--k);color:var(--w)}
+button,input{font:inherit;color:inherit}
+svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:square;stroke-linejoin:miter;flex:none}
+kbd{font-family:inherit;font-size:11px;font-weight:700;line-height:16px;padding:0 5px;border:1px solid #3A3A3A;color:#BDBDBD}
+/* route bullets: perfect discs, one bold glyph, --t per trunk */
+.b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--t);color:var(--gl,#fff);font-weight:700;font-size:12px;line-height:1;flex:none}
+.b.l{width:28px;height:28px;font-size:16px}
+.gy{--t:#808183}.gn{--t:#00933C}.or{--t:#FF6319}.br{--t:#996633}.lm{--t:#6CBE45;--gl:#111}.bl{--t:#0039A6}.tl{--t:#00ADD0;--gl:#111}.pu{--t:#B933AD}.sl{--t:#A7A9AC;--gl:#111}
+.dia{position:relative;display:grid;place-items:center;width:28px;height:28px;font-weight:700;font-size:15px;color:var(--k);flex:none}
+.dia::before{content:"";position:absolute;inset:4px;background:var(--w);transform:rotate(45deg)}
+.dia>span{position:relative}
+.dia.k{color:var(--w)}.dia.k::before{background:var(--k)}
+.dia.s{width:20px;height:20px;font-size:11px}.dia.s::before{inset:3px}
+.dia.xl{width:36px;height:36px;font-size:18px}.dia.xl::before{inset:5px}
+/* band */
+.band{position:relative;height:56px;background:var(--k);color:var(--w);display:flex;align-items:center;padding:0 24px}
+.band::after{content:"";position:absolute;left:0;right:0;bottom:5px;height:1px;background:var(--w)}
+.stn{width:216px;display:flex;align-items:center;gap:10px;font-size:18px;font-weight:700}
+.cmd{margin-left:40px;width:320px;height:34px;display:flex;align-items:center;gap:10px;padding:0 8px 0 10px;border:1px solid #3A3A3A;background:#1C1C1C;color:var(--g3)}
+.cmd input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--w);font-size:14px}
+.cmd input::placeholder{color:var(--g3)}
+.route{flex:1;display:flex;justify-content:center;gap:20px}
+.route button{display:flex;align-items:center;gap:7px;background:none;border:0;padding:0;color:var(--w);font-weight:700;font-size:13px;cursor:pointer}
+.sync{display:flex;align-items:center;gap:8px;background:none;border:0;padding:0;color:var(--g3);font-size:13px;cursor:pointer}
+/* shell */
+.shell{display:flex;height:844px}
+.rail{position:relative;width:240px;flex:none;border-right:1px solid var(--rule);padding:14px 12px}
+.rail a{display:grid;grid-template-columns:30px 1fr auto;align-items:center;height:30px;padding:0 8px;color:var(--k);text-decoration:none;font-size:14px}
+.rail a i{font-style:normal;font-size:13px;color:var(--g2)}
+.rail a.on{background:var(--sel);font-weight:700}
+.rail .top{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--rule)}
+.grp{margin-bottom:9px}
+.newl{position:absolute;left:20px;bottom:16px;display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;border:1px solid var(--rule);background:var(--w);font-size:14px;font-weight:700;cursor:pointer}
+.main{flex:1;padding:24px 40px 0}
+.col{width:960px}
+.hd{display:flex;align-items:center;gap:12px;height:40px}
+h1{margin:0;font-size:30px;line-height:36px;font-weight:700;letter-spacing:-.01em}
+.hd .meta{margin-left:auto;font-size:14px;color:var(--g2)}
+h2{margin:12px 0 0;height:30px;display:flex;align-items:flex-end;gap:8px;padding:0 8px 6px;border-bottom:1px solid var(--k);font-size:14px;font-weight:700}
+h2 span{font-weight:400;color:var(--g2)}
+.r{position:relative;display:grid;grid-template-columns:28px 30px 1fr 150px 200px;align-items:center;height:36px;padding:0 8px;border-bottom:1px solid var(--rule)}
+.r .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tg{margin-left:10px;font-size:13px;color:var(--g2)}
+.ln{font-size:13px;color:var(--g2)}
+.d{justify-self:end;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--g2)}
+.p{display:inline-block;height:20px;padding:0 9px;border-radius:10px;font-size:12px;font-weight:700;line-height:20px}
+.late{background:var(--red);color:#fff}.today{background:var(--yel);color:var(--k)}
+.r.sel{background:var(--sel);outline:2px solid var(--k);outline-offset:2px;z-index:1}
+input[type=checkbox]{-webkit-appearance:none;appearance:none;width:16px;height:16px;margin:0;border:1.5px solid var(--k);border-radius:0;background:var(--w);cursor:pointer}
+/* platform sign */
+.sec{position:relative;display:flex;align-items:center;gap:12px;height:44px;margin-top:32px;padding:0 8px;background:var(--k);color:var(--w)}
+.sec::after{content:"";position:absolute;left:0;right:0;bottom:4px;height:1px;background:var(--w)}
+.sec b{font-size:22px;line-height:26px}
+.sec .n{font-size:14px;color:var(--g3)}
+.sec .jump{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:12px;color:var(--g3)}
+.add{display:grid;grid-template-columns:28px 30px 1fr;align-items:center;height:36px;padding:0 8px;border-bottom:1px solid var(--rule);color:var(--g2)}
+.add input{border:0;background:none;outline:0;padding:0;font-size:15px}
+.add input::placeholder{color:var(--g2)}
+.more{display:flex;align-items:center;gap:6px;height:32px;padding:0 0 0 66px;background:none;border:0;font-size:13px;font-weight:700;cursor:pointer}
+details summary{display:grid;grid-template-columns:28px 30px 1fr;align-items:center;height:36px;padding:0 8px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);list-style:none;font-size:14px;font-weight:700;color:var(--g2);cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+summary svg{color:var(--slate)}
+.ring{width:20px;height:20px;border-radius:50%;border:2px solid var(--slate)}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <symbol id="i-search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.75"/><path d="M10.5 10.5L14 14"/></symbol>
+ <symbol id="i-plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></symbol>
+ <symbol id="i-right" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4"/></symbol>
+ <symbol id="i-down" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></symbol>
+ <symbol id="i-saved" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25"/><path d="M5.4 8.2l1.8 1.8 3.4-3.7"/></symbol>
+</svg>
+
+<header class="band">
+ <div class="stn"><span class="dia"><span>T</span></span>Today</div>
+ <label class="cmd"><svg><use href="#i-search"/></svg><input placeholder="Search, or type g and a glyph to jump"><kbd>&#8984;K</kbd></label>
+ <nav class="route" aria-label="Lists with something due">
+  <button class="gn"><span class="b l">H</span>1</button>
+  <button class="or"><span class="b l">E</span>1</button>
+  <button class="or"><span class="b l">G</span>1</button>
+  <button class="br"><span class="b l">A</span>2</button>
+  <button class="lm"><span class="b l">D</span>1</button>
+  <button class="bl"><span class="b l">P</span>1</button>
+  <button class="tl"><span class="b l">L</span>1</button>
+ </nav>
+ <button class="sync"><svg><use href="#i-saved"/></svg>saved 14:32 · 2 pending</button>
+</header>
+
+<div class="shell">
+ <nav class="rail" aria-label="Lists">
+  <div class="top"><a class="on" href="#"><span class="dia s k"><span>T</span></span>Today<i>8</i></a></div>
+  <div class="grp"><a class="gy" href="#"><span class="b">I</span>Inbox<i>9</i></a></div>
+  <div class="grp"><a class="gn" href="#"><span class="b">H</span>Home<i>23</i></a><a class="gn" href="#"><span class="b">Y</span>Garden<i>11</i></a></div>
+  <div class="grp"><a class="or" href="#"><span class="b">E</span>Errands<i>12</i></a><a class="or" href="#"><span class="b">G</span>Groceries<i>18</i></a><a class="or" href="#"><span class="b">X</span>Gifts<i>7</i></a></div>
+  <div class="grp"><a class="br" href="#"><span class="b">A</span>Admin &amp; taxes<i>8</i></a><a class="br" href="#"><span class="b">C</span>Car<i>4</i></a></div>
+  <div class="grp"><a class="lm" href="#"><span class="b">D</span>Health<i>6</i></a><a class="lm" href="#"><span class="b">B</span>Bike<i>5</i></a></div>
+  <div class="grp"><a class="bl" href="#"><span class="b">W</span>Work<i>41</i></a><a class="bl" href="#"><span class="b">P</span>Side project<i>27</i></a></div>
+  <div class="grp"><a class="tl" href="#"><span class="b">L</span>Travel: Lisbon<i>14</i></a></div>
+  <div class="grp"><a class="pu" href="#"><span class="b">R</span>Reading<i>32</i></a><a class="pu" href="#"><span class="b">Z</span>Learning Rust<i>19</i></a><a class="pu" href="#"><span class="b">M</span>Music<i>9</i></a></div>
+  <div class="grp"><a class="sl" href="#"><span class="b">S</span>Someday<i>96</i></a></div>
+  <button class="newl"><svg><use href="#i-plus"/></svg>New list</button>
+ </nav>
+
+ <main class="main"><div class="col">
+  <div class="hd"><span class="dia xl k"><span>T</span></span><h1>Today across lists</h1><span class="meta">Fri 16 Oct · all lists</span></div>
+
+  <h2>Overdue <span>3</span></h2>
+  <div class="r gn"><input type="checkbox" aria-label="Complete"><span class="b">H</span><span class="t">Reply to landlord about boiler service<span class="tg">· #calls</span></span><span class="ln">Home</span><span class="d"><span class="p late">2 days late</span></span></div>
+  <div class="r br sel" tabindex="0"><input type="checkbox" aria-label="Complete"><span class="b">A</span><span class="t">Renew passport photo appointment<span class="tg">· #paperwork</span></span><span class="ln">Admin &amp; taxes</span><span class="d">was Tue 13.10<span class="p late">3 days late</span></span></div>
+  <div class="r or"><input type="checkbox" aria-label="Complete"><span class="b">E</span><span class="t">Return library books</span><span class="ln">Errands</span><span class="d"><span class="p late">1 day late</span></span></div>
+
+  <h2>Due today <span>5</span></h2>
+  <div class="r tl"><input type="checkbox" aria-label="Complete"><span class="b">L</span><span class="t">Book train to Lisbon<span class="tg">· #booking</span></span><span class="ln">Travel: Lisbon</span><span class="d"><span class="p today">Today</span></span></div>
+  <div class="r bl"><input type="checkbox" aria-label="Complete"><span class="b">P</span><span class="t">Review PR for the parser rewrite<span class="tg">· #code</span></span><span class="ln">Side project</span><span class="d"><span class="p today">Today</span></span></div>
+  <div class="r or"><input type="checkbox" aria-label="Complete"><span class="b">G</span><span class="t">Buy coffee beans</span><span class="ln">Groceries</span><span class="d"><span class="p today">Today</span></span></div>
+  <div class="r lm"><input type="checkbox" aria-label="Complete"><span class="b">D</span><span class="t">Call dentist to move appointment<span class="tg">· #calls</span></span><span class="ln">Health</span><span class="d"><span class="p today">Today</span></span></div>
+  <div class="r br"><input type="checkbox" aria-label="Complete"><span class="b">A</span><span class="t">Pay electricity bill<span class="tg">· #money</span></span><span class="ln">Admin &amp; taxes</span><span class="d"><span class="p today">Today</span></span></div>
+
+  <section class="gn">
+   <div class="sec"><span class="b l">H</span><b>Home</b><span class="n">23 open</span><span class="jump">Jump <kbd>g</kbd><kbd>H</kbd></span></div>
+   <label class="add"><svg><use href="#i-plus"/></svg><span></span><input placeholder="Add to Home"></label>
+   <div class="r"><input type="checkbox" aria-label="Complete"><span></span><span class="t">Fix dripping kitchen tap<span class="tg">· #diy</span></span><span></span><span class="d"></span></div>
+   <div class="r"><input type="checkbox" aria-label="Complete"><span></span><span class="t">Order replacement filter for the cooker hood</span><span></span><span class="d">Tue 20.10</span></div>
+   <div class="r"><input type="checkbox" aria-label="Complete"><span></span><span class="t">Paint hallway skirting boards<span class="tg">· #diy · #weekend</span></span><span></span><span class="d"></span></div>
+   <div class="r"><input type="checkbox" aria-label="Complete"><span></span><span class="t">Clean gutters before November</span><span></span><span class="d">Sat 31.10</span></div>
+   <button class="more"><svg><use href="#i-down"/></svg>Show 19 more in Home</button>
+   <details><summary><svg><use href="#i-right"/></svg><span class="ring"></span><span>Done · 14</span></summary></details>
+  </section>
+ </div></main>
+</div>
+</body></html>

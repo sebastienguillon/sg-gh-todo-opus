@@ -1,0 +1,788 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-17T14:03:15.000Z",
+  "title": "Design System: sg-gh-todo-opus",
+  "extensions": {
+    "colorMeta": {
+      "orange": {
+        "role": "primary",
+        "displayName": "Rhodia Cover Orange",
+        "canonical": "#f0691e",
+        "oklch": "oklch(67.8% 0.184 44.4)",
+        "dark": "#d45e1e",
+        "tonalRamp": [
+          "oklch(15.0% 0.184 44.4)",
+          "oklch(26.4% 0.184 44.4)",
+          "oklch(37.9% 0.184 44.4)",
+          "oklch(49.3% 0.184 44.4)",
+          "oklch(60.7% 0.184 44.4)",
+          "oklch(72.1% 0.184 44.4)",
+          "oklch(83.6% 0.184 44.4)",
+          "oklch(95.0% 0.184 44.4)"
+        ]
+      },
+      "on-orange": {
+        "role": "primary",
+        "displayName": "Ink on Cover",
+        "canonical": "#141414",
+        "oklch": "oklch(19.1% 0.000 89.9)",
+        "dark": "#0e0e10",
+        "tonalRamp": [
+          "oklch(15.0% 0.000 89.9)",
+          "oklch(26.4% 0.000 89.9)",
+          "oklch(37.9% 0.000 89.9)",
+          "oklch(49.3% 0.000 89.9)",
+          "oklch(60.7% 0.000 89.9)",
+          "oklch(72.1% 0.000 89.9)",
+          "oklch(83.6% 0.000 89.9)",
+          "oklch(95.0% 0.000 89.9)"
+        ]
+      },
+      "pad": {
+        "role": "neutral",
+        "displayName": "Pad White",
+        "canonical": "#fbfbf9",
+        "oklch": "oklch(98.8% 0.003 106.4)",
+        "dark": "#17171a",
+        "tonalRamp": [
+          "oklch(15.0% 0.003 106.4)",
+          "oklch(26.4% 0.003 106.4)",
+          "oklch(37.9% 0.003 106.4)",
+          "oklch(49.3% 0.003 106.4)",
+          "oklch(60.7% 0.003 106.4)",
+          "oklch(72.1% 0.003 106.4)",
+          "oklch(83.6% 0.003 106.4)",
+          "oklch(95.0% 0.003 106.4)"
+        ]
+      },
+      "pad-2": {
+        "role": "neutral",
+        "displayName": "Rail Paper",
+        "canonical": "#f3f3ef",
+        "oklch": "oklch(96.3% 0.005 106.5)",
+        "dark": "#1d1d21",
+        "tonalRamp": [
+          "oklch(15.0% 0.005 106.5)",
+          "oklch(26.4% 0.005 106.5)",
+          "oklch(37.9% 0.005 106.5)",
+          "oklch(49.3% 0.005 106.5)",
+          "oklch(60.7% 0.005 106.5)",
+          "oklch(72.1% 0.005 106.5)",
+          "oklch(83.6% 0.005 106.5)",
+          "oklch(95.0% 0.005 106.5)"
+        ]
+      },
+      "pad-3": {
+        "role": "neutral",
+        "displayName": "Pressed Paper",
+        "canonical": "#e8e8e3",
+        "oklch": "oklch(93.0% 0.007 106.5)",
+        "dark": "#26262b",
+        "tonalRamp": [
+          "oklch(15.0% 0.007 106.5)",
+          "oklch(26.4% 0.007 106.5)",
+          "oklch(37.9% 0.007 106.5)",
+          "oklch(49.3% 0.007 106.5)",
+          "oklch(60.7% 0.007 106.5)",
+          "oklch(72.1% 0.007 106.5)",
+          "oklch(83.6% 0.007 106.5)",
+          "oklch(95.0% 0.007 106.5)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Fineliner Black",
+        "canonical": "#141414",
+        "oklch": "oklch(19.1% 0.000 89.9)",
+        "dark": "#ececea",
+        "tonalRamp": [
+          "oklch(15.0% 0.000 89.9)",
+          "oklch(26.4% 0.000 89.9)",
+          "oklch(37.9% 0.000 89.9)",
+          "oklch(49.3% 0.000 89.9)",
+          "oklch(60.7% 0.000 89.9)",
+          "oklch(72.1% 0.000 89.9)",
+          "oklch(83.6% 0.000 89.9)",
+          "oklch(95.0% 0.000 89.9)"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#55555d",
+        "oklch": "oklch(45.2% 0.013 285.9)",
+        "dark": "#a8a8b0",
+        "tonalRamp": [
+          "oklch(15.0% 0.013 285.9)",
+          "oklch(26.4% 0.013 285.9)",
+          "oklch(37.9% 0.013 285.9)",
+          "oklch(49.3% 0.013 285.9)",
+          "oklch(60.7% 0.013 285.9)",
+          "oklch(72.1% 0.013 285.9)",
+          "oklch(83.6% 0.013 285.9)",
+          "oklch(95.0% 0.013 285.9)"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Faded Ink",
+        "canonical": "#6b6b73",
+        "oklch": "oklch(53.1% 0.012 286.0)",
+        "dark": "#9a9aa2",
+        "tonalRamp": [
+          "oklch(15.0% 0.012 286.0)",
+          "oklch(26.4% 0.012 286.0)",
+          "oklch(37.9% 0.012 286.0)",
+          "oklch(49.3% 0.012 286.0)",
+          "oklch(60.7% 0.012 286.0)",
+          "oklch(72.1% 0.012 286.0)",
+          "oklch(83.6% 0.012 286.0)",
+          "oklch(95.0% 0.012 286.0)"
+        ]
+      },
+      "dot": {
+        "role": "neutral",
+        "displayName": "Dot Grey",
+        "canonical": "#cdcdd4",
+        "oklch": "oklch(85.0% 0.010 286.2)",
+        "dark": "#34343a",
+        "tonalRamp": [
+          "oklch(15.0% 0.010 286.2)",
+          "oklch(26.4% 0.010 286.2)",
+          "oklch(37.9% 0.010 286.2)",
+          "oklch(49.3% 0.010 286.2)",
+          "oklch(60.7% 0.010 286.2)",
+          "oklch(72.1% 0.010 286.2)",
+          "oklch(83.6% 0.010 286.2)",
+          "oklch(95.0% 0.010 286.2)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Perforation Grey",
+        "canonical": "#a9a9b1",
+        "oklch": "oklch(73.7% 0.011 286.1)",
+        "dark": "#55555e",
+        "tonalRamp": [
+          "oklch(15.0% 0.011 286.1)",
+          "oklch(26.4% 0.011 286.1)",
+          "oklch(37.9% 0.011 286.1)",
+          "oklch(49.3% 0.011 286.1)",
+          "oklch(60.7% 0.011 286.1)",
+          "oklch(72.1% 0.011 286.1)",
+          "oklch(83.6% 0.011 286.1)",
+          "oklch(95.0% 0.011 286.1)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#e3e3e0",
+        "oklch": "oklch(91.5% 0.004 106.5)",
+        "dark": "#2a2a30",
+        "tonalRamp": [
+          "oklch(15.0% 0.004 106.5)",
+          "oklch(26.4% 0.004 106.5)",
+          "oklch(37.9% 0.004 106.5)",
+          "oklch(49.3% 0.004 106.5)",
+          "oklch(60.7% 0.004 106.5)",
+          "oklch(72.1% 0.004 106.5)",
+          "oklch(83.6% 0.004 106.5)",
+          "oklch(95.0% 0.004 106.5)"
+        ]
+      },
+      "hl-today": {
+        "role": "secondary",
+        "displayName": "Today Yellow",
+        "canonical": "#fff176",
+        "oklch": "oklch(94.5% 0.144 102.8)",
+        "dark": "#c9b83c",
+        "tonalRamp": [
+          "oklch(15.0% 0.144 102.8)",
+          "oklch(26.4% 0.144 102.8)",
+          "oklch(37.9% 0.144 102.8)",
+          "oklch(49.3% 0.144 102.8)",
+          "oklch(60.7% 0.144 102.8)",
+          "oklch(72.1% 0.144 102.8)",
+          "oklch(83.6% 0.144 102.8)",
+          "oklch(95.0% 0.144 102.8)"
+        ]
+      },
+      "hl-late": {
+        "role": "secondary",
+        "displayName": "Overdue Pink",
+        "canonical": "#ff9cc6",
+        "oklch": "oklch(80.6% 0.127 353.4)",
+        "dark": "#d7739f",
+        "tonalRamp": [
+          "oklch(15.0% 0.127 353.4)",
+          "oklch(26.4% 0.127 353.4)",
+          "oklch(37.9% 0.127 353.4)",
+          "oklch(49.3% 0.127 353.4)",
+          "oklch(60.7% 0.127 353.4)",
+          "oklch(72.1% 0.127 353.4)",
+          "oklch(83.6% 0.127 353.4)",
+          "oklch(95.0% 0.127 353.4)"
+        ]
+      },
+      "hl-select": {
+        "role": "secondary",
+        "displayName": "Selection Blue",
+        "canonical": "#bde7ff",
+        "oklch": "oklch(90.6% 0.055 233.2)",
+        "dark": "#6b9ec2",
+        "tonalRamp": [
+          "oklch(15.0% 0.055 233.2)",
+          "oklch(26.4% 0.055 233.2)",
+          "oklch(37.9% 0.055 233.2)",
+          "oklch(49.3% 0.055 233.2)",
+          "oklch(60.7% 0.055 233.2)",
+          "oklch(72.1% 0.055 233.2)",
+          "oklch(83.6% 0.055 233.2)",
+          "oklch(95.0% 0.055 233.2)"
+        ]
+      },
+      "on-hl": {
+        "role": "secondary",
+        "displayName": "Ink over Highlighter",
+        "canonical": "#141414",
+        "oklch": "oklch(19.1% 0.000 89.9)",
+        "dark": "#141414",
+        "darkNote": "Not redefined in the dark scheme: the same black in both.",
+        "tonalRamp": [
+          "oklch(15.0% 0.000 89.9)",
+          "oklch(26.4% 0.000 89.9)",
+          "oklch(37.9% 0.000 89.9)",
+          "oklch(49.3% 0.000 89.9)",
+          "oklch(60.7% 0.000 89.9)",
+          "oklch(72.1% 0.000 89.9)",
+          "oklch(83.6% 0.000 89.9)",
+          "oklch(95.0% 0.000 89.9)"
+        ]
+      },
+      "alarm": {
+        "role": "neutral",
+        "displayName": "Alarm",
+        "canonical": "#141414",
+        "oklch": "oklch(19.1% 0.000 89.9)",
+        "dark": "#ececea",
+        "tonalRamp": [
+          "oklch(15.0% 0.000 89.9)",
+          "oklch(26.4% 0.000 89.9)",
+          "oklch(37.9% 0.000 89.9)",
+          "oklch(49.3% 0.000 89.9)",
+          "oklch(60.7% 0.000 89.9)",
+          "oklch(72.1% 0.000 89.9)",
+          "oklch(83.6% 0.000 89.9)",
+          "oklch(95.0% 0.000 89.9)"
+        ]
+      },
+      "on-alarm": {
+        "role": "neutral",
+        "displayName": "Ink on Alarm",
+        "canonical": "#fbfbf9",
+        "oklch": "oklch(98.8% 0.003 106.4)",
+        "dark": "#141414",
+        "tonalRamp": [
+          "oklch(15.0% 0.003 106.4)",
+          "oklch(26.4% 0.003 106.4)",
+          "oklch(37.9% 0.003 106.4)",
+          "oklch(49.3% 0.003 106.4)",
+          "oklch(60.7% 0.003 106.4)",
+          "oklch(72.1% 0.003 106.4)",
+          "oklch(83.6% 0.003 106.4)",
+          "oklch(95.0% 0.003 106.4)"
+        ]
+      },
+      "list-1": {
+        "role": "tertiary",
+        "displayName": "Navy",
+        "canonical": "#233c8c",
+        "oklch": "oklch(38.7% 0.137 266.7)",
+        "dark": "#9db0f2",
+        "tonalRamp": [
+          "oklch(15.0% 0.137 266.7)",
+          "oklch(26.4% 0.137 266.7)",
+          "oklch(37.9% 0.137 266.7)",
+          "oklch(49.3% 0.137 266.7)",
+          "oklch(60.7% 0.137 266.7)",
+          "oklch(72.1% 0.137 266.7)",
+          "oklch(83.6% 0.137 266.7)",
+          "oklch(95.0% 0.137 266.7)"
+        ]
+      },
+      "list-2": {
+        "role": "tertiary",
+        "displayName": "Teal",
+        "canonical": "#07777a",
+        "oklch": "oklch(51.7% 0.087 198.0)",
+        "dark": "#55c7ca",
+        "tonalRamp": [
+          "oklch(15.0% 0.087 198.0)",
+          "oklch(26.4% 0.087 198.0)",
+          "oklch(37.9% 0.087 198.0)",
+          "oklch(49.3% 0.087 198.0)",
+          "oklch(60.7% 0.087 198.0)",
+          "oklch(72.1% 0.087 198.0)",
+          "oklch(83.6% 0.087 198.0)",
+          "oklch(95.0% 0.087 198.0)"
+        ]
+      },
+      "list-3": {
+        "role": "tertiary",
+        "displayName": "Magenta",
+        "canonical": "#b5267e",
+        "oklch": "oklch(52.9% 0.195 348.4)",
+        "dark": "#f08ac8",
+        "tonalRamp": [
+          "oklch(15.0% 0.195 348.4)",
+          "oklch(26.4% 0.195 348.4)",
+          "oklch(37.9% 0.195 348.4)",
+          "oklch(49.3% 0.195 348.4)",
+          "oklch(60.7% 0.195 348.4)",
+          "oklch(72.1% 0.195 348.4)",
+          "oklch(83.6% 0.195 348.4)",
+          "oklch(95.0% 0.195 348.4)"
+        ]
+      },
+      "list-4": {
+        "role": "tertiary",
+        "displayName": "Leaf",
+        "canonical": "#277a35",
+        "oklch": "oklch(51.3% 0.131 146.3)",
+        "dark": "#78cf86",
+        "tonalRamp": [
+          "oklch(15.0% 0.131 146.3)",
+          "oklch(26.4% 0.131 146.3)",
+          "oklch(37.9% 0.131 146.3)",
+          "oklch(49.3% 0.131 146.3)",
+          "oklch(60.7% 0.131 146.3)",
+          "oklch(72.1% 0.131 146.3)",
+          "oklch(83.6% 0.131 146.3)",
+          "oklch(95.0% 0.131 146.3)"
+        ]
+      },
+      "list-5": {
+        "role": "tertiary",
+        "displayName": "Cobalt",
+        "canonical": "#1c6db8",
+        "oklch": "oklch(52.7% 0.139 251.3)",
+        "dark": "#78b6f2",
+        "tonalRamp": [
+          "oklch(15.0% 0.139 251.3)",
+          "oklch(26.4% 0.139 251.3)",
+          "oklch(37.9% 0.139 251.3)",
+          "oklch(49.3% 0.139 251.3)",
+          "oklch(60.7% 0.139 251.3)",
+          "oklch(72.1% 0.139 251.3)",
+          "oklch(83.6% 0.139 251.3)",
+          "oklch(95.0% 0.139 251.3)"
+        ]
+      },
+      "list-6": {
+        "role": "tertiary",
+        "displayName": "Violet",
+        "canonical": "#6b3fa0",
+        "oklch": "oklch(46.9% 0.152 301.7)",
+        "dark": "#bea0ec",
+        "tonalRamp": [
+          "oklch(15.0% 0.152 301.7)",
+          "oklch(26.4% 0.152 301.7)",
+          "oklch(37.9% 0.152 301.7)",
+          "oklch(49.3% 0.152 301.7)",
+          "oklch(60.7% 0.152 301.7)",
+          "oklch(72.1% 0.152 301.7)",
+          "oklch(83.6% 0.152 301.7)",
+          "oklch(95.0% 0.152 301.7)"
+        ]
+      },
+      "list-7": {
+        "role": "tertiary",
+        "displayName": "Umber",
+        "canonical": "#7a4a22",
+        "oklch": "oklch(45.7% 0.085 58.0)",
+        "dark": "#d9a87e",
+        "tonalRamp": [
+          "oklch(15.0% 0.085 58.0)",
+          "oklch(26.4% 0.085 58.0)",
+          "oklch(37.9% 0.085 58.0)",
+          "oklch(49.3% 0.085 58.0)",
+          "oklch(60.7% 0.085 58.0)",
+          "oklch(72.1% 0.085 58.0)",
+          "oklch(83.6% 0.085 58.0)",
+          "oklch(95.0% 0.085 58.0)"
+        ]
+      },
+      "list-8": {
+        "role": "tertiary",
+        "displayName": "Rust",
+        "canonical": "#9c3d12",
+        "oklch": "oklch(48.5% 0.137 41.3)",
+        "dark": "#f0936a",
+        "tonalRamp": [
+          "oklch(15.0% 0.137 41.3)",
+          "oklch(26.4% 0.137 41.3)",
+          "oklch(37.9% 0.137 41.3)",
+          "oklch(49.3% 0.137 41.3)",
+          "oklch(60.7% 0.137 41.3)",
+          "oklch(72.1% 0.137 41.3)",
+          "oklch(83.6% 0.137 41.3)",
+          "oklch(95.0% 0.137 41.3)"
+        ]
+      },
+      "list-9": {
+        "role": "tertiary",
+        "displayName": "Olive",
+        "canonical": "#5f6d1a",
+        "oklch": "oklch(50.6% 0.106 118.8)",
+        "dark": "#bfcd72",
+        "tonalRamp": [
+          "oklch(15.0% 0.106 118.8)",
+          "oklch(26.4% 0.106 118.8)",
+          "oklch(37.9% 0.106 118.8)",
+          "oklch(49.3% 0.106 118.8)",
+          "oklch(60.7% 0.106 118.8)",
+          "oklch(72.1% 0.106 118.8)",
+          "oklch(83.6% 0.106 118.8)",
+          "oklch(95.0% 0.106 118.8)"
+        ]
+      },
+      "list-10": {
+        "role": "tertiary",
+        "displayName": "Ochre",
+        "canonical": "#8a5d00",
+        "oklch": "oklch(51.4% 0.108 76.1)",
+        "dark": "#e6bd5c",
+        "tonalRamp": [
+          "oklch(15.0% 0.108 76.1)",
+          "oklch(26.4% 0.108 76.1)",
+          "oklch(37.9% 0.108 76.1)",
+          "oklch(49.3% 0.108 76.1)",
+          "oklch(60.7% 0.108 76.1)",
+          "oklch(72.1% 0.108 76.1)",
+          "oklch(83.6% 0.108 76.1)",
+          "oklch(95.0% 0.108 76.1)"
+        ]
+      },
+      "list-11": {
+        "role": "tertiary",
+        "displayName": "Slate",
+        "canonical": "#4a5a6e",
+        "oklch": "oklch(46.2% 0.038 254.2)",
+        "dark": "#a9b9ce",
+        "tonalRamp": [
+          "oklch(15.0% 0.038 254.2)",
+          "oklch(26.4% 0.038 254.2)",
+          "oklch(37.9% 0.038 254.2)",
+          "oklch(49.3% 0.038 254.2)",
+          "oklch(60.7% 0.038 254.2)",
+          "oklch(72.1% 0.038 254.2)",
+          "oklch(83.6% 0.038 254.2)",
+          "oklch(95.0% 0.038 254.2)"
+        ]
+      },
+      "list-12": {
+        "role": "tertiary",
+        "displayName": "Pine",
+        "canonical": "#1e6b5c",
+        "oklch": "oklch(47.7% 0.077 177.0)",
+        "dark": "#74cbb8",
+        "tonalRamp": [
+          "oklch(15.0% 0.077 177.0)",
+          "oklch(26.4% 0.077 177.0)",
+          "oklch(37.9% 0.077 177.0)",
+          "oklch(49.3% 0.077 177.0)",
+          "oklch(60.7% 0.077 177.0)",
+          "oklch(72.1% 0.077 177.0)",
+          "oklch(83.6% 0.077 177.0)",
+          "oklch(95.0% 0.077 177.0)"
+        ]
+      }
+    },
+    "schemes": {
+      "light": {
+        "selector": ":root"
+      },
+      "dark": {
+        "selector": ":root",
+        "media": "(prefers-color-scheme: dark)",
+        "note": "Every colour token except on-hl is redefined under this media query; each colorMeta entry carries its dark value in `dark` (on-hl keeps its light value). The display swipe also changes in dark: it starts 0.62em from the top and the date takes on-hl ink."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Today's date heading only, on the yellow display swipe; 2rem on phone."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "List section headings: the two-digit number in the list ink, then the name."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Dialog, sheet and popover titles, and the phone bar date. The palette query and large dialog fields use this size at 400."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "To-do titles, fields and running text, on a 20px line box in rows (1.4 elsewhere; 1.45 for notes). Buttons use 500."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Tags, plain dates, counts, summary and hints. Small headings 700; list names on Today rows 600; the today label 600 and late labels 700."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "The two-digit list index on Today rows, in the Index and in the palette, in the list ink. Only the Today-row index adds +0.02em letter-spacing; the Index rail and palette numbers have none."
+      },
+      "keycap": {
+        "displayName": "Key cap",
+        "purpose": "Every kbd key hint."
+      }
+    },
+    "shadows": [],
+    "elevation": {
+      "model": "flat",
+      "note": "No shadows. Overlays use a 1px ink border; modal dialogs add a backdrop of ink at 28% (color-mix(in srgb, var(--ink) 28%, transparent))."
+    },
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The one easing for every transition."
+      },
+      {
+        "name": "fast",
+        "value": "160ms",
+        "purpose": "Opacity and fill changes: key hints fading in, button fills, the phone bar date, the Done chevron."
+      },
+      {
+        "name": "settle",
+        "value": "200ms",
+        "purpose": "The band changing colour on sync failure, and a swiped row settling back."
+      },
+      {
+        "name": "pen-stroke",
+        "value": "220ms",
+        "purpose": "A signifier that changes on screen is drawn in (stroke-dashoffset 1 to 0). Marks present at load stay still."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "Under prefers-reduced-motion every transition and animation collapses, and the pen stroke is removed."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "(max-width: 767px)",
+        "purpose": "44px gutter and rows, 52px app bar, docked capture, bottom sheets."
+      },
+      {
+        "name": "desktop",
+        "value": "(min-width: 768px)",
+        "purpose": "48px band, 248px Index rail, 124px gutter, 32px rows."
+      },
+      {
+        "name": "touch",
+        "value": "(hover: none)",
+        "purpose": "Hides the gutter key hints."
+      }
+    ],
+    "gutterGrid": {
+      "pitch": "16px",
+      "dot": "radial-gradient(circle, var(--dot) 0.9px, transparent 1.4px)",
+      "desktop": {
+        "width": "104px",
+        "offset": "0 8px"
+      },
+      "phone": {
+        "width": "40px",
+        "offset": "0 14px"
+      },
+      "purpose": "Dots only in the notation gutter, placed so each open bullet sits on a dot."
+    }
+  },
+  "components": [
+    {
+      "name": "Cover Band",
+      "kind": "nav",
+      "refersTo": "cover-band",
+      "description": "The sticky 48px orange band: Index toggle, search with its key caps, the tag filter, help and the plain-text sync state. Turns to ink when sync fails.",
+      "html": "<header class=\"ds-band\"><button class=\"ds-band-icon\" aria-pressed=\"true\" aria-label=\"Hide the Index\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M2.5 3.5h11v9h-11z M6 3.5v9\"/></svg></button><button class=\"ds-band-search\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 11.25a4.25 4.25 0 1 0 0-8.5 4.25 4.25 0 0 0 0 8.5z M10.2 10.2l3.3 3.3\"/></svg><span class=\"ds-band-label\">Search or jump to a list</span><kbd class=\"ds-kbd\">⌘</kbd><kbd class=\"ds-kbd\">K</kbd></button><button class=\"ds-band-tags\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6.25 2.5l-1.5 11 M11.25 2.5l-1.5 11 M2.75 6h11 M2.25 10h11\"/></svg><span>Tags</span><kbd class=\"ds-kbd\">#</kbd></button><span class=\"ds-band-spacer\"></span><button class=\"ds-band-icon\" aria-label=\"Keyboard shortcuts\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M1.75 4.25h12.5v7.5H1.75z M4.25 6.75h.01 M6.75 6.75h.01 M9.25 6.75h.01 M11.75 6.75h.01 M5 9.25h6\"/></svg></button><button class=\"ds-band-sync\">saved 14:32</button></header>",
+      "css": ".ds-band { display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 12px; background: var(--orange, #f0691e); color: var(--on-orange, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size: 0.9375rem; font-variant-numeric: tabular-nums; transition: background-color 200ms cubic-bezier(0.16, 1, 0.3, 1), color 200ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-band button { font: inherit; cursor: pointer; } .ds-band-icon { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid transparent; border-radius: 0; background: transparent; color: inherit; } .ds-band-icon:hover { border-color: currentColor; } .ds-band-icon[aria-pressed='true'] { background: color-mix(in srgb, currentColor 10%, transparent); } .ds-band-search { display: flex; align-items: center; gap: 10px; width: min(420px, 40vw); height: 32px; padding: 0 8px 0 10px; border: 1px solid currentColor; border-radius: 0; background: color-mix(in srgb, var(--pad, #fbfbf9) 88%, var(--orange, #f0691e)); color: var(--ink, #141414); text-align: left; } .ds-band-search:hover { background: var(--pad, #fbfbf9); } .ds-band-label { flex: 1; color: var(--ink-2, #55555d); } .ds-band-search .ds-kbd { color: var(--ink-2, #55555d); } .ds-band-tags, .ds-band-sync { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 0; background: transparent; color: inherit; font-weight: 500; } .ds-band-sync { font-size: 0.8125rem; white-space: nowrap; } .ds-band-tags:hover, .ds-band-sync:hover { border-color: currentColor; } .ds-band-spacer { flex: 1; } .ds-band :focus-visible { outline: 2px solid currentColor; outline-offset: 2px; } .ds-band .ds-kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border: 1px solid currentColor; border-radius: 0; font: inherit; font-size: 0.75rem; font-weight: 600; line-height: 1; }"
+    },
+    {
+      "name": "Signifier Row",
+      "kind": "custom",
+      "refersTo": "todo-row",
+      "description": "The signature log row: a dotted notation gutter with a drawn signifier over a real checkbox and the x > < key hints, then the list number in its ink, title, tag, list name and a margin date on its highlighter.",
+      "html": "<ul class=\"ds-log\"><li class=\"ds-row ds-late\" style=\"--list-ink: var(--list-7, #7a4a22)\"><div class=\"ds-gutter\"><label class=\"ds-sig\"><input type=\"checkbox\" aria-label=\"Renew passport photo appointment\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"2.6\" fill=\"currentColor\"/></svg></label><span class=\"ds-hints ds-always\"><button class=\"ds-key\" aria-label=\"Done\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M4.5 4.5l7 7M11.5 4.5l-7 7\"/></svg></button><button class=\"ds-key\" aria-label=\"Move to a list\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M5.75 3.5 10.25 8l-4.5 4.5\"/></svg></button><button class=\"ds-key\" aria-label=\"Reschedule\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M10.25 3.5 5.75 8l4.5 4.5\"/></svg></button></span></div><span class=\"ds-index\">07</span><div class=\"ds-body\"><span class=\"ds-title\">Renew passport photo appointment</span><span class=\"ds-tag\">#paperwork</span></div><span class=\"ds-list\">Admin &amp; taxes</span><span class=\"ds-due\"><span class=\"ds-swipe-late\">−3d</span></span></li><li class=\"ds-row\" style=\"--list-ink: var(--list-4, #277a35)\"><div class=\"ds-gutter\"><label class=\"ds-sig\"><input type=\"checkbox\" aria-label=\"Buy coffee beans\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"2.6\" fill=\"currentColor\"/></svg></label><span class=\"ds-hints\"><button class=\"ds-key\" aria-label=\"Done\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M4.5 4.5l7 7M11.5 4.5l-7 7\"/></svg></button><button class=\"ds-key\" aria-label=\"Move to a list\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M5.75 3.5 10.25 8l-4.5 4.5\"/></svg></button><button class=\"ds-key\" aria-label=\"Reschedule\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M10.25 3.5 5.75 8l4.5 4.5\"/></svg></button></span></div><span class=\"ds-index\">04</span><div class=\"ds-body\"><span class=\"ds-title\">Buy coffee beans</span></div><span class=\"ds-list\">Groceries</span><span class=\"ds-due\"><span class=\"ds-swipe-today\">today</span></span></li><li class=\"ds-row ds-done\" style=\"--list-ink: var(--list-1, #233c8c)\"><div class=\"ds-gutter\"><label class=\"ds-sig\"><input type=\"checkbox\" checked aria-label=\"Sort photos from the weekend\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M4.5 4.5l7 7M11.5 4.5l-7 7\"/></svg></label></div><span class=\"ds-index\">01</span><div class=\"ds-body\"><span class=\"ds-title\">Sort photos from the weekend</span><span class=\"ds-tag\">#photos</span></div><span class=\"ds-list\">Inbox</span><span class=\"ds-due\"></span></li></ul>",
+      "css": ".ds-log { margin: 0; padding: 0; list-style: none; background: var(--pad, #fbfbf9); color: var(--ink, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size: 0.9375rem; font-variant-numeric: tabular-nums; } .ds-row { display: grid; grid-template-columns: 124px 36px minmax(0, 1fr) max-content 104px; align-items: start; min-height: 32px; background: var(--pad, #fbfbf9); } .ds-row:hover { background: color-mix(in srgb, var(--pad-2, #f3f3ef) 70%, var(--pad, #fbfbf9)); } .ds-row:has(input:focus-visible) { outline: 2px solid var(--ink, #141414); outline-offset: -2px; } .ds-row:has(input:focus-visible) .ds-title { background: linear-gradient(var(--hl-select, #bde7ff), var(--hl-select, #bde7ff)) 0 55% / 100% 70% no-repeat; color: var(--on-hl, #141414); } .ds-gutter { position: relative; display: flex; align-items: flex-start; align-self: stretch; min-height: 32px; padding-left: 8px; } .ds-gutter::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 104px; background: radial-gradient(circle, var(--dot, #cdcdd4) 0.9px, transparent 1.4px) 0 8px / 16px 16px; pointer-events: none; } .ds-gutter > * { position: relative; } .ds-sig { position: relative; display: grid; place-items: center; width: 32px; height: 32px; color: var(--ink, #141414); cursor: pointer; } .ds-sig input { position: absolute; inset: 0; margin: 0; appearance: none; border: 1px solid transparent; border-radius: 0; background: transparent; cursor: pointer; } .ds-sig input:focus-visible { outline: none; } .ds-sig:hover input { border-color: var(--rule, #a9a9b1); } .ds-hints { display: flex; align-items: center; gap: 3px; height: 32px; margin-left: 8px; opacity: 0; transition: opacity 160ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-hints.ds-always, .ds-row:hover .ds-hints, .ds-row:focus-within .ds-hints { opacity: 1; } .ds-key { display: grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 1px solid var(--rule, #a9a9b1); border-radius: 0; background: var(--pad, #fbfbf9); color: var(--ink-2, #55555d); cursor: pointer; } .ds-key .ds-glyph { width: 12px; height: 12px; } .ds-key:hover, .ds-row:has(input:focus-visible) .ds-key { border-color: var(--ink, #141414); color: var(--ink, #141414); } .ds-key:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; } .ds-index { line-height: 32px; color: var(--list-ink); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.02em; } .ds-body { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; min-width: 0; padding-block: 6px; line-height: 20px; } .ds-title { overflow-wrap: anywhere; } .ds-tag { color: var(--ink-2, #55555d); font-size: 0.8125rem; } .ds-list { padding: 6px 0 0 16px; color: var(--list-ink); font-size: 0.8125rem; font-weight: 600; line-height: 20px; white-space: nowrap; } .ds-due { display: flex; justify-content: flex-end; padding: 6px 12px 0 0; line-height: 20px; font-size: 0.8125rem; color: var(--ink-2, #55555d); white-space: nowrap; } .ds-late .ds-due { color: var(--ink, #141414); font-weight: 700; } .ds-swipe-late { background-color: var(--hl-late, #ff9cc6); clip-path: polygon(2px 0, 100% 0, calc(100% - 2px) 100%, 0 100%); padding-inline: 4px; color: var(--on-hl, #141414); } .ds-swipe-today { background-color: var(--hl-today, #fff176); clip-path: polygon(2px 0, 100% 0, calc(100% - 2px) 100%, 0 100%); padding-inline: 4px; color: var(--on-hl, #141414); font-weight: 600; } .ds-done .ds-sig { color: var(--ink-3, #6b6b73); } .ds-done .ds-title { color: var(--ink-3, #6b6b73); text-decoration: line-through; text-decoration-thickness: 1px; } .ds-log .ds-glyph { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; } .ds-log .ds-glyph circle { stroke: none; }"
+    },
+    {
+      "name": "Highlighter Swipe",
+      "kind": "chip",
+      "refersTo": "swipe-today",
+      "description": "Squared, 2px-skewed highlighter fills behind fineliner ink: the display swipe under the date heading, then today, late and selection labels.",
+      "html": "<div class=\"ds-swipes\"><h1 class=\"ds-display\"><span class=\"ds-swipe-display\">Sat 17.10</span></h1><p class=\"ds-swipe-row\"><span class=\"ds-swipe ds-hl-today\">today</span><span class=\"ds-swipe ds-hl-late\">−3d</span><span class=\"ds-swipe ds-hl-select\">01 Inbox</span></p></div>",
+      "css": ".ds-swipes { display: grid; gap: 16px; padding: 8px 4px; background: var(--pad, #fbfbf9); color: var(--ink, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-variant-numeric: tabular-nums; } .ds-display { margin: 0; font-size: 2.5rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; } .ds-swipe-display { position: relative; isolation: isolate; padding-inline: 4px; color: var(--ink, #141414); } .ds-swipe-display::before { content: ''; position: absolute; inset: 1.04em -6px 0.14em; z-index: -1; background: var(--hl-today, #fff176); clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%); } .ds-swipe-row { display: flex; gap: 12px; margin: 0; font-size: 0.8125rem; line-height: 20px; } .ds-swipe { clip-path: polygon(2px 0, 100% 0, calc(100% - 2px) 100%, 0 100%); padding-inline: 4px; color: var(--on-hl, #141414); } .ds-hl-today { background-color: var(--hl-today, #fff176); font-weight: 600; } .ds-hl-late { background-color: var(--hl-late, #ff9cc6); font-weight: 700; } .ds-hl-select { background-color: var(--hl-select, #bde7ff); }"
+    },
+    {
+      "name": "Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "The default square control: 1px fineliner border, transparent fill, pressed paper on hover, with an optional signifier and key cap.",
+      "html": "<button class=\"ds-btn\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M5.75 3.5 10.25 8l-4.5 4.5\"/></svg> Move <kbd class=\"ds-kbd\">&gt;</kbd></button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 12px; border: 1px solid var(--ink, #141414); border-radius: 0; background: transparent; color: var(--ink, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size: 0.9375rem; font-weight: 500; cursor: pointer; transition: background-color 160ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn:hover { background: var(--pad-3, #e8e8e3); } .ds-btn:active { background: var(--line, #e3e3e0); } .ds-btn:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; } .ds-btn:disabled { border-color: var(--rule, #a9a9b1); color: var(--ink-3, #6b6b73); background: transparent; cursor: not-allowed; } .ds-btn .ds-glyph { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; } .ds-btn .ds-glyph circle { stroke: none; } .ds-btn .ds-kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border: 1px solid currentColor; border-radius: 0; font: inherit; font-size: 0.75rem; font-weight: 600; line-height: 1; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The committing action of a dialog (Reschedule, Save tags): an ink fill with pad text. Disabled, it is a transparent box with a Perforation Grey border and Faded Ink text.",
+      "html": "<button class=\"ds-btn-primary\">Reschedule</button> <button class=\"ds-btn-primary\" disabled>Reschedule</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 12px; border: 1px solid var(--ink, #141414); border-radius: 0; background: var(--ink, #141414); color: var(--pad, #fbfbf9); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size: 0.9375rem; font-weight: 500; cursor: pointer; transition: background-color 160ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover { background: color-mix(in srgb, var(--ink, #141414) 86%, var(--pad, #fbfbf9)); } .ds-btn-primary:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; } .ds-btn-primary:disabled { border-color: var(--rule, #a9a9b1); background: transparent; color: var(--ink-3, #6b6b73); cursor: not-allowed; }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Secondary actions (Cancel, Delete, Close, New list, Clear done): no visible border until hover, when the perforation grey appears.",
+      "html": "<button class=\"ds-btn-quiet\">Close <kbd class=\"ds-kbd\">esc</kbd></button>",
+      "css": ".ds-btn-quiet { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 12px; border: 1px solid transparent; border-radius: 0; background: transparent; color: var(--ink, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size: 0.9375rem; font-weight: 500; cursor: pointer; transition: background-color 160ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-quiet:hover { border-color: var(--rule, #a9a9b1); background: var(--pad-3, #e8e8e3); } .ds-btn-quiet:active { background: var(--line, #e3e3e0); } .ds-btn-quiet:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; } .ds-btn-quiet .ds-kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border: 1px solid currentColor; border-radius: 0; font: inherit; font-size: 0.75rem; font-weight: 600; line-height: 1; }"
+    },
+    {
+      "name": "Capture Field",
+      "kind": "input",
+      "refersTo": "capture-field",
+      "description": "The log-a-task field: a faded open bullet in the gutter, a 40px ink-bordered field, and a hint line of key caps that files the entry.",
+      "html": "<form class=\"ds-capture\" onsubmit=\"return false\"><span class=\"ds-capture-mark\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"2.6\" fill=\"currentColor\"/></svg></span><div class=\"ds-capture-input\"><input class=\"ds-field\" placeholder=\"Log a task\" aria-label=\"Log a task\" autocomplete=\"off\"><p class=\"ds-capture-hint\"><span><kbd class=\"ds-kbd\">#</kbd> tag</span><span><kbd class=\"ds-kbd\">&gt;</kbd> list</span><span><kbd class=\"ds-kbd\">&lt;</kbd> date</span><span class=\"ds-capture-where\">Enter files it in 01 Inbox</span></p></div></form>",
+      "css": ".ds-capture { display: grid; grid-template-columns: 124px minmax(0, 1fr) 12px; align-items: start; padding: 8px 0; background: var(--pad, #fbfbf9); color: var(--ink, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-variant-numeric: tabular-nums; } .ds-capture-mark { display: grid; place-items: center; width: 32px; height: 40px; margin-left: 8px; color: var(--ink-3, #6b6b73); } .ds-capture-input { display: grid; gap: 6px; } .ds-field { width: 100%; min-height: 40px; padding: 6px 10px; border: 1px solid var(--ink, #141414); border-radius: 0; background: var(--pad, #fbfbf9); color: var(--ink, #141414); font: inherit; font-size: 0.9375rem; } .ds-field::placeholder { color: var(--ink-3, #6b6b73); } .ds-field:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 0; } .ds-capture-hint { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; min-height: 20px; color: var(--ink-2, #55555d); font-size: 0.8125rem; line-height: 20px; } .ds-capture-hint span { display: inline-flex; align-items: center; gap: 6px; } .ds-capture .ds-kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border: 1px solid currentColor; border-radius: 0; font: inherit; font-size: 0.75rem; font-weight: 600; line-height: 1; } .ds-capture-hint .ds-kbd { min-width: 18px; height: 18px; } .ds-capture-where { margin-left: auto; } .ds-capture .ds-glyph { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; } .ds-capture .ds-glyph circle { stroke: none; }"
+    },
+    {
+      "name": "Index Rail",
+      "kind": "nav",
+      "refersTo": "index-rail",
+      "description": "The 248px Index: Today with its late count on pink, then every list as its two-digit number in its ink, the name and an open count; the current list sits on the blue band.",
+      "html": "<nav class=\"ds-index-rail\" aria-label=\"Index\"><h2 class=\"ds-index-title\">Index</h2><ul><li><a href=\"#\" class=\"ds-index-item ds-index-today\"><span class=\"ds-index-num\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M2.75 4h10.5v9.25H2.75z M2.75 7h10.5 M5.75 2.5v3 M10.25 2.5v3\"/></svg></span><span class=\"ds-index-name\">Today</span><span class=\"ds-index-count\"><span class=\"ds-index-late\">3</span><span>5</span></span></a></li><li style=\"--list-ink: var(--list-1, #233c8c)\"><a href=\"#\" class=\"ds-index-item\" aria-current=\"location\"><span class=\"ds-index-num\">01</span><span class=\"ds-index-name\">Inbox</span><span class=\"ds-index-count\">9</span></a></li><li style=\"--list-ink: var(--list-2, #07777a)\"><a href=\"#\" class=\"ds-index-item\"><span class=\"ds-index-num\">02</span><span class=\"ds-index-name\">Home</span><span class=\"ds-index-count\">19</span></a></li><li style=\"--list-ink: var(--list-3, #b5267e)\"><a href=\"#\" class=\"ds-index-item\"><span class=\"ds-index-num\">03</span><span class=\"ds-index-name\">Errands</span><span class=\"ds-index-count\">8</span></a></li></ul></nav>",
+      "css": ".ds-index-rail { display: flex; flex-direction: column; gap: 4px; width: 248px; padding: 20px 12px 24px; background: var(--pad-2, #f3f3ef); border-right: 1px solid var(--line, #e3e3e0); color: var(--ink, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size: 0.9375rem; font-variant-numeric: tabular-nums; } .ds-index-title { margin: 0; padding: 0 8px 6px; font-size: 0.8125rem; font-weight: 700; color: var(--ink-2, #55555d); } .ds-index-rail ul { margin: 0; padding: 0; list-style: none; } .ds-index-item { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 32px; padding: 0 8px; border: 1px solid transparent; color: var(--ink, #141414); text-decoration: none; } .ds-index-item:hover { border-color: var(--rule, #a9a9b1); } .ds-index-item:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; } .ds-index-item[aria-current] { background: linear-gradient(var(--hl-select, #bde7ff), var(--hl-select, #bde7ff)) 0 50% / 100% 70% no-repeat; color: var(--on-hl, #141414); } .ds-index-item[aria-current] .ds-index-num, .ds-index-item[aria-current] .ds-index-count { color: var(--on-hl, #141414); } .ds-index-num { color: var(--list-ink, var(--ink, #141414)); font-size: 0.8125rem; font-weight: 700; } .ds-index-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .ds-index-today { margin-bottom: 8px; } .ds-index-today .ds-index-name { font-weight: 700; } .ds-index-count { display: inline-flex; gap: 8px; color: var(--ink-2, #55555d); font-size: 0.8125rem; } .ds-index-late { background-color: var(--hl-late, #ff9cc6); clip-path: polygon(2px 0, 100% 0, calc(100% - 2px) 100%, 0 100%); padding-inline: 4px; color: var(--on-hl, #141414); font-weight: 700; }"
+    },
+    {
+      "name": "Perforation and Done Fold",
+      "kind": "custom",
+      "refersTo": "button-quiet",
+      "description": "The dashed tear line that ends a list's open rows, carrying the \"N done\" fold and, when open, a quiet Clear done.",
+      "html": "<div class=\"ds-perforation\"><button class=\"ds-fold\" aria-expanded=\"true\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M4.5 4.5l7 7M11.5 4.5l-7 7\"/></svg><span>3 done</span><span class=\"ds-chev ds-up\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4.5 6.25 8 9.75l3.5-3.5\"/></svg></span></button><button class=\"ds-clear\">Clear done</button></div>",
+      "css": ".ds-perforation { display: flex; align-items: center; gap: 8px; min-height: 32px; padding-left: 8px; border-top: 1px dashed var(--rule, #a9a9b1); background: var(--pad, #fbfbf9); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-variant-numeric: tabular-nums; } .ds-fold { display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px; border: 0; background: none; color: var(--ink-2, #55555d); font: inherit; font-size: 0.8125rem; cursor: pointer; } .ds-fold .ds-glyph { width: 14px; height: 14px; } .ds-fold:hover { color: var(--ink, #141414); } .ds-fold:focus-visible, .ds-clear:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; } .ds-chev { display: inline-flex; transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-chev.ds-up { transform: rotate(180deg); } .ds-clear { min-height: 28px; padding: 0 12px; border: 1px solid transparent; border-radius: 0; background: transparent; color: var(--ink, #141414); font: inherit; font-size: 0.8125rem; font-weight: 500; cursor: pointer; } .ds-clear:hover { border-color: var(--rule, #a9a9b1); background: var(--pad-3, #e8e8e3); } .ds-perforation .ds-glyph { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; } .ds-perforation .ds-glyph circle { stroke: none; }"
+    },
+    {
+      "name": "Toast",
+      "kind": "custom",
+      "refersTo": "toast",
+      "description": "A solid ink slip at the bottom left confirming a delete or clear, with an outlined Undo and its u key cap.",
+      "html": "<div class=\"ds-toast\" role=\"status\"><span>Deleted “Return library books”</span><button class=\"ds-toast-undo\">Undo <kbd class=\"ds-kbd\">u</kbd></button><button class=\"ds-toast-x\" aria-label=\"Dismiss\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4.25 4.25l7.5 7.5 M11.75 4.25l-7.5 7.5\"/></svg></button></div>",
+      "css": ".ds-toast { display: inline-flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 6px 0 14px; background: var(--ink, #141414); color: var(--pad, #fbfbf9); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size: 0.9375rem; } .ds-toast button { font: inherit; cursor: pointer; } .ds-toast-undo { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 6px 0 10px; border: 1px solid currentColor; border-radius: 0; background: transparent; color: inherit; font-weight: 700; } .ds-toast-undo:hover { background: color-mix(in srgb, var(--pad, #fbfbf9) 14%, transparent); } .ds-toast .ds-kbd { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 4px; border: 1px solid currentColor; border-radius: 0; font: inherit; font-size: 0.75rem; font-weight: 600; line-height: 1; } .ds-toast-undo .ds-kbd { min-width: 18px; height: 18px; } .ds-toast-x { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; background: none; color: inherit; } .ds-toast :focus-visible { outline: 2px solid var(--pad, #fbfbf9); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Rapid Log",
+    "overview": "The Rapid Log is the Bullet Journal's rapid-log key, written in black fineliner on a Rhodia dotPad under the pad's orange cover band. The checkbox column is a notation column. Each state has one drawn glyph (• open, × done, > moved, < rescheduled) and each verb has one key (x, >, <), so the morning triage is a single pass down that gutter.\n\nThe density is that of a working notebook: 32px rows, 15px text, tabular figures throughout, and dates in a right margin. Colour carries meaning and nothing else. Orange is the cover. Highlighter swipes sit behind text for today (yellow), late (pink) and selection (blue). Twelve fineliner inks identify lists through their two-digit index. Everything else is black and grey ink on pad white.\n\nThe surface is flat paper: square corners, 1px ink borders, no shadows, a dot grid only in the gutter, and a dashed perforation above each list's Done. The system refuses the category's round checkbox, a sidebar of anonymous coloured dots, swipe menus of extra options, and any washi tape, stickers, hand lettering or handwriting faces.",
+    "keyCharacteristics": [
+      "A signifier gutter: one drawn glyph per state, each over a real checkbox.",
+      "An orange cover band over black and grey ink on pad white.",
+      "Highlighters behind text only: yellow today, pink late, blue selection.",
+      "Twelve fineliner inks on two-digit list indexes.",
+      "One face, Atkinson Hyperlegible Next, with tabular figures and weights from 400 to 800.",
+      "Square, flat and shadowless, with dots only in the gutter and a dashed perforation above Done.",
+      "Light and dark schemes from the same token names."
+    ],
+    "rules": [
+      {
+        "name": "The Cover Band Rule",
+        "body": "Orange is the notebook's cover and nothing else. It fills the band (and the browser theme colour) and never appears on text, rows, buttons or rules inside the pad. The band changes colour only when sync fails, when it turns to ink.",
+        "section": "colors"
+      },
+      {
+        "name": "The Highlighter Rule",
+        "body": "Highlighters are fills behind fineliner ink, never text colours. Yellow means today, pink means late, blue means selected or current, and the ink over any of them is always `on-hl` black, in both schemes.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink Identity Rule",
+        "body": "A list's ink colours only its two-digit index, its name on Today rows, and the > mark beside it in the move picker. Titles, tags and dates stay black and grey. Because the twelve inks repeat, the number and name identify a list; the colour alone never does.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Hand Rule",
+        "body": "Atkinson Hyperlegible Next is the only face. Hierarchy comes from size and weight (400 body, 500 controls, 600 key caps and list names, 700 numbers and labels, 800 headings), never from a second family, a script or a handwriting face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "Every numeral is tabular, set on the body and repeated on form controls, so margin dates, rail counts and two-digit indexes line up in columns.",
+        "section": "typography"
+      },
+      {
+        "name": "The Notation Column Rule",
+        "body": "Text starts at one gutter line, 124px on desktop and 44px on phone, for every row, list heading, capture field and empty-state line. The gutter holds only signifiers, key hints, the dot grid and the Done fold's \u00d7 count at the perforation.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Right Edge Rule",
+        "body": "On desktop every column ends 12px (`edge`) inside the main column's right side; on the phone, columns end 16px from the screen edge. Due dates are right-aligned in the 104px margin column against that edge, and a quiet button pulls its box out by 12px so that its text, not its box, meets the edge.",
+        "section": "layout"
+      },
+      {
+        "name": "The Dots-in-the-Gutter Rule",
+        "body": "The dot grid appears only in the gutter and in the phone's opened-row verb column, never across the page.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Pad Rule",
+        "body": "No surface casts a shadow. Separation comes from a 1px ink edge, a paper tone or the 28% ink backdrop.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Square Corner Rule",
+        "body": "Every box has square corners. Curves appear only inside drawn marks: the bullet, the gutter dots, icon strokes such as the search lens and the offline arcs, and round stroke caps.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Real Checkbox Rule",
+        "body": "Every signifier is drawn over a real native checkbox that fills its cell, so a click, Space and `x` all do the same thing and assistive technology announces a checkbox.",
+        "section": "components"
+      },
+      {
+        "name": "The Three Verbs Rule",
+        "body": "A row's gutter and swipe offer exactly three verbs, × done, > move and < reschedule, in that order wherever they appear: the gutter hints, the phone's opened-row stack and the phone swipe (right for ×, left for > and <). Tags and Delete live in the opened row and on their keys (t, Delete).",
+        "section": "components"
+      },
+      {
+        "name": "The Pen Stroke Rule",
+        "body": "The one authored motion: when a signifier changes on screen, it is drawn in like a pen stroke over 220ms. Marks present at load stay still.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do head the log with today's date at display size on the yellow display swipe, which crosses the lower band of the letters in light mode and covers the whole word, under black ink, in dark mode.",
+      "Do keep every row on the row pitch (32px desktop, 44px phone) with a 20px line box, and let long titles wrap rather than truncate.",
+      "Do name a list by its two-digit index in its ink at 700 (800 in list headings), followed by its name, everywhere it appears: the Index, list headings, Today rows, the palette and the move picker.",
+      "Do show the × > < key hints at all times on late Today rows, on hover or focus elsewhere, and never on touch devices.",
+      "Do end every list's open rows with the dashed perforation (1px dashed `rule`) and fold Done beneath it.",
+      "Do keep sync state as plain text at the right end of the band (\"saved 14:32\"), and turn the whole band to ink when sync fails.",
+      "Do mark keyboard focus with a 2px ink outline; on a row, also lay the blue highlighter behind the title.",
+      "Do draw icons on a 16px grid with the fineliner stroke (1.6px, round caps and joins), rendered at 14, 16 or 18px, in the current text colour.",
+      "Do turn dialogs into full-width bottom sheets on phones, with a top border only, and give every phone target at least 44px."
+    ],
+    "donts": [
+      "Don't draw a round or boxed checkbox at rest; the only box is the 1px Perforation Grey outline of the cell on hover.",
+      "Don't identify lists with anonymous coloured dots or by colour alone.",
+      "Don't add swipe actions or gutter verbs beyond ×, > and <; Tags and Delete live in the opened row and on their keys.",
+      "Don't set text in a highlighter colour, or put light ink on a highlighter.",
+      "Don't use orange anywhere inside the pad.",
+      "Don't add shadows or rounded corners.",
+      "Don't add washi tape, stickers, hand lettering or handwriting faces.",
+      "Don't spread the dot grid outside the gutter."
+    ]
+  }
+}

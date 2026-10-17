@@ -1,0 +1,363 @@
+/* Rapid Log: black fineliner on a Rhodia dotPad, under an orange cover band. */
+
+:root {
+  color-scheme: light dark;
+
+  --font: 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+
+  /* Cover band */
+  --orange: #f0691e;
+  --orange-hover: #f27b36;
+  --orange-press: #d85e1b;
+  --on-orange: #141414;
+
+  /* Pad */
+  --pad: #fbfbf9;
+  --pad-2: #f3f3ef;
+  --pad-3: #e8e8e3;
+  --ink: #141414;
+  --ink-2: #55555d;
+  --ink-3: #6b6b73;
+  --dot: #cdcdd4;
+  --rule: #a9a9b1;
+  --line: #e3e3e0;
+
+  /* Highlighters: behind text, never as text colour */
+  --hl-today: #fff176;
+  --hl-late: #ff9cc6;
+  --hl-select: #bde7ff;
+  /* Ink laid over a highlighter, in both schemes */
+  --on-hl: #141414;
+
+  /* Failed sync turns the band to ink */
+  --alarm: #141414;
+  --on-alarm: #fbfbf9;
+
+  /* Fineliner inks for list identity (each >= 4.5:1 on the pad) */
+  --list-1: #233c8c;
+  --list-2: #07777a;
+  --list-3: #b5267e;
+  --list-4: #277a35;
+  --list-5: #1c6db8;
+  --list-6: #6b3fa0;
+  --list-7: #7a4a22;
+  --list-8: #9c3d12;
+  --list-9: #5f6d1a;
+  --list-10: #8a5d00;
+  --list-11: #4a5a6e;
+  --list-12: #1e6b5c;
+
+  /* Rhythm */
+  --row: 32px;
+  --gutter: 124px;
+  --rail: 248px;
+  --band: 48px;
+  --margin-col: 104px;
+  /* The one right edge every column ends on */
+  --edge: 12px;
+
+  /* Type scale (1.2) */
+  --t-meta: 0.8125rem;
+  --t-body: 0.9375rem;
+  --t-sub: 1.125rem;
+  --t-head: 1.625rem;
+  --t-display: 2.5rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --fast: 160ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --orange: #d45e1e;
+    --orange-hover: #da6827;
+    --orange-press: #bf5419;
+    --on-orange: #0e0e10;
+
+    --pad: #17171a;
+    --pad-2: #1d1d21;
+    --pad-3: #26262b;
+    --ink: #ececea;
+    --ink-2: #a8a8b0;
+    --ink-3: #9a9aa2;
+    --dot: #34343a;
+    --rule: #55555e;
+    --line: #2a2a30;
+
+    /* Dimmed highlighters: still behind the text, under dark ink */
+    --hl-today: #c9b83c;
+    --hl-late: #d7739f;
+    --hl-select: #6b9ec2;
+
+    --alarm: #ececea;
+    --on-alarm: #141414;
+
+    --list-1: #9db0f2;
+    --list-2: #55c7ca;
+    --list-3: #f08ac8;
+    --list-4: #78cf86;
+    --list-5: #78b6f2;
+    --list-6: #bea0ec;
+    --list-7: #d9a87e;
+    --list-8: #f0936a;
+    --list-9: #bfcd72;
+    --list-10: #e6bd5c;
+    --list-11: #a9b9ce;
+    --list-12: #74cbb8;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--band) + 16px);
+  scrollbar-color: var(--rule) var(--pad);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--pad);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--t-body);
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  caret-color: var(--ink);
+}
+
+::selection {
+  background: var(--hl-select);
+  color: var(--on-hl);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+button {
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+.vh {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Highlighter swipe: squared ends with a 2px skew, laid behind the text. The fill is the
+   element's own background, so the ink over it never depends on a pseudo-element painting. */
+.swipe {
+  padding-inline: 4px;
+  background-color: var(--hl);
+  clip-path: polygon(2px 0, 100% 0, calc(100% - 2px) 100%, 0 100%);
+  color: var(--on-hl);
+}
+
+.swipe.today {
+  --hl: var(--hl-today);
+}
+
+.swipe.late {
+  --hl: var(--hl-late);
+}
+
+.swipe.select {
+  --hl: var(--hl-select);
+}
+
+/* Display type: the swipe passes over the lower band of the letters, the way a highlighter
+   crosses a heading. Its fill sits under the glyphs, so the ink stays the page's own. */
+.swipe.display {
+  position: relative;
+  isolation: isolate;
+  background-color: transparent;
+  clip-path: none;
+  color: var(--ink);
+}
+
+.swipe.display::before {
+  content: '';
+  position: absolute;
+  inset: 1.04em -6px 0.14em;
+  z-index: -1;
+  background: var(--hl);
+  clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+  /* At night the display swipe covers the whole word under dark ink, never light ink on a dim fill. */
+  .swipe.display {
+    color: var(--on-hl);
+  }
+
+  .swipe.display::before {
+    inset: 0.62em -6px 0.14em;
+  }
+}
+
+.log {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Plain, standard control shapes in the pad's vocabulary. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 500;
+  transition: background-color var(--fast) var(--ease-out);
+}
+
+.btn:hover {
+  background: var(--pad-3);
+}
+
+.btn:active {
+  background: var(--line);
+}
+
+.btn:disabled {
+  border-color: var(--rule);
+  color: var(--ink-3);
+  cursor: not-allowed;
+  background: transparent;
+}
+
+.btn.primary {
+  background: var(--ink);
+  color: var(--pad);
+}
+
+.btn.primary:hover {
+  background: color-mix(in srgb, var(--ink) 86%, var(--pad));
+}
+
+.btn.primary:disabled {
+  border-color: var(--rule);
+  background: transparent;
+  color: var(--ink-3);
+}
+
+.btn.quiet {
+  border-color: transparent;
+}
+
+.btn.quiet:hover {
+  border-color: var(--rule);
+}
+
+kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border: 1px solid currentColor;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.field {
+  width: 100%;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  background: var(--pad);
+  color: var(--ink);
+}
+
+.field:hover {
+  border-color: var(--ink-3);
+}
+
+.field:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 0;
+  border-color: var(--ink);
+}
+
+.field::placeholder {
+  color: var(--ink-3);
+}
+
+/* Dialogs: square paper sheets, no shadows; a dimmed backdrop for focus. */
+dialog.sheet {
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(640px, calc(100dvh - 64px));
+  margin: 12vh auto auto;
+  padding: 0;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--pad);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+dialog.sheet::backdrop {
+  background: color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+@media (max-width: 767px) {
+  dialog.sheet {
+    width: 100vw;
+    max-width: 100vw;
+    max-height: 86dvh;
+    margin: auto 0 0;
+    border-width: 1px 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

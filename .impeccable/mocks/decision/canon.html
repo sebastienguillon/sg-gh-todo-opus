@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Today</title>
+<style>
+:root{--bg:#FFFFFF;--side:#F7F7F8;--ink:#1C1C1E;--sec:#6E6E73;--sep:#E6E6E9;--blue:#2F6FEB;--red:#E5484D;--red-ink:#C62F35;--red-bg:#FDEDEE;--orange:#E58A00;--orange-ink:#9A5800;--orange-bg:#FDF2E1;--sel:rgba(47,111,235,.10);--box:#8E8E93;
+--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{width:1440px;height:900px;overflow:hidden;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 15px/19px var(--font);-webkit-font-smoothing:antialiased;display:grid;grid-template-columns:260px 1fr;font-variant-numeric:tabular-nums}
+::selection{background:rgba(47,111,235,.22);color:var(--ink)}
+svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+button,input{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+ul{list-style:none;margin:0;padding:0}
+aside{background:var(--side);border-right:1px solid var(--sep);padding:12px 10px;display:flex;flex-direction:column;height:900px}
+.find{display:flex;align-items:center;gap:8px;height:32px;padding:0 6px 0 9px;background:#fff;border:1px solid var(--sep);border-radius:8px;color:var(--sec)}
+.find input{border:0;outline:0;background:none;flex:1;min-width:0;font-size:14px;color:var(--ink)}
+.find input::placeholder,.add input::placeholder{color:var(--sec)}
+kbd{font:500 11px/16px var(--font);padding:0 5px;border:1px solid var(--sep);border-radius:4px;background:var(--side);color:var(--sec)}
+.nav{margin:12px 0 18px}
+aside a{display:flex;align-items:center;gap:10px;height:30px;padding:0 8px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14px}
+.nav svg{color:var(--sec)}
+a.on{background:var(--sel);font-weight:600}
+a.on svg{color:var(--blue)}
+.n{margin-left:auto;font-size:13px;color:var(--sec)}
+a.on .n{color:var(--ink)}
+.lists h2{font-size:13px;line-height:24px;font-weight:600;color:var(--sec);margin:0 8px 2px}
+.d{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none;margin:0 3px}
+.newlist{margin-top:auto;display:flex;align-items:center;gap:10px;height:32px;padding:0 8px;color:var(--sec);font-size:14px;border-radius:8px}
+main{position:relative;overflow:hidden}
+.sync{position:absolute;top:18px;right:24px;display:flex;align-items:center;gap:6px;font-size:12px;line-height:16px;color:var(--sec)}
+.col{width:760px;margin:0 auto;padding-top:28px}
+header{display:flex;align-items:baseline;gap:10px;margin:0 10px 14px}
+h1{font-size:28px;line-height:34px;font-weight:700;letter-spacing:-.02em;margin:0}
+.date{color:var(--sec)}
+.add{display:flex;align-items:center;gap:12px;height:38px;padding:0 10px;border-bottom:1px solid var(--sep);margin-bottom:18px}
+.plus{width:18px;height:18px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;flex:none}
+.plus svg{width:12px;height:12px;stroke-width:2}
+.add input{flex:1;border:0;outline:0;background:none}
+.grp{margin-bottom:20px}
+.grp+.grp{margin-bottom:28px}
+.gh{display:flex;align-items:center;gap:8px;height:30px;padding:0 10px;border-bottom:1px solid var(--sep);font-size:14px;font-weight:600}
+.gh svg{width:15px;height:15px}
+.pill{font-size:12px;line-height:18px;font-weight:600;padding:0 6px;border-radius:6px}
+.r{background:var(--red-bg);color:var(--red-ink)}
+.o{background:var(--orange-bg);color:var(--orange-ink)}
+.act{margin-left:auto;color:var(--blue);font-size:13px;font-weight:500;padding:2px 6px;border-radius:6px}
+.row{position:relative;display:grid;grid-template-columns:18px 1fr auto;column-gap:12px;align-items:start;padding:5px 10px;border-radius:8px}
+.row.one{padding:6px 10px}
+.row::after{content:"";position:absolute;left:40px;right:10px;bottom:0;height:1px;background:var(--sep)}
+.row:last-child::after,.row.sel::after,.row:has(+.sel)::after{display:none}
+.row.sel{background:var(--sel);box-shadow:inset 0 0 0 1px rgba(47,111,235,.5)}
+.row.sel .m{color:#5A5A5F}
+.row input{appearance:none;-webkit-appearance:none;width:18px;height:18px;margin:.5px 0 0;border:1.5px solid var(--box);border-radius:50%;background:#fff}
+.t{min-width:0}
+.m{display:flex;align-items:center;gap:6px;font-size:13px;line-height:16px;color:var(--sec);margin-top:1px}
+.m .d{width:8px;height:8px;margin:0 1px 0 0}
+.m span{margin-left:6px}
+.due{display:flex;align-items:center;gap:6px;font-size:13px;line-height:19px;color:var(--sec)}
+.due svg{width:13px;height:13px}
+.due .pill{font-weight:500;line-height:19px;padding:0 7px}
+.lh{display:flex;align-items:center;gap:10px;height:36px;padding:0 10px 2px 7px;border-bottom:1px solid var(--sep)}
+.lh .d{width:12px;height:12px}
+.lh h2{font-size:22px;line-height:28px;font-weight:650;letter-spacing:-.01em;margin:0}
+.lh .n2{color:var(--sec)}
+.more{margin-left:auto;color:var(--sec);display:grid;place-items:center;width:28px;height:28px;border-radius:8px}
+.show{display:flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 40px;font-size:13px;color:var(--sec);border-radius:8px}
+.show svg{width:14px;height:14px}
+.done{display:flex;align-items:center;gap:12px;width:100%;height:34px;margin-top:4px;padding:0 10px;border-top:1px solid var(--sep);font-size:13px;font-weight:500;color:var(--sec);text-align:left}
+.done svg{width:18px;height:14px}
+</style>
+</head>
+<body>
+<svg style="position:absolute;width:0;height:0" aria-hidden="true">
+<symbol id="search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.25"/><path d="M10.25 10.25 13.5 13.5"/></symbol>
+<symbol id="cal" viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="11" height="10" rx="2"/><path d="M2.5 6.75h11M5.5 2v2.5M10.5 2v2.5"/></symbol>
+<symbol id="today" viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="11" height="10" rx="2"/><path d="M2.5 6.75h11M5.5 2v2.5M10.5 2v2.5"/><circle cx="8" cy="10.1" r="1.3" fill="currentColor" stroke="none"/></symbol>
+<symbol id="up" viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="11" height="10" rx="2"/><path d="M2.5 6.75h11M5.5 2v2.5M10.5 2v2.5M5.5 9.5h1M9.5 9.5h1M5.5 11.5h1"/></symbol>
+<symbol id="plus" viewBox="0 0 16 16"><path d="M8 3.5v9M3.5 8h9"/></symbol>
+<symbol id="chev" viewBox="0 0 16 16"><path d="M6.5 4.5 10 8l-3.5 3.5"/></symbol>
+<symbol id="down" viewBox="0 0 16 16"><path d="M4.5 6.5 8 10l3.5-3.5"/></symbol>
+<symbol id="cloud" viewBox="0 0 16 16"><path d="M4.75 12.5h6.5a2.75 2.75 0 0 0 .3-5.48A3.75 3.75 0 0 0 4.3 7.1a2.75 2.75 0 0 0 .45 5.4Z"/><path d="M6.4 9.9l1.2 1.1 2.1-2.3"/></symbol>
+<symbol id="more" viewBox="0 0 16 16"><circle cx="3.5" cy="8" r=".8" fill="currentColor"/><circle cx="8" cy="8" r=".8" fill="currentColor"/><circle cx="12.5" cy="8" r=".8" fill="currentColor"/></symbol>
+</svg>
+<aside>
+  <label class="find"><svg><use href="#search"/></svg><input type="search" placeholder="Quick find" aria-label="Quick find"><kbd>⌘K</kbd></label>
+  <nav class="nav"><ul>
+    <li><a class="on" href="#" aria-current="page"><svg><use href="#today"/></svg>Today<span class="n">8</span></a></li>
+    <li><a href="#"><svg><use href="#up"/></svg>Upcoming</a></li>
+  </ul></nav>
+  <nav class="lists"><h2>Lists</h2><ul>
+    <li><a href="#"><i class="d" style="--c:#8B8D98"></i>Inbox<span class="n">9</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#2F6FEB"></i>Home<span class="n">23</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#F5A524"></i>Errands<span class="n">12</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#30A46C"></i>Groceries<span class="n">18</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#6E56CF"></i>Work<span class="n">41</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#AB4ABA"></i>Side project<span class="n">27</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#A07553"></i>Admin &amp; taxes<span class="n">8</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#E5484D"></i>Health<span class="n">6</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#00A2C7"></i>Travel: Lisbon<span class="n">14</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#12A594"></i>Reading<span class="n">32</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#D6409F"></i>Bike<span class="n">5</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#46A758"></i>Garden<span class="n">11</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#F76B15"></i>Gifts<span class="n">7</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#8B8D98"></i>Car<span class="n">4</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#E54D2E"></i>Learning Rust<span class="n">19</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#3E63DD"></i>Music<span class="n">9</span></a></li>
+    <li><a href="#"><i class="d" style="--c:#A07553"></i>Someday<span class="n">96</span></a></li>
+  </ul></nav>
+  <button class="newlist"><svg><use href="#plus"/></svg>New list</button>
+</aside>
+<main>
+  <div class="sync" role="status"><svg><use href="#cloud"/></svg>saved 14:32 · 2 pending</div>
+  <div class="col">
+    <header><h1>Today</h1><span class="date">Fri 16 Oct</span></header>
+    <label class="add"><span class="plus"><svg><use href="#plus"/></svg></span><input placeholder="Add a to-do for today" aria-label="Add a to-do for today"></label>
+    <section class="grp" aria-label="Overdue">
+      <div class="gh"><span style="color:var(--red-ink)">Overdue</span><span class="pill r">3</span><button class="act">Reschedule</button></div>
+      <ul>
+        <li class="row"><input type="checkbox" aria-label="Complete"><div class="t">Reply to landlord about boiler service<div class="m"><i class="d" style="--c:#2F6FEB"></i>Home<span>#calls</span></div></div><div class="due"><span class="pill r">2 days late</span></div></li>
+        <li class="row sel" tabindex="0" aria-selected="true"><input type="checkbox" aria-label="Complete"><div class="t">Renew passport photo appointment<div class="m"><i class="d" style="--c:#A07553"></i>Admin &amp; taxes<span>#paperwork</span></div></div><div class="due">Tue 13.10<span class="pill r">3 days late</span></div></li>
+        <li class="row"><input type="checkbox" aria-label="Complete"><div class="t">Return library books<div class="m"><i class="d" style="--c:#F5A524"></i>Errands</div></div><div class="due"><span class="pill r">1 day late</span></div></li>
+      </ul>
+    </section>
+    <section class="grp" aria-label="Due today">
+      <div class="gh"><svg style="color:var(--orange)"><use href="#today"/></svg>Due today<span class="pill o">5</span></div>
+      <ul>
+        <li class="row"><input type="checkbox" aria-label="Complete"><div class="t">Book train to Lisbon<div class="m"><i class="d" style="--c:#00A2C7"></i>Travel: Lisbon<span>#booking</span></div></div></li>
+        <li class="row"><input type="checkbox" aria-label="Complete"><div class="t">Review PR for the parser rewrite<div class="m"><i class="d" style="--c:#AB4ABA"></i>Side project<span>#code</span></div></div></li>
+        <li class="row"><input type="checkbox" aria-label="Complete"><div class="t">Buy coffee beans<div class="m"><i class="d" style="--c:#30A46C"></i>Groceries</div></div></li>
+        <li class="row"><input type="checkbox" aria-label="Complete"><div class="t">Call dentist to move appointment<div class="m"><i class="d" style="--c:#E5484D"></i>Health<span>#calls</span></div></div></li>
+        <li class="row"><input type="checkbox" aria-label="Complete"><div class="t">Pay electricity bill<div class="m"><i class="d" style="--c:#A07553"></i>Admin &amp; taxes<span>#money</span></div></div></li>
+      </ul>
+    </section>
+    <section aria-label="Home">
+      <div class="lh"><i class="d" style="--c:#2F6FEB"></i><h2>Home</h2><span class="n2">23</span><button class="more" aria-label="List actions"><svg><use href="#more"/></svg></button></div>
+      <ul>
+        <li class="row"><input type="checkbox" aria-label="Complete"><div class="t">Fix dripping kitchen tap<div class="m">#diy</div></div></li>
+        <li class="row one"><input type="checkbox" aria-label="Complete"><div class="t">Order replacement filter for the cooker hood</div><div class="due"><svg><use href="#cal"/></svg>Tue 20.10</div></li>
+        <li class="row"><input type="checkbox" aria-label="Complete"><div class="t">Paint hallway skirting boards<div class="m">#diy<span>#weekend</span></div></div></li>
+        <li class="row one"><input type="checkbox" aria-label="Complete"><div class="t">Clean gutters before November</div><div class="due"><svg><use href="#cal"/></svg>Sat 31.10</div></li>
+      </ul>
+      <button class="show"><svg><use href="#down"/></svg>19 more</button>
+      <button class="done" aria-expanded="false"><svg><use href="#chev"/></svg>Done · 14</button>
+    </section>
+  </div>
+</main>
+</body>
+</html>

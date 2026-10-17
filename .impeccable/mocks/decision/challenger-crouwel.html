@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=1440"><title>Construction Grid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FDFDFB;--pale:#CFE0F5;--cobalt:#2236D8;--ink:#0E1116;--verm:#C8290F;--yel:#FFD21F;--black:#10141C;--grey:#5A6372;--rule:#8FA2EA;--field:#1A2BB3;--edge:#6F82EC;--f:"Hanken Grotesk",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{width:1440px;height:900px;overflow:hidden;margin:0;background:var(--paper);color:var(--ink);font:400 15px/20px var(--f);-webkit-font-smoothing:antialiased}
+::selection{background:var(--pale);color:var(--ink)}
+.n{font-variant-numeric:tabular-nums}
+.sp{position:absolute;width:0;height:0;overflow:hidden}
+.ic{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:square}
+.mg{width:24px;height:24px;flex:none;display:block}
+kbd{font:500 12px/16px var(--f);padding:0 4px;border:1px solid currentColor}
+:focus-visible{outline:2px solid var(--cobalt);outline-offset:2px}
+.band{height:64px;display:flex;align-items:center;padding:0 40px 0 24px;color:#fff;background:linear-gradient(rgba(207,224,245,.16) 1px,transparent 1px) 0 0/8px 8px,linear-gradient(90deg,rgba(207,224,245,.16) 1px,transparent 1px) 0 0/8px 8px,var(--cobalt)}
+.date{width:234px;height:42px;flex:none;display:block}
+.cmd{margin-left:30px;width:400px;height:32px;display:flex;align-items:center;gap:8px;padding:0 8px;background:var(--field);border:1px solid var(--edge);color:var(--pale)}
+.cmd input{flex:1;min-width:0;border:0;background:none;color:#fff;font:400 14px/20px var(--f);outline:0}
+.cmd input::placeholder{color:var(--pale);opacity:1}
+.bb{margin-left:8px;height:32px;display:inline-flex;align-items:center;gap:8px;padding:0 12px;background:none;border:1px solid var(--edge);color:#fff;font:500 14px/1 var(--f)}
+.bb kbd{color:var(--pale)}
+.sync{margin-left:auto;background:none;border:0;padding:0;color:var(--pale);font:400 13px/1 var(--f)}
+.shell{display:grid;grid-template-columns:240px 48px 1fr;height:836px}
+.rail{padding:16px}
+.rail a{display:flex;align-items:center;gap:12px;height:32px;padding:0 8px;color:var(--ink);text-decoration:none;font-weight:500}
+.rail a.on{background:var(--pale)}
+.rail a>b{margin-left:auto;font-weight:400;font-size:13px;color:var(--grey)}
+.cnt{margin-left:auto;display:flex;gap:4px}
+.cnt i{font-style:normal;min-width:24px;height:20px;padding:0 4px;display:inline-grid;place-items:center;font-size:13px;font-weight:500}
+.cnt .o{background:var(--verm);color:#fff;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,0 100%)}
+.cnt .t{background:var(--yel)}
+.rh{display:flex;align-items:center;justify-content:space-between;height:32px;margin-top:16px;padding:0 8px;font-size:13px;color:var(--grey)}
+.rh h2{margin:0;font:600 13px/1 var(--f);color:var(--ink)}
+.rh kbd{color:var(--ink);margin-right:4px}
+.nl{margin-top:8px;height:32px;display:flex;align-items:center;gap:16px;padding:0 8px 0 12px;border:0;background:none;color:var(--grey);font:500 14px/1 var(--f)}
+.gut{border-right:1px solid var(--pale);background:linear-gradient(var(--pale) 1px,transparent 1px) 0 0/8px 8px,linear-gradient(90deg,var(--pale) 1px,transparent 1px) 0 0/8px 8px}
+main{padding:24px 40px 0 0;min-width:0}
+.top{display:flex;align-items:center;height:40px;padding-left:8px}
+h1,.sec h2{margin:0;font:600 24px/32px var(--f);letter-spacing:-.01em}
+.nb{margin-left:auto;height:32px;display:inline-flex;align-items:center;gap:8px;padding:0 12px;background:var(--paper);border:1px solid var(--ink);color:var(--ink);font:500 14px/1 var(--f)}
+.grp{display:flex;align-items:center;gap:8px;height:32px;margin-top:16px;padding-left:8px;font-weight:600}
+.grp i{width:16px;height:16px;background:var(--verm)}
+.grp i.y{background:var(--yel)}
+.grp span{font-weight:400;color:var(--grey)}
+.row{display:grid;grid-template-columns:32px 1fr 192px 208px 168px;align-items:center;height:32px;border-bottom:1px solid var(--pale)}
+.row.sel{background:var(--pale);outline:2px solid var(--cobalt);outline-offset:-2px}
+.row input{appearance:none;-webkit-appearance:none;width:16px;height:16px;margin:0 0 0 8px;border:2px solid var(--ink);border-radius:0;background:var(--paper)}
+.tg,.ls,.du{font-size:13px;color:var(--grey)}
+.ls{display:flex;align-items:center;gap:8px}
+.du{justify-self:end;display:flex;align-items:center;gap:8px;padding-right:8px}
+.c{height:24px;min-width:64px;padding:0 8px;display:inline-grid;place-items:center;font-weight:500;color:var(--ink)}
+.c.o{background:var(--verm);color:#fff;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)}
+.c.t{background:var(--yel)}
+.c.f{border:1px solid var(--ink);font-weight:400}
+.sec{display:flex;align-items:center;gap:16px;height:48px;margin:40px 0 8px}
+.sec .mg{width:48px;height:48px}
+.sec span{color:var(--grey)}
+.more{display:block;height:32px;margin-left:32px;padding:0;border:0;background:none;color:var(--cobalt);font:500 13px/32px var(--f)}
+.done{border-top:1px solid var(--rule)}
+.done summary{list-style:none;display:flex;align-items:center;gap:8px;height:32px;padding-left:8px;font-weight:500;cursor:pointer}
+.done summary::-webkit-details-marker{display:none}
+.done summary b{font-weight:400;color:var(--grey)}
+</style></head><body>
+<svg class="sp" aria-hidden="true"><defs>
+<path id="gA" fill="none" stroke="#fff" d="M.5 7V1.5L1.5 .5H4.5V7M1 3.5H4"/><path id="gB" fill="none" stroke="#fff" d="M.5 0V7M1 .5H3.5V3M1 3.5H4.5V6.5H1"/>
+<path id="gC" fill="none" stroke="#fff" d="M5 .5H1.5L.5 1.5V6.5H5"/><path id="gD" fill="none" stroke="#fff" d="M.5 0V7M1 .5H3.5L4.5 1.5V6.5H1"/>
+<path id="gE" fill="none" stroke="#fff" d="M5 .5H.5V6.5H5M1 3.5H4"/><path id="gF" fill="none" stroke="#fff" d="M5 .5H.5V7M1 3.5H4"/>
+<path id="gG" fill="none" stroke="#fff" d="M5 .5H1.5L.5 1.5V6.5H4.5V3.5H2"/><path id="gH" fill="none" stroke="#fff" d="M.5 0V7M4.5 0V7M1 3.5H4"/>
+<path id="gI" fill="none" stroke="#fff" d="M2.5 1V6M1 .5H4M1 6.5H4"/><path id="gK" fill="none" stroke="#fff" d="M4.5 0V1.5L2.5 3.5L4.5 5.5V7M.5 0V7M1 3.5H2.5"/>
+<path id="gL" fill="none" stroke="#fff" d="M.5 0V6.5H5"/><path id="gM" fill="none" stroke="#fff" d="M.5 7V.5H4.5V7M2.5 1V5"/>
+<path id="gN" fill="none" stroke="#fff" d="M.5 7V.5H3.5L4.5 1.5V7"/><path id="gP" fill="none" stroke="#fff" d="M.5 7V1.5L1.5 .5H4.5V3.5H1"/>
+<path id="gR" fill="none" stroke="#fff" d="M.5 7V.5H4.5V3.5H1M2.5 3.5L4.5 5.5V7"/><path id="gS" fill="none" stroke="#fff" d="M5 .5H1.5L.5 1.5V3.5H4.5V6.5H0"/>
+<path id="gT" fill="none" stroke="#fff" d="M0 .5H5M2.5 1V7"/><path id="gU" fill="none" stroke="#fff" d="M.5 0V6.5H4.5V0"/>
+<path id="gW" fill="none" stroke="#fff" d="M.5 0V6.5H4.5V0M2.5 6V2"/><path id="g0" fill="none" stroke="#fff" d="M4.5 .5H1.5L.5 1.5V6.5H4.5Z"/>
+<path id="g1" fill="none" stroke="#fff" d="M1 .5H2.5V7"/><path id="g6" fill="none" stroke="#fff" d="M4 .5H1.5L.5 1.5V6.5H4.5V3.5H1"/><path id="gd" fill="none" stroke="#fff" d="M.5 6V7"/>
+<pattern id="cg" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M0 .08H1M.08 0V1" stroke="#5468E4" stroke-width=".17"/></pattern>
+<pattern id="sk" width="1" height="1" x=".5" y=".5" patternUnits="userSpaceOnUse"><path d="M0 .12H1M.12 0V1" stroke="#0E1116" stroke-opacity=".22" stroke-width=".25"/></pattern>
+<symbol id="mTD" viewBox="0 0 12 12"><rect width="12" height="12" fill="#2236D8"/><use href="#g1" x="1" y="2.5"/><use href="#g6" x="5" y="2.5"/></symbol>
+<symbol id="mIN" viewBox="0 0 12 12"><rect width="12" height="12" fill="#4A5262"/><use href="#gI" x="1" y="2.5"/><use href="#gN" x="6.5" y="2.5"/></symbol>
+<symbol id="mHM" viewBox="0 0 12 12"><rect width="12" height="12" fill="#A0650A"/><use href="#gH" x=".5" y="2.5"/><use href="#gM" x="6.5" y="2.5"/></symbol>
+<symbol id="mER" viewBox="0 0 12 12"><rect width="12" height="12" fill="#8E2E78"/><use href="#gE" x=".5" y="2.5"/><use href="#gR" x="6.5" y="2.5"/></symbol>
+<symbol id="mGR" viewBox="0 0 12 12"><rect width="12" height="12" fill="#2E7D3A"/><use href="#gG" x=".5" y="2.5"/><use href="#gR" x="6.5" y="2.5"/></symbol>
+<symbol id="mWK" viewBox="0 0 12 12"><rect width="12" height="12" fill="#00777A"/><use href="#gW" x=".5" y="2.5"/><use href="#gK" x="6.5" y="2.5"/></symbol>
+<symbol id="mSP" viewBox="0 0 12 12"><rect width="12" height="12" fill="#6B3FC0"/><use href="#gS" x=".5" y="2.5"/><use href="#gP" x="6.5" y="2.5"/></symbol>
+<symbol id="mAD" viewBox="0 0 12 12"><rect width="12" height="12" fill="#7B5A3A"/><use href="#gA" x=".5" y="2.5"/><use href="#gD" x="6.5" y="2.5"/></symbol>
+<symbol id="mHE" viewBox="0 0 12 12"><rect width="12" height="12" fill="#C2365F"/><use href="#gH" x=".5" y="2.5"/><use href="#gE" x="6.5" y="2.5"/></symbol>
+<symbol id="mTL" viewBox="0 0 12 12"><rect width="12" height="12" fill="#0B7BA8"/><use href="#gT" x=".5" y="2.5"/><use href="#gL" x="6.5" y="2.5"/></symbol>
+<symbol id="mRD" viewBox="0 0 12 12"><rect width="12" height="12" fill="#67701A"/><use href="#gR" x=".5" y="2.5"/><use href="#gD" x="6.5" y="2.5"/></symbol>
+<symbol id="mBK" viewBox="0 0 12 12"><rect width="12" height="12" fill="#4B50B0"/><use href="#gB" x=".5" y="2.5"/><use href="#gK" x="6.5" y="2.5"/></symbol>
+<symbol id="mGD" viewBox="0 0 12 12"><rect width="12" height="12" fill="#1F6B55"/><use href="#gG" x=".5" y="2.5"/><use href="#gD" x="6.5" y="2.5"/></symbol>
+<symbol id="mGF" viewBox="0 0 12 12"><rect width="12" height="12" fill="#B83280"/><use href="#gG" x=".5" y="2.5"/><use href="#gF" x="6.5" y="2.5"/></symbol>
+<symbol id="mCA" viewBox="0 0 12 12"><rect width="12" height="12" fill="#5D6B7C"/><use href="#gC" x=".5" y="2.5"/><use href="#gA" x="6.5" y="2.5"/></symbol>
+<symbol id="mLR" viewBox="0 0 12 12"><rect width="12" height="12" fill="#A04A1E"/><use href="#gL" x=".5" y="2.5"/><use href="#gR" x="6.5" y="2.5"/></symbol>
+<symbol id="mMU" viewBox="0 0 12 12"><rect width="12" height="12" fill="#8C3BA8"/><use href="#gM" x=".5" y="2.5"/><use href="#gU" x="6.5" y="2.5"/></symbol>
+<symbol id="mSD" viewBox="0 0 12 12"><rect width="12" height="12" fill="#2F3540"/><use href="#gS" x=".5" y="2.5"/><use href="#gD" x="6.5" y="2.5"/></symbol>
+<symbol id="iS" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></symbol>
+<symbol id="iT" viewBox="0 0 16 16"><path d="M2.5 2.5h5.5l6 6-5.5 5.5-6-6Z"/><path d="M5.5 5.5h.5v.5h-.5Z"/></symbol>
+<symbol id="iG" viewBox="0 0 16 16"><path d="M2 2h12v12H2ZM6 2v12M10 2v12M2 6h12M2 10h12"/></symbol>
+<symbol id="iP" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></symbol>
+<symbol id="iC" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4"/></symbol>
+</defs></svg>
+<header class="band">
+<svg class="date" viewBox="0 0 39 7" role="img" aria-label="Friday 16 October 2026"><rect width="39" height="7" fill="#2236D8"/><use href="#gF"/><use href="#gR" x="6"/><use href="#gI" x="12"/><use href="#g1" x="19"/><use href="#g6" x="23"/><use href="#gd" x="29"/><use href="#g1" x="30"/><use href="#g0" x="34"/><rect width="39" height="7" fill="url(#cg)"/></svg>
+<label class="cmd"><svg class="ic"><use href="#iS"/></svg><input type="search" placeholder="Search to-dos or run a command" aria-label="Search or run a command"><kbd>Cmd K</kbd></label>
+<button class="bb" type="button"><svg class="ic"><use href="#iT"/></svg>Tags</button>
+<button class="bb" type="button" aria-pressed="false"><svg class="ic"><use href="#iG"/></svg>Grid<kbd>Shift G</kbd></button>
+<button class="sync n" type="button">saved 14:32 · 2 pending</button>
+</header>
+<div class="shell">
+<nav class="rail" aria-label="Lists">
+<a class="on" href="#" aria-current="page"><svg class="mg" aria-hidden="true"><use href="#mTD"/></svg>Today<span class="cnt n"><i class="o">3</i><i class="t">5</i></span></a>
+<div class="rh"><h2>Lists</h2><span><kbd>g</kbd>+ letters</span></div>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mIN"/></svg>Inbox<b class="n">9</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mHM"/></svg>Home<b class="n">23</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mER"/></svg>Errands<b class="n">12</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mGR"/></svg>Groceries<b class="n">18</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mWK"/></svg>Work<b class="n">41</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mSP"/></svg>Side project<b class="n">27</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mAD"/></svg>Admin &amp; taxes<b class="n">8</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mHE"/></svg>Health<b class="n">6</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mTL"/></svg>Travel: Lisbon<b class="n">14</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mRD"/></svg>Reading<b class="n">32</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mBK"/></svg>Bike<b class="n">5</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mGD"/></svg>Garden<b class="n">11</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mGF"/></svg>Gifts<b class="n">7</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mCA"/></svg>Car<b class="n">4</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mLR"/></svg>Learning Rust<b class="n">19</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mMU"/></svg>Music<b class="n">9</b></a>
+<a href="#"><svg class="mg" aria-hidden="true"><use href="#mSD"/></svg>Someday<b class="n">96</b></a>
+<button class="nl" type="button"><svg class="ic"><use href="#iP"/></svg>New list</button>
+</nav>
+<div class="gut" aria-hidden="true"></div>
+<main>
+<div class="top"><h1>Today across lists</h1><button class="nb" type="button"><svg class="ic"><use href="#iP"/></svg>New to-do<kbd>N</kbd></button></div>
+<div class="grp"><i></i>Overdue<span class="n">3</span></div>
+<div class="row"><input type="checkbox" aria-label="Complete"><span>Reply to landlord about boiler service</span><span class="tg">#calls</span><span class="ls"><svg class="mg" aria-hidden="true"><use href="#mHM"/></svg>Home</span><span class="du n"><span class="c o" title="2 days late">−2d</span></span></div>
+<div class="row sel" aria-selected="true"><input type="checkbox" aria-label="Complete"><span>Renew passport photo appointment</span><span class="tg">#paperwork</span><span class="ls"><svg class="mg" aria-hidden="true"><use href="#mAD"/></svg>Admin &amp; taxes</span><span class="du n">was Tue 13.10<span class="c o" title="3 days late">−3d</span></span></div>
+<div class="row"><input type="checkbox" aria-label="Complete"><span>Return library books</span><span class="tg"></span><span class="ls"><svg class="mg" aria-hidden="true"><use href="#mER"/></svg>Errands</span><span class="du n"><span class="c o" title="1 day late">−1d</span></span></div>
+<div class="grp"><i class="y"></i>Due today<span class="n">5</span></div>
+<div class="row"><input type="checkbox" aria-label="Complete"><span>Book train to Lisbon</span><span class="tg">#booking</span><span class="ls"><svg class="mg" aria-hidden="true"><use href="#mTL"/></svg>Travel: Lisbon</span><span class="du"><span class="c t">today</span></span></div>
+<div class="row"><input type="checkbox" aria-label="Complete"><span>Review PR for the parser rewrite</span><span class="tg">#code</span><span class="ls"><svg class="mg" aria-hidden="true"><use href="#mSP"/></svg>Side project</span><span class="du"><span class="c t">today</span></span></div>
+<div class="row"><input type="checkbox" aria-label="Complete"><span>Buy coffee beans</span><span class="tg"></span><span class="ls"><svg class="mg" aria-hidden="true"><use href="#mGR"/></svg>Groceries</span><span class="du"><span class="c t">today</span></span></div>
+<div class="row"><input type="checkbox" aria-label="Complete"><span>Call dentist to move appointment</span><span class="tg">#calls</span><span class="ls"><svg class="mg" aria-hidden="true"><use href="#mHE"/></svg>Health</span><span class="du"><span class="c t">today</span></span></div>
+<div class="row"><input type="checkbox" aria-label="Complete"><span>Pay electricity bill</span><span class="tg">#money</span><span class="ls"><svg class="mg" aria-hidden="true"><use href="#mAD"/></svg>Admin &amp; taxes</span><span class="du"><span class="c t">today</span></span></div>
+<section>
+<div class="sec"><svg class="mg" viewBox="0 0 12 12" aria-hidden="true"><use href="#mHM"/><rect width="12" height="12" fill="url(#sk)"/></svg><h2>Home</h2><span class="n">23 open</span></div>
+<div class="row"><input type="checkbox" aria-label="Complete"><span>Fix dripping kitchen tap</span><span class="tg">#diy</span><span></span><span class="du"></span></div>
+<div class="row"><input type="checkbox" aria-label="Complete"><span>Order replacement filter for the cooker hood</span><span class="tg"></span><span></span><span class="du n"><span class="c f">Tue 20.10</span></span></div>
+<div class="row"><input type="checkbox" aria-label="Complete"><span>Paint hallway skirting boards</span><span class="tg">#diy #weekend</span><span></span><span class="du"></span></div>
+<div class="row"><input type="checkbox" aria-label="Complete"><span>Clean gutters before November</span><span class="tg"></span><span></span><span class="du n"><span class="c f">Sat 31.10</span></span></div>
+<button class="more n" type="button">Show 19 more</button>
+<details class="done"><summary><svg class="ic"><use href="#iC"/></svg>Done<b class="n">14</b></summary></details>
+</section>
+<div class="sec"><svg class="mg" viewBox="0 0 12 12" aria-hidden="true"><use href="#mWK"/><rect width="12" height="12" fill="url(#sk)"/></svg><h2>Work</h2><span class="n">41 open</span></div>
+</main>
+</div>
+</body></html>

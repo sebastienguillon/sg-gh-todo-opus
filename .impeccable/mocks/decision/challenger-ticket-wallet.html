@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Today</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Overpass+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0E2A5C;--stock:#FCFCFA;--red:#D2262F;--carbon:#5A3F9E;--rule:#C9D1DE;--tint:#E3EBF8;--orange:#E8731A;--ground:#EDF1F7;--hair:#DDE3EC;--mute:#556479}
+*{box-sizing:border-box}
+html,body{width:1440px;height:900px;overflow:hidden;margin:0}
+body{background:var(--ground);color:var(--navy);font:400 15px/1.3 Archivo,system-ui,sans-serif;font-stretch:100%;-webkit-font-smoothing:antialiased}
+::selection{background:var(--carbon);color:var(--stock)}
+:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+button,input{font:inherit;color:inherit}
+.mono{font-family:"Overpass Mono",ui-monospace,monospace;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.caps{font-stretch:87.5%;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+kbd{font:600 11px/1 "Overpass Mono",monospace;padding:3px 5px 2px;border:1px solid var(--rule);color:var(--mute);background:var(--stock)}
+/* band */
+.band{height:44px;background:var(--navy);color:var(--stock);display:flex;align-items:center;gap:16px;padding:0 16px}
+.day{width:264px;display:flex;align-items:baseline;gap:10px;font-size:16px;font-weight:600}
+.day .mono{font-size:12.5px;color:var(--rule)}
+.cmd{width:440px;height:30px;display:flex;align-items:center;gap:8px;padding:0 5px 0 10px;background:#17366F;border:1px solid #33528A;color:var(--rule)}
+.cmd input{flex:1;min-width:0;background:none;border:0;font-size:14px;color:var(--stock);caret-color:var(--stock);outline:none}
+.cmd input::placeholder{color:#B4C0D3}
+.cmd kbd{background:none;border-color:#4A679B;color:var(--rule)}
+.bb{height:30px;display:flex;align-items:center;gap:6px;padding:0 10px;background:none;border:1px solid #33528A;font-size:14px}
+.sync{margin-left:auto;display:flex;align-items:center;gap:7px;background:none;border:0;padding:0;color:var(--rule);font-size:11px}
+.sync svg{width:14px;height:14px}
+/* rail */
+.shell{display:flex;height:856px}
+.rail{width:256px;flex:none;background:var(--stock);border-right:1px solid var(--rule);padding:14px 10px 16px;display:flex;flex-direction:column}
+.ri{display:flex;align-items:center;gap:10px;height:30px;padding:0 8px;font-size:14px;color:var(--navy);text-decoration:none;white-space:nowrap}
+.ri .n{margin-left:auto;font-size:12.5px;color:var(--carbon)}
+.ri.on{background:var(--tint);font-weight:500}
+.rh{display:flex;align-items:center;justify-content:space-between;margin:14px 2px 4px 8px;font-size:11px;color:var(--mute)}
+.rh button{display:grid;place-items:center;width:24px;height:24px;background:none;border:1px solid transparent;color:var(--mute);padding:0}
+.hint{margin-top:auto;padding:0 8px;font-size:12.5px;color:var(--mute);display:flex;align-items:center;gap:6px}
+/* baggage-colour code tabs */
+.tg{display:inline-flex;align-items:center;justify-content:center;width:40px;height:17px;flex:none;font-size:10.5px;font-stretch:87.5%;font-weight:600;letter-spacing:.05em}
+.tg svg{width:12px;height:12px}
+.g{background:#1E7B4E;color:#fff}.b{background:#1F63C6;color:#fff}.y{background:#F2C230;color:var(--navy)}.o{background:var(--orange);color:var(--navy)}
+.v{background:#8FAE2A;color:var(--navy)}.s{background:#5B6B82;color:#fff}.t{background:#0F7C83;color:#fff}.k{background:#6FB3E6;color:var(--navy)}
+.w{background:#8A5A2B;color:#fff}.m{background:#B8336A;color:#fff}.x{background:var(--rule);color:var(--navy)}.nv{background:var(--navy);color:#fff}
+/* work column */
+.main{flex:1;padding:28px 40px 0;overflow:hidden}
+.col{width:960px}
+.coupon{background:var(--stock);border:1px solid var(--rule);margin-bottom:28px}
+.grid{display:grid;grid-template-columns:18px 1fr 84px 92px;column-gap:12px;align-items:center;padding:0 12px 0 14px}
+.add{height:40px;background:var(--stock);border:1px solid var(--rule);margin-bottom:22px;color:var(--mute)}
+.add input{border:0;background:none;outline:none;font-size:15px;color:var(--navy);caret-color:var(--navy)}
+.add input::placeholder{color:var(--mute)}
+.head{display:grid;grid-template-columns:1fr 84px 92px;column-gap:12px;padding-right:12px;border-bottom:1px solid var(--rule);height:60px}
+.hl{display:flex;align-items:center;gap:16px}
+.tab{display:flex;align-items:center;gap:14px;height:calc(100% + 2px);margin:-1px 0 -1px -1px;padding:0 22px 0 20px}
+.tab h1,.tab h2{margin:0;font-size:28px;line-height:1;font-stretch:87.5%;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.tab .code{font-size:12px;padding:3px 6px 2px;border:1px solid currentColor}
+.hc{font-size:13px;color:var(--carbon)}
+.lab{align-self:end;text-align:center;padding-bottom:7px;font-size:10px;color:var(--mute)}
+.grp{height:32px;border-top:1px solid var(--hair);display:flex;align-items:center;gap:8px;padding-left:14px;font-size:11px}
+.head+.grp{border-top:0}
+.grp .mono{font-size:12px;color:var(--carbon);letter-spacing:0}
+.row{height:32px;border-top:1px solid var(--hair)}
+.head+.row{border-top:0}
+.row.sel{background:var(--tint);outline:2px solid var(--navy);outline-offset:-2px}
+.chk{appearance:none;-webkit-appearance:none;width:16px;height:16px;margin:0;border:1.5px solid var(--navy);border-radius:2px;background:var(--stock)}
+.ttl{display:flex;align-items:baseline;gap:10px;white-space:nowrap;overflow:hidden}
+.tags{font-size:13px;color:var(--mute)}
+.was{margin-left:auto;font-size:11.5px;color:var(--mute);font-weight:400}
+/* the coupon field strip */
+.f{height:24px;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center;font-size:12.5px;color:var(--carbon)}
+.f.od{border-color:var(--red);color:var(--red)}
+.f.td{border-color:var(--navy);color:var(--navy)}
+.more{height:32px;border-top:1px solid var(--hair);display:flex;align-items:center}
+.more button,.stub button{display:flex;align-items:center;gap:6px;height:28px;background:none;border:0;padding:0 8px;font-size:13.5px;color:var(--mute)}
+.more button{margin-left:36px}
+.stub{height:40px;border-top:1px dashed #8D9AB0;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 6px}
+.stub .open{font-size:14px;color:var(--navy);font-weight:500}
+.stub .open .mono{color:var(--carbon);font-size:12.5px}
+</style>
+</head>
+<body>
+<svg style="display:none" aria-hidden="true">
+<symbol id="i-search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></symbol>
+<symbol id="i-tag" viewBox="0 0 16 16"><path d="M2.5 2.5h5l6 6-5 5-6-6z"/><circle cx="5.5" cy="5.5" r=".9"/></symbol>
+<symbol id="i-down" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></symbol>
+<symbol id="i-right" viewBox="0 0 16 16"><path d="M6 4l4 4-4 4"/></symbol>
+<symbol id="i-plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></symbol>
+<symbol id="i-saved" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M5.6 8.2l1.6 1.6 3.2-3.5"/></symbol>
+<symbol id="i-cal" viewBox="0 0 16 16"><rect x="2.5" y="3.5" width="11" height="10"/><path d="M2.5 6.5h11M5.5 2v3M10.5 2v3"/></symbol>
+</svg>
+<header class="band">
+  <div class="day">Today <span class="mono">FRI 16 OCT</span></div>
+  <label class="cmd"><svg><use href="#i-search"/></svg><input placeholder="Search, jump to a list or run a command" aria-label="Command palette"><kbd>Cmd K</kbd></label>
+  <button class="bb"><svg><use href="#i-tag"/></svg>Tags<svg><use href="#i-down"/></svg></button>
+  <button class="sync caps" aria-label="Sync status"><svg><use href="#i-saved"/></svg>saved <span class="mono">14:32</span> · <span class="mono">2</span> pending</button>
+</header>
+<div class="shell">
+<nav class="rail" aria-label="Lists">
+  <a class="ri on" href="#"><span class="tg nv"><svg><use href="#i-cal"/></svg></span>Today<span class="n mono">8</span></a>
+  <div class="rh caps">Lists<button aria-label="New list"><svg><use href="#i-plus"/></svg></button></div>
+  <a class="ri" href="#"><span class="tg x">INB</span>Inbox<span class="n mono">9</span></a>
+  <a class="ri" href="#"><span class="tg g">HOM</span>Home<span class="n mono">23</span></a>
+  <a class="ri" href="#"><span class="tg y">ERR</span>Errands<span class="n mono">12</span></a>
+  <a class="ri" href="#"><span class="tg v">GRO</span>Groceries<span class="n mono">18</span></a>
+  <a class="ri" href="#"><span class="tg o">WRK</span>Work<span class="n mono">41</span></a>
+  <a class="ri" href="#"><span class="tg b">SID</span>Side project<span class="n mono">27</span></a>
+  <a class="ri" href="#"><span class="tg s">ADM</span>Admin &amp; taxes<span class="n mono">8</span></a>
+  <a class="ri" href="#"><span class="tg t">HLT</span>Health<span class="n mono">6</span></a>
+  <a class="ri" href="#"><span class="tg k">LIS</span>Travel: Lisbon<span class="n mono">14</span></a>
+  <a class="ri" href="#"><span class="tg w">RDG</span>Reading<span class="n mono">32</span></a>
+  <a class="ri" href="#"><span class="tg m">BIK</span>Bike<span class="n mono">5</span></a>
+  <a class="ri" href="#"><span class="tg g">GDN</span>Garden<span class="n mono">11</span></a>
+  <a class="ri" href="#"><span class="tg y">GFT</span>Gifts<span class="n mono">7</span></a>
+  <a class="ri" href="#"><span class="tg s">CAR</span>Car<span class="n mono">4</span></a>
+  <a class="ri" href="#"><span class="tg o">RST</span>Learning Rust<span class="n mono">19</span></a>
+  <a class="ri" href="#"><span class="tg k">MUS</span>Music<span class="n mono">9</span></a>
+  <a class="ri" href="#"><span class="tg x">SMD</span>Someday<span class="n mono">96</span></a>
+  <div class="hint">Jump <kbd>g</kbd> + code · move <kbd>m</kbd></div>
+</nav>
+<main class="main"><div class="col">
+  <label class="grid add"><svg><use href="#i-plus"/></svg><input placeholder="Add a to-do" aria-label="Add a to-do"><span class="f"><span class="tg x">INB</span></span><span class="f"></span></label>
+
+  <section class="coupon" aria-label="Today across lists">
+    <div class="head"><div class="hl"><div class="tab nv"><h1>Today across lists</h1></div><span class="hc mono">8 open</span></div><span class="lab caps">List</span><span class="lab caps">Due</span></div>
+    <div class="grp caps" style="color:var(--red)">Overdue <span class="mono">3</span></div>
+    <div class="grid row"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Reply to landlord about boiler service<span class="tags">#calls</span></span><span class="f"><span class="tg g">HOM</span></span><span class="f od mono">−2D</span></div>
+    <div class="grid row sel" tabindex="0" aria-selected="true"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Renew passport photo appointment<span class="tags">#paperwork</span><span class="was mono">was TUE 13 OCT</span></span><span class="f"><span class="tg s">ADM</span></span><span class="f od mono">−3D</span></div>
+    <div class="grid row"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Return library books</span><span class="f"><span class="tg y">ERR</span></span><span class="f od mono">−1D</span></div>
+    <div class="grp caps">Due today <span class="mono">5</span></div>
+    <div class="grid row"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Book train to Lisbon<span class="tags">#booking</span></span><span class="f"><span class="tg k">LIS</span></span><span class="f td mono">TODAY</span></div>
+    <div class="grid row"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Review PR for the parser rewrite<span class="tags">#code</span></span><span class="f"><span class="tg b">SID</span></span><span class="f td mono">TODAY</span></div>
+    <div class="grid row"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Buy coffee beans</span><span class="f"><span class="tg v">GRO</span></span><span class="f td mono">TODAY</span></div>
+    <div class="grid row"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Call dentist to move appointment<span class="tags">#calls</span></span><span class="f"><span class="tg t">HLT</span></span><span class="f td mono">TODAY</span></div>
+    <div class="grid row"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Pay electricity bill<span class="tags">#money</span></span><span class="f"><span class="tg s">ADM</span></span><span class="f td mono">TODAY</span></div>
+  </section>
+
+  <section class="coupon" aria-label="Home">
+    <div class="head" style="height:56px"><div class="hl"><div class="tab g"><span class="code caps">HOM</span><h2>Home</h2></div><span class="hc mono">23 open</span></div><span class="lab caps">List</span><span class="lab caps">Due</span></div>
+    <div class="grid row"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Fix dripping kitchen tap<span class="tags">#diy</span></span><span class="f"><span class="tg g">HOM</span></span><span class="f"></span></div>
+    <div class="grid row"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Order replacement filter for the cooker hood</span><span class="f"><span class="tg g">HOM</span></span><span class="f mono">20 OCT</span></div>
+    <div class="grid row"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Paint hallway skirting boards<span class="tags">#diy #weekend</span></span><span class="f"><span class="tg g">HOM</span></span><span class="f"></span></div>
+    <div class="grid row"><input type="checkbox" class="chk" aria-label="Complete"><span class="ttl">Clean gutters before November</span><span class="f"><span class="tg g">HOM</span></span><span class="f mono">31 OCT</span></div>
+    <div class="more"><button><svg><use href="#i-down"/></svg>Show <span class="mono">19</span> more</button></div>
+    <div class="stub"><button class="open" aria-expanded="false"><svg><use href="#i-right"/></svg>Done <span class="mono">14</span></button><button>Clear done</button></div>
+  </section>
+
+  <section class="coupon" aria-label="Errands">
+    <div class="head" style="height:56px"><div class="hl"><div class="tab y"><span class="code caps">ERR</span><h2>Errands</h2></div><span class="hc mono">12 open</span></div><span class="lab caps">List</span><span class="lab caps">Due</span></div>
+  </section>
+</div></main>
+</div>
+</body>
+</html>
