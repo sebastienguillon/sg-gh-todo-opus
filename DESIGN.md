@@ -238,7 +238,7 @@ The surface is flat paper: square corners, 1px ink borders, no shadows, a dot gr
 A cover orange, three highlighters, twelve list inks and a black-and-grey pad, each with one job.
 
 ### Primary
-- **Rhodia Cover Orange** (#f0691e): the 48px cover band, the phone app bar and the browser theme colour. Text and icons on it are fineliner black (`on-orange`, 5.9:1). The band search field takes a faint tint of it (pad mixed 88% with orange). It is never used inside the pad.
+- **Rhodia Cover Orange** (#f0691e): the 48px cover band, the phone app bar, the browser theme colour and the app icon. Text and icons on it are fineliner black (`on-orange`, 5.9:1). The band search field takes a faint tint of it (pad mixed 88% with orange). It is never used inside the pad.
 
 ### Secondary
 The highlighters. Each is a fill behind fineliner ink, and the ink over them is always `on-hl`.
@@ -266,7 +266,7 @@ Twelve fineliner inks for list identity, assigned by index and cycling after twe
 **Dark scheme.** The same token names switch under `prefers-color-scheme: dark`; the exact values are in the dark block of `src/app.css` and in each `colorMeta.<token>.dark` entry of the sidecar. The band becomes a deeper burnt orange with near-black text. The pad turns to near-black graphite, with rail paper and pressed paper one and two steps lighter. The inks become off-white and mid greys, and the dots and rules dim to dark greys. The highlighters are dimmed to mustard, rose and steel blue and stay under the same black ink. Alarm flips, so a failed band turns off-white with black text. The twelve list inks become light tints of the same hues, each at least 7.2:1 on the dark pad and rail.
 
 ### Named Rules
-**The Cover Band Rule.** Orange is the notebook's cover and nothing else. It fills the band (and the browser theme colour) and never appears on text, rows, buttons or rules inside the pad. The band changes colour only when sync fails, when it turns to ink.
+**The Cover Band Rule.** Orange is the notebook's cover and nothing else. It fills the band (and the browser theme colour and the app icon) and never appears on text, rows, buttons or rules inside the pad. The band changes colour only when sync fails, when it turns to ink.
 
 **The Highlighter Rule.** Highlighters are fills behind fineliner ink, never text colours. Yellow means today, pink means late, blue means selected or current, and the ink over any of them is always `on-hl` black, in both schemes.
 
@@ -377,6 +377,9 @@ The log's unit: a notation gutter, then the entry.
 - **Index rail:** "Index" in 13px 700 Graphite, then Today (a calendar icon, the name in bold, the late count on a pink swipe, the due count), then every list as a 28px number column in its ink, the name (truncated with an ellipsis) and a 13px Graphite open count. Items are 32px high (44px on phone) with a transparent 1px border that turns grey on hover. The list currently at the top of the page is marked with the blue band. Below sit a quiet "New list" button and a "g + number" hint.
 - **List heading:** the 26px 800 number in the list's ink, then the name, an "N open" count, and `g` `NN` jump caps in Faded Ink at the right edge (hidden on phone).
 - **Perforation and Done fold:** 8px under the last open row, a 1px dashed perforation-grey rule spans the section. On it sits the fold: a 14px ×, "N done" and a chevron that rotates 180° over 160ms when open, in 13px Graphite (ink on hover). A 28px quiet "Clear done" button appears when the fold is open, and the done rows follow below.
+
+### App Icon
+The favicon and the home-screen icon are one drawing, `public/favicon.svg`: a full-bleed orange square, square-cornered (the phone rounds or crops it), holding a black open bullet and a > stroked with round caps and joins. The mark sits well inside the centre 80% circle, so one image serves as both the plain and the maskable icon. The 192px, 512px and 180px Apple touch PNGs are drawn from the SVG by `pnpm run icons` (`scripts/icons.sh`, Inkscape). Installed, the app opens standalone on a pad-white splash.
 
 ### Motion
 State changes fade or slide on one curve, `cubic-bezier(0.16, 1, 0.3, 1)`: 160ms for opacity and fills, 200ms for the band's colour change and a swiped row settling back. The one authored motion is the pen stroke. Reduced motion collapses every transition and removes the stroke animation.

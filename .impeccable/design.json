@@ -699,7 +699,7 @@
     "rules": [
       {
         "name": "The Cover Band Rule",
-        "body": "Orange is the notebook's cover and nothing else. It fills the band (and the browser theme colour) and never appears on text, rows, buttons or rules inside the pad. The band changes colour only when sync fails, when it turns to ink.",
+        "body": "Orange is the notebook's cover and nothing else. It fills the band (and the browser theme colour and the app icon) and never appears on text, rows, buttons or rules inside the pad. The band changes colour only when sync fails, when it turns to ink.",
         "section": "colors"
       },
       {
