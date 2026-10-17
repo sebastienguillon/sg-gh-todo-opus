@@ -1,0 +1,12 @@
+{
+  "name": "todo-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "mock": "node mock-github.mjs",
+    "smoke": "node smoke.mjs"
+  },
+  "dependencies": {
+    "playwright-core": "^1.64.1"
+  }
+}
