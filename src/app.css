@@ -1,4 +1,4 @@
-/* Rapid Log: black fineliner on a Rhodia dotPad, under an orange cover band. */
+/* Rapid Log: black fineliner on a Rhodia pad, under an orange cover band. */
 
 :root {
   color-scheme: light dark;
@@ -18,7 +18,6 @@
   --ink: #141414;
   --ink-2: #55555d;
   --ink-3: #6b6b73;
-  --dot: #cdcdd4;
   --rule: #a9a9b1;
   --line: #e3e3e0;
 
@@ -84,7 +83,6 @@
     --ink: #ececea;
     --ink-2: #a8a8b0;
     --ink-3: #9a9aa2;
-    --dot: #34343a;
     --rule: #55555e;
     --line: #2a2a30;
 

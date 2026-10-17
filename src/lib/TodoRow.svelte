@@ -354,30 +354,13 @@
     color: var(--on-hl);
   }
 
-  /* The dot grid lives only here, at the row pitch; each open bullet sits on a dot. */
   .gutter {
     grid-column: 1;
-    position: relative;
     display: flex;
     align-items: flex-start;
     align-self: stretch;
     min-height: var(--row-h);
     padding-left: 8px;
-  }
-
-  .gutter::before {
-    content: '';
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: calc(var(--gutter) - 20px);
-    /* Offset so the bullet, centred on the title's first line, sits on a dot. */
-    background: radial-gradient(circle, var(--dot) 0.9px, transparent 1.4px) 0
-      calc(var(--inset) + var(--body-line) / 2 - 8px) / 16px 16px;
-    pointer-events: none;
-  }
-
-  .gutter > * {
-    position: relative;
   }
 
   .sig {
@@ -666,10 +649,6 @@
       padding-left: 4px;
     }
 
-    .gutter::before {
-      width: 40px;
-    }
-
     .sig {
       width: 40px;
     }
@@ -694,7 +673,7 @@
       display: flex;
     }
 
-    /* The opened row: its verbs stack down the 44px notation column, the dot grid behind them. */
+    /* The opened row: its verbs stack down the 44px notation column. */
     .details {
       display: grid;
       grid-template-columns: 44px minmax(0, 1fr);
@@ -703,15 +682,6 @@
 
     .details.in-today {
       padding-left: 0;
-    }
-
-    .details::before {
-      content: '';
-      position: absolute;
-      inset: 0 auto 0 0;
-      width: 40px;
-      background: radial-gradient(circle, var(--dot) 0.9px, transparent 1.4px) 0 14px / 16px 16px;
-      pointer-events: none;
     }
 
     .detail-main {
@@ -723,7 +693,6 @@
     }
 
     .triage {
-      position: relative;
       display: flex;
       flex-direction: column;
       gap: 4px;

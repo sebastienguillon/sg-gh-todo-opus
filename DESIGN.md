@@ -1,6 +1,6 @@
 ---
 name: To Do
-description: A rapid-log to-do list in black fineliner on a dotPad, under an orange cover band.
+description: A rapid-log to-do list in black fineliner on a pad, under an orange cover band.
 colors:
   orange: "#f0691e"
   on-orange: "#141414"
@@ -10,7 +10,6 @@ colors:
   ink: "#141414"
   ink-2: "#55555d"
   ink-3: "#6b6b73"
-  dot: "#cdcdd4"
   rule: "#a9a9b1"
   line: "#e3e3e0"
   hl-today: "#fff176"
@@ -80,7 +79,6 @@ rounded:
 spacing:
   row: "32px"
   row-phone: "44px"
-  dot-pitch: "16px"
   edge: "12px"
   band: "48px"
   margin-col: "104px"
@@ -224,11 +222,11 @@ components:
 
 **Creative North Star: "The Rapid Log"**
 
-The Rapid Log is the Bullet Journal's rapid-log key, written in black fineliner on a Rhodia dotPad under the pad's orange cover band. The checkbox column is a notation column. Each state has one drawn glyph (• open, × done, > moved, < rescheduled) and each verb has one key (x, >, <), so the morning triage is a single pass down that gutter.
+The Rapid Log is the Bullet Journal's rapid-log key, written in black fineliner on a Rhodia pad under its orange cover band. The checkbox column is a notation column. Each state has one drawn glyph (• open, × done, > moved, < rescheduled) and each verb has one key (x, >, <), so the morning triage is a single pass down that gutter.
 
 The density is that of a working notebook: 32px rows, 18px text, tabular figures throughout, and dates in a right margin. Colour carries meaning and nothing else. Orange is the cover. Highlighter swipes sit behind text for today (yellow), late (pink) and selection (blue). Twelve fineliner inks identify lists through their two-digit index. Everything else is black and grey ink on pad white.
 
-The surface is flat paper: square corners, 1px ink borders, no shadows, a dot grid only in the gutter, and a dashed perforation above each list's Done. The system refuses the category's round checkbox, a sidebar of anonymous coloured dots, swipe menus of extra options, and any washi tape, stickers, hand lettering or handwriting faces.
+The surface is flat paper: square corners, 1px ink borders, no shadows, and a dashed perforation above each list's Done. The system refuses the category's round checkbox, a sidebar of anonymous coloured dots, swipe menus of extra options, and any washi tape, stickers, hand lettering or handwriting faces.
 
 **Key Characteristics:**
 - A signifier gutter: one drawn glyph per state, each over a real checkbox.
@@ -236,7 +234,7 @@ The surface is flat paper: square corners, 1px ink borders, no shadows, a dot gr
 - Highlighters behind text only: yellow today, pink late, blue selection.
 - Twelve fineliner inks on two-digit list indexes.
 - One face, Atkinson Hyperlegible Next, with tabular figures and weights from 400 to 800.
-- Square, flat and shadowless, with dots only in the gutter and a dashed perforation above Done.
+- Square, flat and shadowless, with a dashed perforation above Done.
 - Light and dark schemes from the same token names.
 
 ## Colors
@@ -264,12 +262,11 @@ Twelve fineliner inks for list identity, assigned by index and cycling after twe
 - **Fineliner Black** (#141414): all primary text, button and field borders, dialog edges, focus outlines, the primary button fill and the toast.
 - **Graphite** (#55555d): secondary text: counts, tags, plain dates, hints, the summary line.
 - **Faded Ink** (#6b6b73): done rows and their signifiers, placeholders, the capture bullet, the jump key caps on list headings.
-- **Dot Grey** (#cdcdd4): the gutter dot grid only.
 - **Perforation Grey** (#a9a9b1): the dashed perforation, quiet borders (key hints, tag chips, field rest state, hover outlines) and the scrollbar.
 - **Hairline** (#e3e3e0): dividers: the rail's right edge, dialog headers, help rows, the opened row's bottom. It is also the pressed fill of buttons and of the phone verb stack.
 - **Alarm** (#141414 / on-alarm #fbfbf9): the failed-sync band, the conflict banner and the conflict mark on a row.
 
-**Dark scheme.** The same token names switch under `prefers-color-scheme: dark`; the exact values are in the dark block of `src/app.css` and in each `colorMeta.<token>.dark` entry of the sidecar. The band becomes a deeper burnt orange with near-black text. The pad turns to near-black graphite, with rail paper and pressed paper one and two steps lighter. The inks become off-white and mid greys, and the dots and rules dim to dark greys. The highlighters are dimmed to mustard, rose and steel blue and stay under the same black ink. Alarm flips, so a failed band turns off-white with black text. The twelve list inks become light tints of the same hues, each at least 7.2:1 on the dark pad and rail.
+**Dark scheme.** The same token names switch under `prefers-color-scheme: dark`; the exact values are in the dark block of `src/app.css` and in each `colorMeta.<token>.dark` entry of the sidecar. The band becomes a deeper burnt orange with near-black text. The pad turns to near-black graphite, with rail paper and pressed paper one and two steps lighter. The inks become off-white and mid greys, and the rules dim to dark greys. The highlighters are dimmed to mustard, rose and steel blue and stay under the same black ink. Alarm flips, so a failed band turns off-white with black text. The twelve list inks become light tints of the same hues, each at least 7.2:1 on the dark pad and rail.
 
 ### Named Rules
 **The Cover Band Rule.** Orange is the notebook's cover and nothing else. It fills the band (and the browser theme colour and the app icon) and never appears on text, rows, buttons or rules inside the pad. The band changes colour only when sync fails, when it turns to ink.
@@ -312,14 +309,10 @@ Every row is a five-column grid: the 124px notation gutter, a 36px index column 
 
 **Phone (767px and narrower).** The band becomes a 52px app bar plus the top safe area, holding the Index button, the date (once the heading has scrolled off), search, the tag filter and a compact sync word. The gutter narrows to 44px and rows grow to a 44px minimum pitch with 10px block padding. Today rows drop the list name column and set the name inline after the tags. The capture docks to the bottom edge with a 1px ink top rule. The Index opens as a bottom sheet, and every dialog becomes a full-width bottom sheet (up to 86% of the viewport height) with only a top border. Interactive targets are at least 44px. Toasts sit above the dock.
 
-**Gutter detail.** The dot grid lives inside the gutter: fine Dot Grey dots (0.9px radius, soft to 1.4px) on a 16px pitch, offset so each open bullet sits exactly on a dot (24px across, 16px down on desktop; 24px across, 22px down on phone). The direction asked for the grid "at the 32px row pitch"; the build sets two dots per row, and the build is the record.
-
 ### Named Rules
-**The Notation Column Rule.** Text starts at one gutter line, 124px on desktop and 44px on phone, for every row, list heading, capture field and empty-state line, and on the setup screen. The gutter holds only signifiers, key hints, the dot grid and the Done fold's × count at the perforation.
+**The Notation Column Rule.** Text starts at one gutter line, 124px on desktop and 44px on phone, for every row, list heading, capture field and empty-state line, and on the setup screen. The gutter holds only signifiers, key hints and the Done fold's × count at the perforation.
 
 **The One Right Edge Rule.** On desktop every column ends 12px (`edge`) inside the main column's right side; on the phone, columns end 16px from the screen edge. Due dates are right-aligned in the 104px margin column against that edge, and a quiet button pulls its box out by 12px so that its text, not its box, meets the edge.
-
-**The Dots-in-the-Gutter Rule.** The dot grid appears only in the gutter and in the phone's opened-row verb column, never across the page.
 
 ## Elevation & Depth
 
@@ -332,20 +325,20 @@ The system is flat. Nothing casts a shadow. Overlays are told apart from the pag
 
 Every box is square (radius 0): buttons, fields, key caps, chips, dialogs, sheets, the toast and the band controls. Borders are 1px and come in three strengths: fineliner black for the edges that matter (buttons, fields, the capture field, dialogs, the sync popover), perforation grey for quiet edges (key hints, tag chips, a field at rest, hover outlines), and hairline for dividers. The one dashed line is the perforation above Done.
 
-The highlighter swipe is a parallelogram: squared ends skewed by 2px (3px on the display swipe), clipped rather than rounded, sitting behind the text with 4px of horizontal padding. Curves live only inside drawn marks: the open bullet (a 2.6px-radius dot on a 16px grid), the gutter's grid dots, curved icon strokes such as the search lens and the offline arcs, and the round caps and joins of every stroke.
+The highlighter swipe is a parallelogram: squared ends skewed by 2px (3px on the display swipe), clipped rather than rounded, sitting behind the text with 4px of horizontal padding. Curves live only inside drawn marks: the open bullet (a 2.6px-radius dot on a 16px grid), curved icon strokes such as the search lens and the offline arcs, and the round caps and joins of every stroke.
 
 ### Named Rules
-**The Square Corner Rule.** Every box has square corners. Curves appear only inside drawn marks: the bullet, the gutter dots, icon strokes such as the search lens and the offline arcs, and round stroke caps.
+**The Square Corner Rule.** Every box has square corners. Curves appear only inside drawn marks: the bullet, icon strokes such as the search lens and the offline arcs, and round stroke caps.
 
 ## Components
 
 ### Signature: the Signifier Row
 The log's unit: a notation gutter, then the entry.
-- **Gutter:** a 32px signifier cell (40×44 on phone) on the dot grid, holding a drawn glyph (16px, 1.6px stroke, round caps): a filled dot for open, × for done, and briefly > for moved or < for rescheduled after the action. Under the glyph is a real native checkbox filling the cell, with its appearance removed. Hovering the cell shows a 1px grey box around it. Done rows fade the glyph and title to Faded Ink and strike the title through at 1px.
+- **Gutter:** a 32px signifier cell (40×44 on phone), holding a drawn glyph (16px, 1.6px stroke, round caps): a filled dot for open, × for done, and briefly > for moved or < for rescheduled after the action. Under the glyph is a real native checkbox filling the cell, with its appearance removed. Hovering the cell shows a 1px grey box around it. Done rows fade the glyph and title to Faded Ink and strike the title through at 1px.
 - **Key hints:** three 20px square buttons (× > <) with a 1px grey border, 12px glyphs and Graphite ink, 3px apart, 8px right of the signifier. They fade in (160ms) on hover or focus, stay visible on late Today rows, and are hidden on touch devices and phones.
 - **Entry:** on Today rows, the list's two-digit index in its ink. Then the title, a note icon if a note exists, tags (14.625px Graphite, `#tag`, bold ink when it is the active filter), the list name in its ink (600), and the date in the right margin. Late dates are bold ink on a pink swipe, today is 600 on a yellow swipe, and other dates are plain 14.625px Graphite ("tomorrow", "Mon 19.10").
 - **States:** hover tints the row with rail paper at 70%. Keyboard focus draws a 2px ink outline inset by 2px, lays the blue highlighter behind the title and darkens the key hints to ink. A conflict adds a 20px alarm square with an alert icon before the date.
-- **Opened row (Enter):** the title becomes an input with a 1px ink underline (2px when focused). Below it come a Note textarea and the actions Move >, Reschedule <, Tags t, Delete and Close esc, the last two as quiet buttons with Close against the right edge. A hairline closes the block. On phone, × > < stack down the 44px gutter as 40×44 pressed-paper buttons with the dot grid behind them; pressing one fills it with hairline grey and draws a 1px ink outline inset by 1px. Move and Reschedule then drop out of the action row and the key caps are hidden.
+- **Opened row (Enter):** the title becomes an input with a 1px ink underline (2px when focused). Below it come a Note textarea and the actions Move >, Reschedule <, Tags t, Delete and Close esc, the last two as quiet buttons with Close against the right edge. A hairline closes the block. On phone, × > < stack down the 44px gutter as 40×44 pressed-paper buttons; pressing one fills it with hairline grey and draws a 1px ink outline inset by 1px. Move and Reschedule then drop out of the action row and the key caps are hidden.
 - **Phone swipe:** a horizontal drag of 10px or more takes over from scrolling. Dragging right uncovers a strip of Pressed Paper with the × in Fineliner Black, and past 80px marks the row done. Dragging left opens a 104px tray of two 52px pressed-paper buttons, Move > and Later <, each with a 13.5px caption and a grey left rule. The row settles back over 200ms.
 
 ### Highlighter Swipe
@@ -422,4 +415,4 @@ State changes fade or slide on one curve, `cubic-bezier(0.16, 1, 0.3, 1)`: 160ms
 - **Don't** use orange anywhere inside the pad.
 - **Don't** add shadows or rounded corners.
 - **Don't** add washi tape, stickers, hand lettering or handwriting faces.
-- **Don't** spread the dot grid outside the gutter.
+- **Don't** draw a dot grid, in the gutter or anywhere else. One was built and removed on 2026-10-17 because it carried no meaning.

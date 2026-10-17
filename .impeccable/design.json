@@ -140,23 +140,6 @@
           "oklch(95.0% 0.012 286.0)"
         ]
       },
-      "dot": {
-        "role": "neutral",
-        "displayName": "Dot Grey",
-        "canonical": "#cdcdd4",
-        "oklch": "oklch(85.0% 0.010 286.2)",
-        "dark": "#34343a",
-        "tonalRamp": [
-          "oklch(15.0% 0.010 286.2)",
-          "oklch(26.4% 0.010 286.2)",
-          "oklch(37.9% 0.010 286.2)",
-          "oklch(49.3% 0.010 286.2)",
-          "oklch(60.7% 0.010 286.2)",
-          "oklch(72.1% 0.010 286.2)",
-          "oklch(83.6% 0.010 286.2)",
-          "oklch(95.0% 0.010 286.2)"
-        ]
-      },
       "rule": {
         "role": "neutral",
         "displayName": "Perforation Grey",
@@ -587,20 +570,7 @@
         "value": "(hover: none)",
         "purpose": "Hides the gutter key hints."
       }
-    ],
-    "gutterGrid": {
-      "pitch": "16px",
-      "dot": "radial-gradient(circle, var(--dot) 0.9px, transparent 1.4px)",
-      "desktop": {
-        "width": "104px",
-        "offset": "0 8px"
-      },
-      "phone": {
-        "width": "40px",
-        "offset": "0 14px"
-      },
-      "purpose": "Dots only in the notation gutter, placed so each open bullet sits on a dot."
-    }
+    ]
   },
   "components": [
     {
@@ -615,9 +585,9 @@
       "name": "Signifier Row",
       "kind": "custom",
       "refersTo": "todo-row",
-      "description": "The signature log row: a dotted notation gutter with a drawn signifier over a real checkbox and the x > < key hints, then the list number in its ink, title, tag, list name and a margin date on its highlighter.",
+      "description": "The signature log row: a notation gutter with a drawn signifier over a real checkbox and the x > < key hints, then the list number in its ink, title, tag, list name and a margin date on its highlighter.",
       "html": "<ul class=\"ds-log\"><li class=\"ds-row ds-late\" style=\"--list-ink: var(--list-7, #7a4a22)\"><div class=\"ds-gutter\"><label class=\"ds-sig\"><input type=\"checkbox\" aria-label=\"Renew passport photo appointment\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"2.6\" fill=\"currentColor\"/></svg></label><span class=\"ds-hints ds-always\"><button class=\"ds-key\" aria-label=\"Done\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M4.5 4.5l7 7M11.5 4.5l-7 7\"/></svg></button><button class=\"ds-key\" aria-label=\"Move to a list\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M5.75 3.5 10.25 8l-4.5 4.5\"/></svg></button><button class=\"ds-key\" aria-label=\"Reschedule\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M10.25 3.5 5.75 8l4.5 4.5\"/></svg></button></span></div><span class=\"ds-index\">07</span><div class=\"ds-body\"><span class=\"ds-title\">Renew passport photo appointment</span><span class=\"ds-tag\">#paperwork</span></div><span class=\"ds-list\">Admin &amp; taxes</span><span class=\"ds-due\"><span class=\"ds-swipe-late\">−3d</span></span></li><li class=\"ds-row\" style=\"--list-ink: var(--list-4, #277a35)\"><div class=\"ds-gutter\"><label class=\"ds-sig\"><input type=\"checkbox\" aria-label=\"Buy coffee beans\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><circle cx=\"8\" cy=\"8\" r=\"2.6\" fill=\"currentColor\"/></svg></label><span class=\"ds-hints\"><button class=\"ds-key\" aria-label=\"Done\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M4.5 4.5l7 7M11.5 4.5l-7 7\"/></svg></button><button class=\"ds-key\" aria-label=\"Move to a list\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M5.75 3.5 10.25 8l-4.5 4.5\"/></svg></button><button class=\"ds-key\" aria-label=\"Reschedule\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M10.25 3.5 5.75 8l4.5 4.5\"/></svg></button></span></div><span class=\"ds-index\">04</span><div class=\"ds-body\"><span class=\"ds-title\">Buy coffee beans</span></div><span class=\"ds-list\">Groceries</span><span class=\"ds-due\"><span class=\"ds-swipe-today\">today</span></span></li><li class=\"ds-row ds-done\" style=\"--list-ink: var(--list-1, #233c8c)\"><div class=\"ds-gutter\"><label class=\"ds-sig\"><input type=\"checkbox\" checked aria-label=\"Sort photos from the weekend\"><svg class=\"ds-glyph\" width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M4.5 4.5l7 7M11.5 4.5l-7 7\"/></svg></label></div><span class=\"ds-index\">01</span><div class=\"ds-body\"><span class=\"ds-title\">Sort photos from the weekend</span><span class=\"ds-tag\">#photos</span></div><span class=\"ds-list\">Inbox</span><span class=\"ds-due\"></span></li></ul>",
-      "css": ".ds-log { margin: 0; padding: 0; list-style: none; background: var(--pad, #fbfbf9); color: var(--ink, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size: 0.9375rem; font-variant-numeric: tabular-nums; } .ds-row { display: grid; grid-template-columns: 124px 36px minmax(0, 1fr) max-content 104px; align-items: start; min-height: 32px; background: var(--pad, #fbfbf9); } .ds-row:hover { background: color-mix(in srgb, var(--pad-2, #f3f3ef) 70%, var(--pad, #fbfbf9)); } .ds-row:has(input:focus-visible) { outline: 2px solid var(--ink, #141414); outline-offset: -2px; } .ds-row:has(input:focus-visible) .ds-title { background: linear-gradient(var(--hl-select, #bde7ff), var(--hl-select, #bde7ff)) 0 55% / 100% 70% no-repeat; color: var(--on-hl, #141414); } .ds-gutter { position: relative; display: flex; align-items: flex-start; align-self: stretch; min-height: 32px; padding-left: 8px; } .ds-gutter::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 104px; background: radial-gradient(circle, var(--dot, #cdcdd4) 0.9px, transparent 1.4px) 0 8px / 16px 16px; pointer-events: none; } .ds-gutter > * { position: relative; } .ds-sig { position: relative; display: grid; place-items: center; width: 32px; height: 32px; color: var(--ink, #141414); cursor: pointer; } .ds-sig input { position: absolute; inset: 0; margin: 0; appearance: none; border: 1px solid transparent; border-radius: 0; background: transparent; cursor: pointer; } .ds-sig input:focus-visible { outline: none; } .ds-sig:hover input { border-color: var(--rule, #a9a9b1); } .ds-hints { display: flex; align-items: center; gap: 3px; height: 32px; margin-left: 8px; opacity: 0; transition: opacity 160ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-hints.ds-always, .ds-row:hover .ds-hints, .ds-row:focus-within .ds-hints { opacity: 1; } .ds-key { display: grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 1px solid var(--rule, #a9a9b1); border-radius: 0; background: var(--pad, #fbfbf9); color: var(--ink-2, #55555d); cursor: pointer; } .ds-key .ds-glyph { width: 12px; height: 12px; } .ds-key:hover, .ds-row:has(input:focus-visible) .ds-key { border-color: var(--ink, #141414); color: var(--ink, #141414); } .ds-key:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; } .ds-index { line-height: 32px; color: var(--list-ink); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.02em; } .ds-body { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; min-width: 0; padding-block: 6px; line-height: 20px; } .ds-title { overflow-wrap: anywhere; } .ds-tag { color: var(--ink-2, #55555d); font-size: 0.8125rem; } .ds-list { padding: 6px 0 0 16px; color: var(--list-ink); font-size: 0.8125rem; font-weight: 600; line-height: 20px; white-space: nowrap; } .ds-due { display: flex; justify-content: flex-end; padding: 6px 12px 0 0; line-height: 20px; font-size: 0.8125rem; color: var(--ink-2, #55555d); white-space: nowrap; } .ds-late .ds-due { color: var(--ink, #141414); font-weight: 700; } .ds-swipe-late { background-color: var(--hl-late, #ff9cc6); clip-path: polygon(2px 0, 100% 0, calc(100% - 2px) 100%, 0 100%); padding-inline: 4px; color: var(--on-hl, #141414); } .ds-swipe-today { background-color: var(--hl-today, #fff176); clip-path: polygon(2px 0, 100% 0, calc(100% - 2px) 100%, 0 100%); padding-inline: 4px; color: var(--on-hl, #141414); font-weight: 600; } .ds-done .ds-sig { color: var(--ink-3, #6b6b73); } .ds-done .ds-title { color: var(--ink-3, #6b6b73); text-decoration: line-through; text-decoration-thickness: 1px; } .ds-log .ds-glyph { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; } .ds-log .ds-glyph circle { stroke: none; }"
+      "css": ".ds-log { margin: 0; padding: 0; list-style: none; background: var(--pad, #fbfbf9); color: var(--ink, #141414); font-family: var(--font, 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible Next', system-ui, sans-serif); font-size: 0.9375rem; font-variant-numeric: tabular-nums; } .ds-row { display: grid; grid-template-columns: 124px 36px minmax(0, 1fr) max-content 104px; align-items: start; min-height: 32px; background: var(--pad, #fbfbf9); } .ds-row:hover { background: color-mix(in srgb, var(--pad-2, #f3f3ef) 70%, var(--pad, #fbfbf9)); } .ds-row:has(input:focus-visible) { outline: 2px solid var(--ink, #141414); outline-offset: -2px; } .ds-row:has(input:focus-visible) .ds-title { background: linear-gradient(var(--hl-select, #bde7ff), var(--hl-select, #bde7ff)) 0 55% / 100% 70% no-repeat; color: var(--on-hl, #141414); } .ds-gutter { display: flex; align-items: flex-start; align-self: stretch; min-height: 32px; padding-left: 8px; } .ds-sig { position: relative; display: grid; place-items: center; width: 32px; height: 32px; color: var(--ink, #141414); cursor: pointer; } .ds-sig input { position: absolute; inset: 0; margin: 0; appearance: none; border: 1px solid transparent; border-radius: 0; background: transparent; cursor: pointer; } .ds-sig input:focus-visible { outline: none; } .ds-sig:hover input { border-color: var(--rule, #a9a9b1); } .ds-hints { display: flex; align-items: center; gap: 3px; height: 32px; margin-left: 8px; opacity: 0; transition: opacity 160ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-hints.ds-always, .ds-row:hover .ds-hints, .ds-row:focus-within .ds-hints { opacity: 1; } .ds-key { display: grid; place-items: center; width: 20px; height: 20px; padding: 0; border: 1px solid var(--rule, #a9a9b1); border-radius: 0; background: var(--pad, #fbfbf9); color: var(--ink-2, #55555d); cursor: pointer; } .ds-key .ds-glyph { width: 12px; height: 12px; } .ds-key:hover, .ds-row:has(input:focus-visible) .ds-key { border-color: var(--ink, #141414); color: var(--ink, #141414); } .ds-key:focus-visible { outline: 2px solid var(--ink, #141414); outline-offset: 2px; } .ds-index { line-height: 32px; color: var(--list-ink); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.02em; } .ds-body { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; min-width: 0; padding-block: 6px; line-height: 20px; } .ds-title { overflow-wrap: anywhere; } .ds-tag { color: var(--ink-2, #55555d); font-size: 0.8125rem; } .ds-list { padding: 6px 0 0 16px; color: var(--list-ink); font-size: 0.8125rem; font-weight: 600; line-height: 20px; white-space: nowrap; } .ds-due { display: flex; justify-content: flex-end; padding: 6px 12px 0 0; line-height: 20px; font-size: 0.8125rem; color: var(--ink-2, #55555d); white-space: nowrap; } .ds-late .ds-due { color: var(--ink, #141414); font-weight: 700; } .ds-swipe-late { background-color: var(--hl-late, #ff9cc6); clip-path: polygon(2px 0, 100% 0, calc(100% - 2px) 100%, 0 100%); padding-inline: 4px; color: var(--on-hl, #141414); } .ds-swipe-today { background-color: var(--hl-today, #fff176); clip-path: polygon(2px 0, 100% 0, calc(100% - 2px) 100%, 0 100%); padding-inline: 4px; color: var(--on-hl, #141414); font-weight: 600; } .ds-done .ds-sig { color: var(--ink-3, #6b6b73); } .ds-done .ds-title { color: var(--ink-3, #6b6b73); text-decoration: line-through; text-decoration-thickness: 1px; } .ds-log .ds-glyph { display: block; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; } .ds-log .ds-glyph circle { stroke: none; }"
     },
     {
       "name": "Highlighter Swipe",
@@ -694,14 +664,14 @@
   ],
   "narrative": {
     "northStar": "The Rapid Log",
-    "overview": "The Rapid Log is the Bullet Journal's rapid-log key, written in black fineliner on a Rhodia dotPad under the pad's orange cover band. The checkbox column is a notation column. Each state has one drawn glyph (• open, × done, > moved, < rescheduled) and each verb has one key (x, >, <), so the morning triage is a single pass down that gutter.\n\nThe density is that of a working notebook: 32px rows, 15px text, tabular figures throughout, and dates in a right margin. Colour carries meaning and nothing else. Orange is the cover. Highlighter swipes sit behind text for today (yellow), late (pink) and selection (blue). Twelve fineliner inks identify lists through their two-digit index. Everything else is black and grey ink on pad white.\n\nThe surface is flat paper: square corners, 1px ink borders, no shadows, a dot grid only in the gutter, and a dashed perforation above each list's Done. The system refuses the category's round checkbox, a sidebar of anonymous coloured dots, swipe menus of extra options, and any washi tape, stickers, hand lettering or handwriting faces.",
+    "overview": "The Rapid Log is the Bullet Journal's rapid-log key, written in black fineliner on a Rhodia pad under its orange cover band. The checkbox column is a notation column. Each state has one drawn glyph (• open, × done, > moved, < rescheduled) and each verb has one key (x, >, <), so the morning triage is a single pass down that gutter.\n\nThe density is that of a working notebook: 32px rows, 15px text, tabular figures throughout, and dates in a right margin. Colour carries meaning and nothing else. Orange is the cover. Highlighter swipes sit behind text for today (yellow), late (pink) and selection (blue). Twelve fineliner inks identify lists through their two-digit index. Everything else is black and grey ink on pad white.\n\nThe surface is flat paper: square corners, 1px ink borders, no shadows, and a dashed perforation above each list's Done. The system refuses the category's round checkbox, a sidebar of anonymous coloured dots, swipe menus of extra options, and any washi tape, stickers, hand lettering or handwriting faces.",
     "keyCharacteristics": [
       "A signifier gutter: one drawn glyph per state, each over a real checkbox.",
       "An orange cover band over black and grey ink on pad white.",
       "Highlighters behind text only: yellow today, pink late, blue selection.",
       "Twelve fineliner inks on two-digit list indexes.",
       "One face, Atkinson Hyperlegible Next, with tabular figures and weights from 400 to 800.",
-      "Square, flat and shadowless, with dots only in the gutter and a dashed perforation above Done.",
+      "Square, flat and shadowless, with a dashed perforation above Done.",
       "Light and dark schemes from the same token names."
     ],
     "rules": [
@@ -732,17 +702,12 @@
       },
       {
         "name": "The Notation Column Rule",
-        "body": "Text starts at one gutter line, 124px on desktop and 44px on phone, for every row, list heading, capture field and empty-state line, and on the setup screen. The gutter holds only signifiers, key hints, the dot grid and the Done fold's × count at the perforation.",
+        "body": "Text starts at one gutter line, 124px on desktop and 44px on phone, for every row, list heading, capture field and empty-state line, and on the setup screen. The gutter holds only signifiers, key hints and the Done fold's × count at the perforation.",
         "section": "layout"
       },
       {
         "name": "The One Right Edge Rule",
         "body": "On desktop every column ends 12px (`edge`) inside the main column's right side; on the phone, columns end 16px from the screen edge. Due dates are right-aligned in the 104px margin column against that edge, and a quiet button pulls its box out by 12px so that its text, not its box, meets the edge.",
-        "section": "layout"
-      },
-      {
-        "name": "The Dots-in-the-Gutter Rule",
-        "body": "The dot grid appears only in the gutter and in the phone's opened-row verb column, never across the page.",
         "section": "layout"
       },
       {
@@ -752,7 +717,7 @@
       },
       {
         "name": "The Square Corner Rule",
-        "body": "Every box has square corners. Curves appear only inside drawn marks: the bullet, the gutter dots, icon strokes such as the search lens and the offline arcs, and round stroke caps.",
+        "body": "Every box has square corners. Curves appear only inside drawn marks: the bullet, icon strokes such as the search lens and the offline arcs, and round stroke caps.",
         "section": "shapes"
       },
       {
@@ -790,7 +755,7 @@
       "Don't use orange anywhere inside the pad.",
       "Don't add shadows or rounded corners.",
       "Don't add washi tape, stickers, hand lettering or handwriting faces.",
-      "Don't spread the dot grid outside the gutter."
+      "Don't draw a dot grid, in the gutter or anywhere else. One was built and removed on 2026-10-17 because it carried no meaning."
     ]
   }
 }
