@@ -23,7 +23,7 @@ related_targets:
 
 ## Scope and mode
 
-The app's main screen, on desktop and phone: the band, the Index rail (a bottom sheet on the phone), Today across lists, the list sections and their folded Done, the capture field (docked at the bottom on the phone), and the sync indicator with its details popover. Its overlays belong to it too: the palette (search or jump, move to a list, show only a tag), the Reschedule and Tags dialogs, the Keyboard help and the undo toast. Mode: **Operate**. Production fidelity, fully keyboard-driven. A to-do is edited in place by opening its row; there is no separate editor screen. First-run token setup is the one adjacent screen: it shows instead of this one until a repo is connected or the demo is chosen, and the sync popover leads back to it (Connect a repo, Replace token).
+The app's main screen, on desktop and phone: the band, the Index rail (a bottom sheet on the phone), Today across lists, the list sections and their folded Done, the capture field (docked at the bottom on the phone), and the sync indicator with its details popover. Its overlays belong to it too: the palette (search or jump, move to a list, show only a tag, rename a list), the Reschedule and Tags dialogs, the Keyboard help and the undo toast. Mode: **Operate**. Production fidelity, fully keyboard-driven. A to-do is edited in place by opening its row; there is no separate editor screen. First-run token setup is the one adjacent screen: it shows instead of this one until a repo is connected or the demo is chosen, and the sync popover leads back to it (Connect a repo, Replace token).
 
 ## Audience, job, task
 
@@ -68,9 +68,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 - **Where the `x > <` hints show.** At all times on late rows in Today; on hover or focus on every other open row; never on phones or touch screens.
 - **How phone triage works.** By swipe and by the opened row, never by buttons under each late row. A drag right past 80px marks a row done; a drag left opens a tray of Move > and Later <. Opening a row stacks × > < down its gutter, and its action row keeps only Tags, Delete and Close.
 - **Whether list numbers stay stable.** They do. A list's number is stored in its `_list.md` (`index`), a new list takes the number after the highest, and the screen offers no way to reorder or renumber lists. The only renumbering is automatic: when two lists share a number (created at once on two devices, or hand-edited), the one later by folder name moves to the end.
+- **How a list is renamed.** In place, like a to-do's title. The heading's name is the control: a click or tap, `r` from any of the list's rows (Today rows included) or its heading, or Rename a list in the palette turns it into a field with the opened row's underline at heading size. Enter or leaving the field saves, Esc cancels, and `u` undoes. Only `name` in `_list.md` changes; the folder, number and ink stay, so the jump and capture keys keep working.
 - **What a conflict offers beyond its banner.** Nothing to choose: the merge has already kept the latest edit, field by field. The banner names the file as it is on GitHub and offers only Dismiss. While it stands, the row carries an alarm mark before its date, the band's sync word reads "conflict", and saving goes on behind it. The edit that gave way is not offered back.
 
 ## Open decisions
 
-- Lists can be added from the Index but not renamed, re-inked, reordered or deleted on screen; for now that means editing the data repo by hand.
+- Lists can be added from the Index and renamed in place, but not re-inked, reordered or deleted on screen; for now that means editing the data repo by hand.
 - Clear done deletes a list's done rows (with undo). Whether they should move to an archive folder instead stays open in PRODUCT.md.

@@ -1,7 +1,7 @@
 import { tick } from 'svelte'
 import { store } from './store.svelte'
 
-export type PaletteMode = 'search' | 'move' | 'tag'
+export type PaletteMode = 'search' | 'move' | 'tag' | 'rename'
 
 const RAIL_KEY = 'gh-todo:rail'
 
@@ -23,6 +23,8 @@ class UI {
   dateFor = $state<string | null>(null)
   tagsFor = $state<string | null>(null)
   expanded = $state<string | null>(null)
+  /** The list whose heading is an input for its new name. */
+  renaming = $state<string | null>(null)
   help = $state(false)
   sheet = $state(false)
   railOpen = $state(readRail())
@@ -47,12 +49,18 @@ class UI {
     this.#returnFocus = null
   }
 
-  restoreFocus(todoId?: string | null) {
+  restoreFocus(todoId?: string | null, fallback?: HTMLElement) {
     const el = this.#returnFocus
     this.#returnFocus = null
     requestAnimationFrame(() => {
-      if (el && el.isConnected) return el.focus({ preventScroll: true })
+      if (el && el.isConnected) {
+        // Back on a row that may have scrolled away (a list renamed from Today): bring it into view.
+        el.focus({ preventScroll: true })
+        el.closest('li')?.scrollIntoView({ block: 'nearest' })
+        return
+      }
       if (todoId) focusRow(todoId)
+      else fallback?.focus({ preventScroll: true })
     })
   }
 
@@ -135,6 +143,17 @@ class UI {
     if (!row) return
     row.scrollIntoView({ block: 'center', behavior: smooth() })
     row.querySelector<HTMLElement>('[data-row-focus]')?.focus({ preventScroll: true })
+  }
+
+  /** Turn a list's heading into the field for its name, closing the phone Index first. */
+  async renameList(listId: string) {
+    this.rememberFocus()
+    this.tray = null
+    await this.#closeSheet()
+    this.renaming = listId
+    this.activeList = listId
+    await tick()
+    document.getElementById(`list-${listId}`)?.scrollIntoView({ block: 'start', behavior: smooth() })
   }
 
   jumpToIndex(index: number): boolean {

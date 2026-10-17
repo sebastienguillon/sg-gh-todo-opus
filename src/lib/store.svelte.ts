@@ -420,6 +420,27 @@ class Store implements Host {
     return list
   }
 
+  /** Only the name in the list's `_list.md` changes: its folder, id, number and ink stay. */
+  renameList(id: string, name: string): boolean {
+    const list = this.listById.get(id)
+    const clean = name.trim()
+    if (!list || !clean || clean === list.name) return false
+    const before = list.name
+    list.name = clean
+    this.#recordList(list)
+    this.#announce(`Renamed ${pad2(list.index)} ${before} to ${clean}. Press U to undo.`)
+    this.#showToast(`Renamed “${before}” to “${clean}”`, () => {
+      const now = this.listById.get(id)
+      if (now) {
+        now.name = before
+        this.#recordList(now)
+        this.#announce(`Name restored: ${label(now)}`)
+      }
+      return null
+    })
+    return true
+  }
+
   setTagFilter(tag: string | null) {
     this.tagFilter = tag
     this.#announce(tag ? `Showing #${tag} only` : 'Showing everything')

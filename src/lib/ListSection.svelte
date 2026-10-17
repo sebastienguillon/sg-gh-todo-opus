@@ -4,6 +4,7 @@
   import { pad2, store } from './store.svelte'
   import TodoRow from './TodoRow.svelte'
   import type { TodoList } from './types'
+  import { ui } from './ui.svelte'
 
   let { list }: { list: TodoList } = $props()
 
@@ -11,8 +12,39 @@
   let done = $derived(store.doneIn(list.id))
   let foldOpen = $derived(!!store.openDone[list.id])
   let filtered = $derived(!!store.tagFilter)
+  let renaming = $derived(ui.renaming === list.id)
 
   let section = $state<HTMLElement>()
+  let heading = $state<HTMLElement>()
+  let settled = false
+
+  function editName(el: HTMLInputElement) {
+    settled = false
+    el.focus({ preventScroll: true })
+    el.select()
+  }
+
+  /** Enter and Esc hand focus back; leaving the field by pointer keeps it where it went. */
+  function finishRename(save: boolean, value: string, refocus: boolean) {
+    if (settled) return
+    settled = true
+    if (save) store.renameList(list.id, value)
+    ui.renaming = null
+    if (refocus) ui.restoreFocus(null, heading)
+    else ui.forgetFocus()
+  }
+
+  function renameKey(e: KeyboardEvent) {
+    const value = (e.currentTarget as HTMLInputElement).value
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      finishRename(true, value, true)
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      e.stopPropagation()
+      finishRename(false, value, true)
+    }
+  }
 
   function clearDone() {
     // The fold and its button go away with the done rows; move focus into the list first.
@@ -31,12 +63,25 @@
   }
 </script>
 
-{#if !filtered || open.length || done.length}
+{#if !filtered || open.length || done.length || renaming}
   <section bind:this={section} class="list" id="list-{list.id}" aria-labelledby="h-{list.id}" style:--list-ink="var(--list-{list.ink})">
-    <header class="head">
-      <h2 id="h-{list.id}" tabindex="-1">
+    <header class="head" class:renaming>
+      <h2 id="h-{list.id}" tabindex="-1" bind:this={heading}>
         <span class="num">{pad2(list.index)}</span>
-        <span class="name">{list.name}</span>
+        {#if renaming}
+          <input
+            class="name-edit"
+            value={list.name}
+            aria-label="Name of list {pad2(list.index)}"
+            autocomplete="off"
+            enterkeyhint="done"
+            use:editName
+            onkeydown={renameKey}
+            onblur={(e) => finishRename(true, e.currentTarget.value, false)}
+          />
+        {:else}
+          <button class="name" tabindex="-1" title="Rename (r)" onclick={() => ui.renameList(list.id)}>{list.name}</button>
+        {/if}
       </h2>
       <span class="count">{open.filter((t) => !t.done).length} open</span>
       <span class="jump" aria-hidden="true"><kbd>g</kbd><kbd>{pad2(list.index)}</kbd></span>
@@ -109,6 +154,39 @@
 
   .num {
     color: var(--list-ink);
+  }
+
+  /* The name reads as plain heading text; a click or tap renames it, as a title opens its row. */
+  .name {
+    padding: 0;
+    border: 0;
+    background: none;
+    letter-spacing: inherit;
+    text-align: left;
+    cursor: text;
+  }
+
+  .renaming h2 {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* The opened row's title field at heading size: a 1px ink underline, 2px with focus, in the same box. */
+  .name-edit {
+    flex: 1;
+    min-width: 0;
+    padding: 0 0 1px;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    border-radius: 0;
+    background: transparent;
+    letter-spacing: inherit;
+  }
+
+  .name-edit:focus-visible {
+    outline: none;
+    padding-bottom: 0;
+    border-bottom-width: 2px;
   }
 
   .count {

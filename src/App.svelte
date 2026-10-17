@@ -166,6 +166,15 @@
           ui.openTags(id)
         }
         break
+      case 'r': {
+        // The list of the row or heading in focus; with neither, pick one in the palette.
+        e.preventDefault()
+        const section = target.closest<HTMLElement>('section.list')
+        const listId = id ? store.find(id)?.listId : section?.id.replace(/^list-/, '')
+        if (listId) void ui.renameList(listId)
+        else ui.openPalette('rename')
+        break
+      }
       case 'u':
         if (store.toast?.undo) {
           e.preventDefault()

@@ -2,6 +2,7 @@
   import Icon from './Icon.svelte'
   import Signifier from './Signifier.svelte'
   import { pad2, store } from './store.svelte'
+  import type { TodoList } from './types'
   import { ui } from './ui.svelte'
 
   interface Item {
@@ -23,6 +24,12 @@
   let skipRestore = false
 
   let mode = $derived(ui.palette?.mode ?? 'search')
+
+  /** A list by the start of its number, or by any part of its name. */
+  function matches(l: TodoList, q: string): boolean {
+    if (!q) return true
+    return /^\d+$/.test(q) ? String(l.index).startsWith(q.replace(/^0(?=\d)/, '')) : l.name.toLowerCase().includes(q.toLowerCase())
+  }
   let subject = $derived(ui.palette?.todoId ? store.find(ui.palette.todoId) : undefined)
 
   let items = $derived.by((): Item[] => {
@@ -31,9 +38,7 @@
       const t = subject
       return store.listsInOrder
         .filter((l) => l.id !== t.listId)
-        .filter((l) =>
-          !q ? true : /^\d+$/.test(q) ? String(l.index).startsWith(q.replace(/^0(?=\d)/, '')) : l.name.toLowerCase().includes(q.toLowerCase()),
-        )
+        .filter((l) => matches(l, q))
         .map((l) => ({
           key: l.id,
           kind: 'list',
@@ -43,6 +48,20 @@
           meta: `${store.openCount.get(l.id) ?? 0} open`,
           run: () => store.move(t.id, l.id),
           restore: true,
+        }))
+    }
+    if (mode === 'rename') {
+      return store.listsInOrder
+        .filter((l) => matches(l, q))
+        .map((l) => ({
+          key: l.id,
+          kind: 'list',
+          text: l.name,
+          num: pad2(l.index),
+          ink: l.ink,
+          meta: `${store.openCount.get(l.id) ?? 0} open`,
+          run: () => ui.renameList(l.id),
+          restore: false,
         }))
     }
     if (mode === 'tag') {
@@ -90,6 +109,7 @@
       : [
           { key: 'new', kind: 'command', text: 'Log a task', meta: 'n', run: () => document.getElementById('capture')?.focus(), restore: false },
           { key: 'today', kind: 'command', text: 'Go to Today', meta: 'g t', run: () => ui.jumpToToday(), restore: false },
+          { key: 'rename', kind: 'command', text: 'Rename a list', meta: 'r', run: () => {}, restore: false },
           { key: 'help', kind: 'command', text: 'Keyboard shortcuts', meta: '?', run: () => ui.openHelp(), restore: false },
         ]
     const outside: Item[] =
@@ -100,7 +120,13 @@
   })
 
   let heading = $derived(
-    mode === 'move' && subject ? `Move “${subject.title}” to` : mode === 'tag' ? 'Show only a tag' : 'Search or jump',
+    mode === 'move' && subject
+      ? `Move “${subject.title}” to`
+      : mode === 'tag'
+        ? 'Show only a tag'
+        : mode === 'rename'
+          ? 'Rename a list'
+          : 'Search or jump',
   )
 
   $effect(() => {
@@ -133,6 +159,14 @@
 
   function choose(item: Item | undefined) {
     if (!item) return
+    if (item.kind === 'command' && item.key === 'rename') {
+      // Pick the list next, in the same palette.
+      ui.palette = { mode: 'rename', todoId: null }
+      query = ''
+      active = 0
+      input?.focus()
+      return
+    }
     if (item.key === 'unfilter') {
       // Widen the search in place; the palette stays open on the same query, from its top result.
       item.run()
@@ -192,7 +226,7 @@
         aria-controls="palette-list"
         aria-activedescendant={activeItem ? optionId(activeItem) : undefined}
         aria-autocomplete="list"
-        placeholder={mode === 'move' ? 'Type a number or a name' : mode === 'tag' ? 'Type a tag' : 'Type a to-do, a list or a number'}
+        placeholder={mode === 'move' || mode === 'rename' ? 'Type a number or a name' : mode === 'tag' ? 'Type a tag' : 'Type a to-do, a list or a number'}
         autocomplete="off"
         onkeydown={keydown}
       />

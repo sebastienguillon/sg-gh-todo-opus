@@ -42,14 +42,14 @@ The data never lives in a vendor database or on an app server. It is a set of pl
 
 **First version:**
 - Add, check off, edit, delete and reorder to-dos.
-- **Multiple lists:** each list is a folder in the data repo.
+- **Multiple lists:** each list is a folder in the data repo. Lists are added from the Index and renamed in place (`r`, the list's heading, or the palette). A rename changes only the `name` in the list's `_list.md`: the folder, number and ink stay, so `>03` and `g 03` keep working.
 - **Due dates:** optional per to-do, with clear signals for due today and overdue.
 - **Notes:** a free-text Markdown body under each to-do's title.
 - **Tags:** free-form labels, with filtering.
 - **Interface language:** English only.
 
 **Data format (built):**
-- Each list is a folder. Its `_list.md` holds the list's `index`, `name` and `ink` as YAML front-matter. A folder's name is the list's id.
+- Each list is a folder. Its `_list.md` holds the list's `index`, `name` and `ink` as YAML front-matter. A folder's name is the list's id, and it keeps its first name when the list is renamed: the name lives only in `_list.md`.
 - Every other `.md` file in a folder is one to-do: YAML front-matter with `id`, `title`, `tags`, `due`, `done`, `doneAt`, `order`, `createdAt` and `updatedAt`, and the note as the Markdown body. The file is named after the title (`fix-dripping-kitchen-tap.md`), with the id added when two to-dos in a list share a title. It is renamed when the title changes or the to-do moves to another list.
 - Hand edits are welcome. A file needs only a title (`title:` or a `# Heading`); a missing id, order or index is filled in the same way on every device and written back on the to-do's next change. Root files, `README.md` files and folders starting with `.` or `_` are ignored.
 - The app reads the whole repo with one recursive Git Trees call, then fetches only the files whose blob id changed, a hundred per GraphQL call.
@@ -59,7 +59,7 @@ The data never lives in a vendor database or on an app server. It is a set of pl
 - One file per to-do, so edits to different to-dos on different devices never conflict. Each to-do stores its own sort position, so reordering doesn't rewrite a shared list.
 - Writes: once edits settle (1.5 s, at most 8 s), all pending changes go into one commit through the Git Data API (tree, commit, then a fast-forward-only ref update). At most one commit every 10 s, and at least 1 s between write requests.
 - Reads: the branch ref is polled with `If-None-Match` every 60 s while the app is visible, and on focus or return to the tab. GitHub doesn't count 304 "not modified" replies against the rate limit.
-- Conflicts: if the branch moved (a newer head before committing, or a 422 non-fast-forward on the ref update), the app re-reads, merges and retries, up to three times. Each to-do is merged field by field against the last version both sides shared: a field changed on one side takes that side's value; a field changed on both takes the latest write (`updatedAt`), and the band then shows a conflict naming the file. A delete and an edit of the same to-do also resolve by latest write.
+- Conflicts: if the branch moved (a newer head before committing, or a 422 non-fast-forward on the ref update), the app re-reads, merges and retries, up to three times. Each to-do is merged field by field against the last version both sides shared: a field changed on one side takes that side's value; a field changed on both takes the latest write (`updatedAt`), and the band then shows a conflict naming the file. A delete and an edit of the same to-do also resolve by latest write. A list's `_list.md` merges the same way, field by field (`index`, `name`, `ink`): a field changed on one device takes that device's value, and a field changed on two (a list renamed on both) keeps the value of the device that syncs last, without a conflict banner. A rename on one device and edits to that list's to-dos on another never meet, since they are different files.
 - Failures: the band turns to ink with Retry, and the app retries by itself after 30 s, doubling up to 10 min (or at the time a rate limit names). A token GitHub rejects, one without write access, or one that can't find the repo or its branch shows Reconnect instead, which opens the setup screen for a new token without touching pending changes.
 
 **GitHub limits to stay inside** (checked against GitHub's docs on 2026-10-15):

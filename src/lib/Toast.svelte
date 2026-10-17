@@ -56,7 +56,9 @@
     color: var(--pad);
   }
 
+  /* The message wraps; the buttons keep their size beside it. */
   .undo {
+    flex: none;
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -78,6 +80,7 @@
   }
 
   .x {
+    flex: none;
     display: grid;
     place-items: center;
     width: 28px;

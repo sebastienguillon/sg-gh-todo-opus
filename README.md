@@ -54,11 +54,12 @@ Press `?` (or the keyboard button in the band) to show this list in the app.
 | `n` | Log a task |
 | `g` `07` | Jump to list 07 |
 | `g` `t` | Jump to Today |
+| `r` | Rename the list |
 | `⌘` `K` | Search or jump |
 | `#` | Show only a tag |
 | `Alt` `↑` | Move a row up or down |
 | `Delete` | Delete |
-| `u` | Undo a delete or a clear |
+| `u` | Undo a delete, a clear or a rename |
 | `Esc` | Close, or clear the tag filter |
 
 `⌘` `K` is `Ctrl` `K` on Windows and Linux.
@@ -76,11 +77,18 @@ Buy stamps #post >03 <fri
 - Below the field, a hint shows where Enter will file the task and with which date and tags. Without `>`, it goes to the first list (the Inbox, in a repo To Do started).
 - `Esc` clears the field.
 
+### Lists
+
+- **Add a list** from the Index: choose New list and type its name. It takes the next number and an ink of its own.
+- **Rename a list** by pressing `r` on one of its rows (in Today too) or on its heading, by clicking or tapping its name in the heading, or by choosing Rename a list in the search palette (`⌘` `K`, then the list's number or name). Enter, or leaving the field, saves; `Esc` cancels; `u` undoes. Only the name changes: the list keeps its number, ink and folder, so `>03` and `g 03` still work, and the repo records the rename as a change to that folder's `_list.md`.
+- Changing a list's number or ink, reordering lists and deleting a list are done in the data repo by hand for now.
+
 ### On a phone
 
 - **Swipe a row right** about 80 px to mark it done (or reopen a done row).
 - **Swipe a row left** to open a tray with **Move** (`>`) and **Later** (`<`). Swipe back, or tap outside the rows, to close it.
 - **Tap a title** to open the row: its title, note and actions, with done, move and reschedule stacked in the gutter.
+- **Tap a list's name** in its heading to rename it.
 - Tap the bullet to mark a row done.
 
 A drag only counts as a swipe once it is clearly sideways; otherwise the page scrolls. Every action a swipe offers also has a button and a key.
@@ -89,7 +97,7 @@ A drag only counts as a swipe once it is clearly sideways; otherwise the page sc
 
 The data repo holds one folder per list and one Markdown file per to-do:
 
-- Each folder is a list. Its `_list.md` holds the list's number, name and colour.
+- Each folder is a list. Its `_list.md` holds the list's number, name and colour. Renaming a list in To Do rewrites only its `name:`; the folder keeps its first name.
 - Every other `.md` file in the folder is one to-do, named after its title (`fix-dripping-kitchen-tap.md`), with its fields as YAML front-matter and its note as the Markdown body.
 
 The full format is in the data repo's own README, which To Do writes when it starts an empty repo. For this owner that is [`sebastienguillon/gh-todo-data`](https://github.com/sebastienguillon/gh-todo-data) (private), whose default branch is `master`.

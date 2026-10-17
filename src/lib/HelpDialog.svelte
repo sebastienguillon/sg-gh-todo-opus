@@ -13,11 +13,12 @@
     [['n'], 'Log a task'],
     [['g', '07'], 'Jump to list 07'],
     [['g', 't'], 'Jump to Today'],
+    [['r'], 'Rename the list'],
     [['⌘', 'K'], 'Search or jump'],
     [['#'], 'Show only a tag'],
     [['Alt', '↑'], 'Move a row up or down'],
     [['Delete'], 'Delete'],
-    [['u'], 'Undo a delete or a clear'],
+    [['u'], 'Undo a delete, a clear or a rename'],
     [['Esc'], 'Close, or clear the tag filter'],
   ]
 
