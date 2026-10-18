@@ -50,7 +50,7 @@
         <a
           href="#list-{list.id}"
           class="item"
-          aria-current={ui.activeList === list.id ? 'location' : undefined}
+          aria-current={ui.activeList === list.id ? 'true' : undefined}
           onclick={(e) => {
             e.preventDefault()
             ui.jumpToList(list.id)

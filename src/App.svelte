@@ -297,27 +297,6 @@
     if (gone(ui.expanded)) ui.expanded = null
     if (gone(ui.tray)) ui.tray = null
   })
-
-  // ---- where am I: the Index marks the list at the top of the page ----------
-
-  $effect(() => {
-    void store.listsInOrder.length
-    void store.tagFilter
-    let observer: IntersectionObserver | undefined
-    tick().then(() => {
-      const seen = new Map<string, boolean>()
-      observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) seen.set(entry.target.id.replace(/^list-/, ''), entry.isIntersecting)
-          const first = store.listsInOrder.find((l) => seen.get(l.id))
-          ui.activeList = first ? first.id : null
-        },
-        { rootMargin: '-64px 0px -55% 0px' },
-      )
-      document.querySelectorAll('section.list').forEach((s) => observer!.observe(s))
-    })
-    return () => observer?.disconnect()
-  })
 </script>
 
 <svelte:window {onkeydown} />
@@ -356,7 +335,7 @@
 
 {#if isPhone}
   <div class="dock">
-    <Capture />
+    <Capture docked />
   </div>
 {/if}
 
