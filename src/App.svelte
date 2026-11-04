@@ -207,7 +207,7 @@
         break
       case 'n':
         e.preventDefault()
-        document.getElementById('capture')?.focus()
+        ui.openCapture()
         break
       case '/':
         e.preventDefault()
@@ -339,6 +339,7 @@
   </div>
 {/if}
 
+<Capture />
 <Palette />
 <DateDialog />
 <TagDialog />

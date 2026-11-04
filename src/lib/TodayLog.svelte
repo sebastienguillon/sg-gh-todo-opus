@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Capture from './Capture.svelte'
   import { formatDay } from './dates'
   import Icon from './Icon.svelte'
   import { store } from './store.svelte'
@@ -24,10 +23,6 @@
       <span>{store.totalOpen} open in {store.lists.length} lists</span>
     </p>
   </header>
-
-  {#if !compact}
-    <Capture />
-  {/if}
 
   {#if store.tagFilter}
     <p class="filtered">
@@ -68,7 +63,7 @@
     flex-wrap: wrap;
     align-items: baseline;
     gap: 8px 20px;
-    padding: 0 var(--edge) 0 calc(var(--gutter) - 4px);
+    padding: 0 var(--edge) 12px calc(var(--gutter) - 4px);
   }
 
   h1 {

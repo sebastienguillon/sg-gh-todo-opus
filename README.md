@@ -51,7 +51,7 @@ Press `?` (or the keyboard button in the band) to show this list in the app.
 | `<` | Reschedule |
 | `t` | Edit tags |
 | `Enter` | Open the row: title, note, actions |
-| `n` | Log a task |
+| `n` | Log a task (the + Log a task button in the band does the same) |
 | `g` `07` | Jump to list 07 |
 | `g` `t` | Jump to Today |
 | `r` | Rename the list |
@@ -76,8 +76,8 @@ Buy stamps #post >03 <fri
 - `>` takes a list's two-digit number (`>03`) or the start of its name (`>home`).
 - `<` takes a single date word: `today`, `tomorrow` (or `tom`), a weekday (`fri`), a day and month (`24.10`), or a number of days ahead (`+3`).
 - Without `>`, the task goes to the list selected in the Index, the one marked in blue. A list is selected by clicking it in the Index, by `g` and its number, or from the search palette. Going to Today clears the selection, and the task then goes to the first list (the Inbox, in a repo To Do started).
-- Below the field, a hint shows where Enter will file the task and with which date and tags. The selected list shows there in blue too. On a phone, where the hint is hidden, the field's placeholder names the selected list.
-- `Esc` clears the field.
+- On a desktop, `n` or the + Log a task button in the band opens a dialog for the task. Under its field, a line shows where Enter will file the task and with which date and tags; the selected list shows there in blue too. Enter files it and closes the dialog, and a message at the bottom left says which list it went to. `Esc` or Cancel closes it without logging.
+- On a phone the field is docked at the bottom of the screen and stays there after Enter, ready for the next task. Its placeholder names the selected list. `Esc` clears it.
 
 ### Lists
 

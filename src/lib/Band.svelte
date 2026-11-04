@@ -28,6 +28,11 @@
     <button class="icon-btn" aria-label={ui.railOpen ? 'Hide the Index' : 'Show the Index'} aria-pressed={ui.railOpen} title="Index" onclick={() => ui.toggleRail()}>
       <Icon name="index" />
     </button>
+    <button class="log" aria-label="Log a task" title="Log a task (n)" onclick={() => ui.openCapture()}>
+      <Icon name="plus" />
+      <span class="log-label">Log a task</span>
+      <kbd>n</kbd>
+    </button>
     <button class="search" onclick={() => ui.openPalette('search')}>
       <Icon name="search" />
       <span class="label">Search or jump to a list</span>
@@ -104,6 +109,7 @@
     align-items: center;
     gap: 10px;
     width: min(420px, 40vw);
+    min-width: 0;
     min-height: 32px;
     padding: 0 8px 0 10px;
     border: 1px solid currentColor;
@@ -116,9 +122,14 @@
     border-color: var(--pad);
   }
 
+  /* A crowded band (a narrow desk, a failed sync) cuts the label short rather than wrap it. */
   .search .label {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
     color: var(--ink-2);
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .search kbd {
@@ -144,6 +155,32 @@
 
   .tags:hover {
     border-color: currentColor;
+  }
+
+  /* The band's one verb: outlined at rest, so it reads as a button before the tools that find. */
+  .log {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+    min-height: 32px;
+    padding: 0 8px;
+    border: 1px solid currentColor;
+    background: transparent;
+    color: inherit;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .log:hover {
+    background: color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  /* A narrow desk keeps the + and its key; the search field needs the room. */
+  @media (max-width: 1023px) {
+    .log-label {
+      display: none;
+    }
   }
 
   .chip {
