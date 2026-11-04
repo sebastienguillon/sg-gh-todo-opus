@@ -126,6 +126,13 @@ components:
   list-index:
     typography: "{typography.numeral}"
     width: "36px"
+  row-handle:
+    textColor: "{colors.ink-3}"
+    rounded: "{rounded.none}"
+    width: "32px"
+  drop-line:
+    backgroundColor: "{colors.ink}"
+    height: "2px"
   signifier-key:
     backgroundColor: "{colors.pad}"
     textColor: "{colors.ink-2}"
@@ -227,14 +234,14 @@ components:
 
 **Creative North Star: "The Rapid Log"**
 
-The Rapid Log is the Bullet Journal's rapid-log key, written in black fineliner on a Rhodia pad under its orange cover band. The checkbox column is a notation column. Each state has one drawn glyph (• open, × done, > moved, < rescheduled) and each verb has one key (x, >, <), so the morning triage is a single pass down that gutter.
+The Rapid Log is the Bullet Journal's rapid-log key, written in black fineliner on a Rhodia pad under its orange cover band. The checkbox column is a notation column. A done row is marked ×, and for a moment after an action a row shows > (moved) or < (rescheduled); each verb has one key (x, >, <), so the morning triage is a single pass down that gutter. An open row carries no mark: in a list its cell holds the handle that drags it to a new place.
 
 The density is that of a working notebook: 32px rows, 18px text, tabular figures throughout, and dates in a right margin. Colour carries meaning and nothing else. Orange is the cover. Highlighter swipes sit behind text for today (yellow), late (pink) and selection (blue). Twelve fineliner inks identify lists through their two-digit index. Everything else is black and grey ink on pad white.
 
 The surface is flat paper: square corners, 1px ink borders, no shadows, and a dashed perforation above each list's Done. The system refuses the category's round checkbox, a sidebar of anonymous coloured dots, swipe menus of extra options, and any washi tape, stickers, hand lettering or handwriting faces.
 
 **Key Characteristics:**
-- A signifier gutter: one drawn glyph per state, each over a real checkbox.
+- A signifier gutter: × for done, > and < after a move or a reschedule, a drag handle on open list rows, each cell over a real checkbox.
 - An orange cover band over black and grey ink on pad white.
 - Highlighters behind text only: yellow today, pink late, blue selection.
 - Twelve fineliner inks on two-digit list indexes.
@@ -266,7 +273,7 @@ Twelve fineliner inks for list identity, assigned by index and cycling after twe
 - **Pressed Paper** (#e8e8e3): button hover, the chip clear button's hover, both phone swipe reveals (the × strip uncovered by a right drag and the Move and Later tray) and the phone triage buttons.
 - **Fineliner Black** (#141414): all primary text, button and field borders, dialog edges, focus outlines, the primary button fill and the toast.
 - **Graphite** (#55555d): secondary text: counts, tags, plain dates, hints, the summary line.
-- **Faded Ink** (#6b6b73): done rows and their signifiers, placeholders, the capture bullet, the jump key caps on list headings.
+- **Faded Ink** (#6b6b73): done rows and their signifiers, the row handle, placeholders, the capture bullet, the jump key caps on list headings.
 - **Perforation Grey** (#a9a9b1): the dashed perforation, quiet borders (key hints, tag chips, field rest state, hover outlines) and the scrollbar.
 - **Hairline** (#e3e3e0): dividers: the rail's right edge, dialog headers, help rows, the opened row's bottom. It is also the pressed fill of buttons and of the phone verb stack.
 - **Alarm** (#141414 / on-alarm #fbfbf9): the failed-sync band, the conflict banner and the conflict mark on a row.
@@ -321,7 +328,7 @@ Every row is a five-column grid: the 124px notation gutter, a 36px index column 
 
 ## Elevation & Depth
 
-The system is flat. Nothing casts a shadow. Overlays are told apart from the page by a 1px fineliner border and, for modal dialogs, a backdrop of ink at 28% opacity. Surfaces are told apart by paper tone (pad, rail paper, pressed paper) and by hairline dividers. Stacking is structural only: the band is sticky above the page, the rail is sticky beside it, the phone capture is docked at the bottom, and the toast floats at the bottom left as a solid ink slip.
+The system is flat. Nothing casts a shadow. Overlays are told apart from the page by a 1px fineliner border and, for modal dialogs, a backdrop of ink at 28% opacity. Surfaces are told apart by paper tone (pad, rail paper, pressed paper) and by hairline dividers. Stacking is structural only: the band is sticky above the page, the rail is sticky beside it, the phone capture is docked at the bottom, the toast floats at the bottom left as a solid ink slip, and a row being dragged rides over the others as pad with a 1px ink edge.
 
 ### Named Rules
 **The Flat Pad Rule.** No surface casts a shadow. Separation comes from a 1px ink edge, a paper tone or the 28% ink backdrop.
@@ -339,7 +346,8 @@ The highlighter swipe is a parallelogram: squared ends skewed by 2px (3px on the
 
 ### Signature: the Signifier Row
 The log's unit: a notation gutter, then the entry.
-- **Gutter:** a 32px signifier cell (40×44 on phone), holding a drawn glyph (16px, 1.6px stroke, round caps): a filled dot for open, × for done, and briefly > for moved or < for rescheduled after the action. Under the glyph is a real native checkbox filling the cell, with its appearance removed. Hovering the cell shows a 1px grey box around it. Done rows fade the glyph and title to Faded Ink and strike the title through at 1px.
+- **Gutter:** a 32px signifier cell (40×44 on phone) over a real native checkbox that fills it, with its appearance removed. A done row shows × (16px, 1.6px stroke, round caps), and a click on it reopens the row; hovering it shows a 1px grey box. Briefly after an action the cell shows > for moved or < for rescheduled. An open row's cell shows no mark and takes no click: the checkbox is there for the keyboard and screen readers. Done rows fade the glyph and title to Faded Ink and strike the title through at 1px.
+- **Handle:** on open rows in a list (not in Today, which is ordered by date and list number, nor in the Done fold), the cell holds a grip of two 7px fineliner strokes in Faded Ink, ink on hover with the 1px grey box, and a grab cursor. At a desk it fades in (160ms) on hover or focus, like the key hints; on a phone or any touch screen it always shows. Dragging it lifts the row, which follows the pointer as pad with a 1px ink edge over the rows it passes, while its old place stays open. A 2px ink line, from the handle to the right edge, marks where it will land (none while it would land where it was). Near the band or the bottom of the view (above the phone's docked field) the page scrolls. Esc puts it back. A press only becomes a drag after 4px of travel; a click on the handle does nothing. A row lands only among its own list's open rows; under a tag filter it lands right after the visible row above it.
 - **Key hints:** three 20px square buttons (× > <) with a 1px grey border, 12px glyphs and Graphite ink, 3px apart, 8px right of the signifier. They fade in (160ms) on hover or focus, stay visible on late Today rows, and are hidden on touch devices and phones.
 - **Entry:** on Today rows, the list's two-digit index in its ink. Then the title, a note icon if a note exists, tags (14.625px Graphite, `#tag`, bold ink when it is the active filter), the list name in its ink (600), and the date in the right margin. Late dates are bold ink on a pink swipe, today is 600 on a yellow swipe, and other dates are plain 14.625px Graphite ("tomorrow", "Mon 19.10").
 - **States:** hover tints the row with rail paper at 70%. Keyboard focus draws a 2px ink outline inset by 2px, lays the blue highlighter behind the title and darkens the key hints to ink. A conflict adds a 20px alarm square with an alert icon before the date.
@@ -393,9 +401,9 @@ The favicon and the home-screen icon are one drawing, `public/favicon.svg`: a fu
 State changes fade or slide on one curve, `cubic-bezier(0.16, 1, 0.3, 1)`: 160ms for opacity and fills, 200ms for the band's colour change and a swiped row settling back. The one authored motion is the pen stroke. Reduced motion collapses every transition and removes the stroke animation.
 
 ### Named Rules
-**The Real Checkbox Rule.** Every signifier is drawn over a real native checkbox that fills its cell, so a click, Space and `x` all do the same thing and assistive technology announces a checkbox.
+**The Real Checkbox Rule.** Every row's cell holds a real native checkbox, the row's anchor for `j`/`k`, so Space and `x` do the same thing and assistive technology announces a checkbox. A done row's × takes a click too; an open row's cell gives the pointer to its handle, or to nothing in Today.
 
-**The Three Verbs Rule.** A row's gutter and swipe offer exactly three verbs, × done, > move and < reschedule, in that order wherever they appear: the gutter hints, the phone's opened-row stack and the phone swipe (right for ×, left for > and <). Tags and the to-do's Delete live in the opened row and on their keys (t, Delete).
+**The Three Verbs Rule.** A row's gutter and swipe offer exactly three verbs, × done, > move and < reschedule, in that order wherever they appear: the gutter hints, the phone's opened-row stack and the phone swipe (right for ×, left for > and <). Tags and the to-do's Delete live in the opened row and on their keys (t, Delete). The handle is not a verb: it only changes a row's place in its list, as Alt ↑ ↓ does.
 
 **The Pen Stroke Rule.** The one authored motion: when a signifier changes on screen, it is drawn in like a pen stroke over 220ms. Marks present at load stay still.
 
@@ -415,7 +423,7 @@ State changes fade or slide on one curve, `cubic-bezier(0.16, 1, 0.3, 1)`: 160ms
 ### Don't:
 - **Don't** draw a round or boxed checkbox at rest; the only box is the 1px Perforation Grey outline of the cell on hover.
 - **Don't** identify lists with anonymous coloured dots or by colour alone.
-- **Don't** add swipe actions or gutter verbs beyond ×, > and <; Tags and the to-do's Delete live in the opened row and on their keys. A list is deleted from its heading, `Shift D` or the palette, never from a row.
+- **Don't** add swipe actions or gutter verbs beyond ×, > and < (the handle on open list rows only reorders); Tags and the to-do's Delete live in the opened row and on their keys. A list is deleted from its heading, `Shift D` or the palette, never from a row.
 - **Don't** set text in a highlighter colour, or put light ink on a highlighter.
 - **Don't** use orange anywhere inside the pad.
 - **Don't** add shadows or rounded corners.

@@ -58,7 +58,7 @@ Press `?` (or the keyboard button in the band) to show this list in the app.
 | `Shift` `D` | Delete the list |
 | `⌘` `K` | Search or jump |
 | `#` | Show only a tag |
-| `Alt` `↑` | Move a row up or down |
+| `Alt` `↑` | Move a row up or down (or drag its handle) |
 | `Delete` | Delete the row |
 | `u` | Undo a delete, a clear or a rename |
 | `Esc` | Close, or clear the tag filter |
@@ -86,13 +86,17 @@ Buy stamps #post >03 <fri
 - **Delete a list** with `Shift` `D` on one of its rows (in Today too) or on its heading, with Delete beside its name while you rename it, or by choosing Delete a list in the search palette (`⌘` `K`, then the list's number or name). A list with open to-dos asks once and says how many go with it; an empty one, or one with only done to-dos, goes at once. `u` undoes it, and nothing reaches GitHub while the undo is on offer. The other lists keep their numbers, and the last list can't be deleted. If another device changed one of its to-dos meanwhile, the list stays with just those, and the band says so.
 - Changing a list's number or ink and reordering lists are done in the data repo by hand for now.
 
+### Reordering
+
+In a list, an open row shows a handle at its start when you point at it (always, on a touch screen). Drag the handle up or down: a line shows where the row will land, the page scrolls when you get near the top or bottom, and `Esc` puts it back. Only the moved to-do's file changes. From the keyboard, `Alt` `↑` and `Alt` `↓` move the row in focus. Today has no handles: it is ordered by date and list number. With a tag filter on, a row lands right after the visible row above it.
+
 ### On a phone
 
 - **Swipe a row right** about 80 px to mark it done (or reopen a done row).
 - **Swipe a row left** to open a tray with **Move** (`>`) and **Later** (`<`). Swipe back, or tap outside the rows, to close it.
 - **Tap a title** to open the row: its title, note and actions, with done, move and reschedule stacked in the gutter.
 - **Tap a list's name** in its heading to rename it, or tap Delete beside it to delete the list.
-- Tap the bullet to mark a row done.
+- **Drag a row's handle** (the two short lines at the start of each open row in a list) up or down to put it somewhere else in its list.
 
 A drag only counts as a swipe once it is clearly sideways; otherwise the page scrolls. Every action a swipe offers also has a button and a key.
 

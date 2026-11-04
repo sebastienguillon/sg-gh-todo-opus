@@ -2,6 +2,7 @@
   import { describeDue } from './dates'
   import Icon from './Icon.svelte'
   import Signifier from './Signifier.svelte'
+  import { dragRow } from './reorder'
   import { pad2, store } from './store.svelte'
   import type { Todo } from './types'
   import { ui } from './ui.svelte'
@@ -22,6 +23,8 @@
   let due = $derived(todo.due && !todo.done ? describeDue(todo.due, store.today) : null)
   let late = $derived(!todo.done && (group === 'late' || due?.kind === 'late'))
   let inToday = $derived(context === 'today')
+  /** Open rows in their own list take a handle; Today is ordered by date and list number. */
+  let draggable = $derived(context === 'list' && !todo.done && !flash)
   let expanded = $derived(ui.expanded === key)
   let trayOpen = $derived(ui.tray === key)
   let conflict = $derived(
@@ -141,7 +144,9 @@
     onpointercancel={up}
   >
     <div class="gutter">
-      <label class="sig">
+      <!-- The checkbox stays the row's anchor for j/k, Space and screen readers. Only a done row's ×
+           takes a click (to reopen); an open row's mark is hidden and its cell holds the handle. -->
+      <label class="sig" class:live={todo.done}>
         <input
           type="checkbox"
           data-row-focus
@@ -154,6 +159,13 @@
         />
         <Signifier {mark} />
       </label>
+      {#if draggable}
+        <!-- A pointer shortcut, like the swipe: Alt ↑ ↓ moves the row from the keyboard. -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <span class="grip" aria-hidden="true" title="Drag to reorder (Alt ↑ ↓)" onpointerdown={(e) => dragRow(e, e.currentTarget)}>
+          <Icon name="grip" />
+        </span>
+      {/if}
       {#if !todo.done}
         <span class="hints" class:always={late && inToday}>
           <button class="key" tabindex="-1" title="Done (x)" aria-label="Done" onclick={() => store.toggle(todo.id)}>
@@ -356,6 +368,7 @@
 
   .gutter {
     grid-column: 1;
+    position: relative;
     display: flex;
     align-items: flex-start;
     align-self: stretch;
@@ -370,7 +383,17 @@
     width: 32px;
     height: calc(2 * var(--inset) + var(--body-line));
     color: var(--ink);
+    pointer-events: none;
+  }
+
+  .sig.live {
+    pointer-events: auto;
     cursor: pointer;
+  }
+
+  /* An open row carries no mark; it stays mounted so a × or a > is drawn in when it changes. */
+  .sig :global([data-mark='open']) {
+    visibility: hidden;
   }
 
   .sig input {
@@ -387,8 +410,51 @@
     outline: none;
   }
 
-  .sig:hover input {
+  .sig.live:hover input {
     border-color: var(--rule);
+  }
+
+  /* The handle, over the mark's cell: on hover or focus at a desk, always on a touch screen. */
+  .grip {
+    position: absolute;
+    top: 0;
+    left: 8px;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: calc(2 * var(--inset) + var(--body-line));
+    border: 1px solid transparent;
+    color: var(--ink-3);
+    cursor: grab;
+    touch-action: none;
+    opacity: 0;
+    transition: opacity var(--fast) var(--ease-out);
+  }
+
+  .row:hover .grip,
+  .row:focus-within .grip {
+    opacity: 1;
+  }
+
+  .grip:hover {
+    border-color: var(--rule);
+    color: var(--ink);
+  }
+
+  /* Lifted: the row follows the pointer as a sheet of pad with an ink edge, over the rows it passes. */
+  .item:global(.lifted) {
+    z-index: 5;
+  }
+
+  .item:global(.lifted) .row {
+    background: var(--pad);
+    outline: 1px solid var(--ink);
+    outline-offset: -1px;
+  }
+
+  .item:global(.lifted) .grip {
+    opacity: 1;
+    color: var(--ink);
   }
 
   .done .sig {
@@ -653,6 +719,12 @@
       width: 40px;
     }
 
+    .grip {
+      left: 4px;
+      width: 40px;
+      opacity: 1;
+    }
+
     .hints {
       display: none;
     }
@@ -732,6 +804,10 @@
   @media (hover: none) {
     .hints {
       display: none;
+    }
+
+    .grip {
+      opacity: 1;
     }
   }
 </style>
