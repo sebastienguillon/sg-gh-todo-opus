@@ -428,6 +428,40 @@ class Store implements Host {
     this.#announce(`Moved ${direction < 0 ? 'up' : 'down'}: ${t.title}, ${i + direction + 1} of ${rows.length}`)
   }
 
+  /** Put an open to-do just after `after` in its list, or with none just before `before`: a drag of its
+      handle. It takes an order between its new neighbours, so only its own file is written; only when no
+      number fits between them is the list numbered afresh. */
+  place(id: string, near: { after?: string; before?: string }) {
+    const t = this.find(id)
+    if (!t || t.done) return
+    // Hidden rows count too: under a tag filter, a drop lands right after the visible row above it.
+    const rows = this.todos.filter((r) => r.listId === t.listId && !r.done).sort((a, b) => a.order - b.order)
+    const from = rows.indexOf(t)
+    const rest = rows.filter((r) => r !== t)
+    const anchor = rest.findIndex((r) => r.id === (near.after ?? near.before))
+    if (anchor < 0) return
+    const to = near.after ? anchor + 1 : anchor
+    if (to === from) return
+    const stamp = new Date().toISOString()
+    const order = between(rest[to - 1]?.order, rest[to]?.order)
+    if (order === null) {
+      rest.splice(to, 0, t)
+      rest.forEach((r, i) => {
+        if (r === t || r.order === i + 1) return
+        r.order = i + 1
+        r.updatedAt = stamp
+        this.#record('edited', r)
+      })
+      t.order = to + 1
+    } else {
+      t.order = order
+    }
+    t.updatedAt = stamp
+    this.#record('edited', t)
+    const shown = this.openIn(t.listId).filter((r) => !r.done)
+    this.#announce(`Moved to ${shown.indexOf(t) + 1} of ${shown.length}: ${t.title}`)
+  }
+
   clearDone(listId: string) {
     const gone = this.todos.filter((t) => t.listId === listId && t.done)
     if (!gone.length) return
@@ -885,6 +919,21 @@ class Store implements Host {
 
 export function label(list: TodoList): string {
   return `${String(list.index).padStart(2, '0')} ${list.name}`
+}
+
+/** A tidy order between two others, either of which may be missing (the top or the end of a list): a whole
+    number if one fits, else the shortest decimal; null when none fits (equal or all but equal). */
+export function between(a: number | undefined, b: number | undefined): number | null {
+  if (a === undefined) return b === undefined ? 1 : Math.ceil(b) - 1
+  if (b === undefined) return Math.floor(a) + 1
+  if (!(a < b)) return null
+  if (Math.floor(a) + 1 < b) return Math.floor(a) + 1
+  for (let digits = 1; digits <= 12; digits++) {
+    const scale = 10 ** digits
+    const x = Math.round(((a + b) / 2) * scale) / scale
+    if (x > a && x < b) return x
+  }
+  return null
 }
 
 export function pad2(n: number): string {

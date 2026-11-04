@@ -366,3 +366,20 @@ dialog.sheet::backdrop {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* A row being dragged by its handle: the grabbing hand everywhere, and no text selected on the way. */
+html.row-dragging,
+html.row-dragging * {
+  cursor: grabbing !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Where a dragged row will land: a 2px fineliner rule from its handle to the right edge. */
+.drop-line {
+  position: absolute;
+  z-index: 30;
+  height: 2px;
+  background: var(--ink);
+  pointer-events: none;
+}
