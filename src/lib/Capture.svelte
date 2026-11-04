@@ -5,12 +5,13 @@
   import type { TodoList } from './types'
   import { ui } from './ui.svelte'
 
-  /** On the phone the field docks at the bottom without its hint line, so the placeholder names the list. */
+  /** `docked`: the phone's field at the bottom of the screen. Otherwise the Log a task dialog,
+      opened with n, the band's + or the palette. */
   let { docked = false }: { docked?: boolean } = $props()
 
+  let dialog = $state<HTMLDialogElement>()
+  let input = $state<HTMLInputElement>()
   let text = $state('')
-  let confirmation = $state('')
-  let timer: ReturnType<typeof setTimeout> | undefined
 
   let parsed = $derived(store.parse(text))
   /** The list picked in the Index takes a task that has no `>`; with none picked, the Inbox does. */
@@ -22,15 +23,32 @@
     ),
   )
 
+  $effect(() => {
+    if (!dialog) return
+    if (ui.capture && !dialog.open) {
+      text = ''
+      dialog.showModal()
+      input?.focus()
+    } else if (!ui.capture && dialog.open) {
+      dialog.close()
+    }
+  })
+
   function submit(e: SubmitEvent) {
     e.preventDefault()
     const todo = store.add(text, selected?.id)
     if (!todo) return
-    const list = store.listOf(todo)
     text = ''
-    confirmation = `Logged in ${list ? label(list) : 'Inbox'}`
-    clearTimeout(timer)
-    timer = setTimeout(() => (confirmation = ''), 2400)
+    // The docked field stays put for the next one; the dialog closes and the toast says where it went.
+    if (docked) return
+    const list = store.listOf(todo)
+    store.note(`Logged in ${list ? label(list) : 'Inbox'}`)
+    dialog?.close()
+  }
+
+  function onclose() {
+    ui.capture = false
+    ui.restoreFocus()
   }
 
   function keydown(e: KeyboardEvent) {
@@ -45,44 +63,66 @@
   <span class={list && list.id === selected?.id ? 'swipe select' : undefined}>{list ? label(list) : 'Inbox'}</span>
 {/snippet}
 
-<form class="capture" onsubmit={submit}>
-  <span class="mark" aria-hidden="true"><Signifier mark="open" /></span>
-  <div class="input">
-    <label class="vh" for="capture">Log a task</label>
-    <input
-      id="capture"
-      class="field"
-      bind:value={text}
-      placeholder={docked && selected ? `Log a task in ${label(selected)}` : 'Log a task'}
-      autocomplete="off"
-      enterkeyhint="done"
-      aria-describedby="capture-hint"
-      onkeydown={keydown}
-    />
-    <p class="hint" id="capture-hint" aria-live="polite">
-      {#if confirmation && !text}
-        {confirmation}
-      {:else if text.trim()}
-        <span class="preview">
-          <span class="files">Enter files it in</span>
-          {@render where(target)}{#each extras as extra}{` · ${extra}`}{/each}
-        </span>
-      {:else}
-        <span><kbd>#</kbd> tag</span>
-        <span><kbd>&gt;</kbd> list</span>
-        <span><kbd>&lt;</kbd> date</span>
-        <span class="where">Enter files it in {@render where(target)}</span>
-      {/if}
-    </p>
-  </div>
-</form>
+{#if docked}
+  <form class="docked" onsubmit={submit}>
+    <span class="mark" aria-hidden="true"><Signifier mark="open" /></span>
+    <div class="input">
+      <label class="vh" for="capture">Log a task</label>
+      <input
+        id="capture"
+        class="field"
+        bind:value={text}
+        placeholder={selected ? `Log a task in ${label(selected)}` : 'Log a task'}
+        autocomplete="off"
+        enterkeyhint="done"
+        onkeydown={keydown}
+      />
+    </div>
+  </form>
+{:else}
+  <dialog bind:this={dialog} class="sheet capture" aria-labelledby="capture-h" {onclose}>
+    <form method="dialog" class="inner" onsubmit={submit}>
+      <h2 id="capture-h"><span class="bullet"><Signifier mark="open" /></span> Log a task</h2>
+
+      <label class="vh" for="capture-text">Task</label>
+      <input
+        id="capture-text"
+        bind:this={input}
+        bind:value={text}
+        class="field big"
+        placeholder="Buy stamps #post >03 <fri"
+        autocomplete="off"
+        enterkeyhint="done"
+        aria-describedby="capture-preview"
+      />
+      <p class="preview" id="capture-preview" aria-live="polite">
+        Enter files it in {@render where(target)}{#each extras as extra}{` · ${extra}`}{/each}
+      </p>
+
+      <div class="foot">
+        <p class="keys">
+          <span><kbd>#</kbd> tag</span>
+          <span><kbd>&gt;</kbd> list</span>
+          <span><kbd>&lt;</kbd> date</span>
+        </p>
+        <div class="actions">
+          <button type="button" class="btn quiet" onclick={() => dialog?.close()}>Cancel</button>
+          <button type="submit" class="btn primary" disabled={!parsed.title}>Log task</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+{/if}
 
 <style>
-  .capture {
+  /* The phone: docked to the bottom edge under a 1px ink rule, the bullet in the 44px gutter. */
+  .docked {
     display: grid;
-    grid-template-columns: var(--gutter) minmax(0, 1fr) var(--edge);
+    grid-template-columns: 44px minmax(0, 1fr);
     align-items: start;
-    margin: 16px 0 12px;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom)) 0;
+    background: var(--pad);
+    border-top: 1px solid var(--ink);
   }
 
   .mark {
@@ -92,70 +132,101 @@
     /* As tall as the field beside it (a 1.4 line, 6px padding, 1px border), so the bullet stays
        on its line. */
     height: max(40px, calc(1.4rem + 14px));
-    margin-left: 8px;
+    margin-left: 4px;
     color: var(--ink-3);
   }
 
   .input {
     display: grid;
-    gap: 6px;
   }
 
-  .field {
+  .docked .field {
     min-height: 40px;
     font-size: var(--t-body);
     border-color: var(--ink);
   }
 
-  .hint {
+  /* The dialog: in the middle of the screen, where the other dialogs hang from 12vh. */
+  @media (min-width: 768px) {
+    .capture {
+      margin: auto;
+    }
+  }
+
+  .inner {
+    display: grid;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  h2 {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px 16px;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--t-sub);
+    font-weight: 800;
+  }
+
+  .bullet {
+    color: var(--ink-3);
+  }
+
+  .big {
+    min-height: 44px;
+    font-size: var(--t-sub);
+    border-color: var(--ink);
+  }
+
+  .preview {
     min-height: 20px;
+    margin-top: -6px;
     color: var(--ink-2);
     font-size: var(--t-meta);
     line-height: calc(20 / 14.625);
   }
 
-  .hint > span {
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding-top: 4px;
+  }
+
+  .keys {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    color: var(--ink-2);
+    font-size: var(--t-meta);
+    line-height: calc(20 / 14.625);
+  }
+
+  .keys > span {
     display: inline-flex;
     align-items: center;
     gap: 6px;
   }
 
-  .hint kbd {
+  .keys kbd {
     min-width: calc(18rem / 18);
     height: calc(18rem / 18);
   }
 
-  .hint .where,
-  .hint .preview {
-    display: block;
-  }
-
-  .where {
+  .actions {
+    display: flex;
+    gap: 8px;
     margin-left: auto;
   }
 
-  .files {
-    color: var(--ink-3);
-  }
-
   @media (max-width: 767px) {
-    .capture {
-      grid-template-columns: 44px minmax(0, 1fr);
-      margin: 0;
-      padding: 8px 12px calc(8px + env(safe-area-inset-bottom)) 0;
-      background: var(--pad);
-      border-top: 1px solid var(--ink);
-    }
-
-    .mark {
-      margin-left: 4px;
-    }
-
-    .hint {
+    .keys {
       display: none;
+    }
+
+    .actions .btn {
+      min-height: 44px;
     }
   }
 </style>

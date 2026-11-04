@@ -140,7 +140,7 @@
       }
     })
     const allCommands: Item[] = [
-      { key: 'new', kind: 'command', text: 'Log a task', meta: 'n', run: () => document.getElementById('capture')?.focus(), restore: false },
+      { key: 'new', kind: 'command', text: 'Log a task', meta: 'n', run: () => ui.openCapture(), restore: false },
       { key: 'today', kind: 'command', text: 'Go to Today', meta: 'g t', run: () => ui.jumpToToday(), restore: false },
       { key: 'rename', kind: 'command', text: 'Rename a list', meta: 'r', run: () => {}, restore: false },
       { key: 'delete', kind: 'command', text: 'Delete a list', meta: '⇧ D', run: () => {}, restore: false },
@@ -246,9 +246,9 @@
   function onclose() {
     const todoId = ui.palette?.todoId ?? null
     ui.palette = null
-    // A command that opened another overlay (Help) has already saved where focus goes back to.
+    // A command that opened another overlay (Help, Log a task) has already saved where focus goes back to.
     if (skipRestore) {
-      if (!ui.help) ui.forgetFocus()
+      if (!ui.help && !ui.capture) ui.forgetFocus()
     } else ui.restoreFocus(todoId)
     skipRestore = false
   }

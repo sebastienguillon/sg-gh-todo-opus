@@ -28,6 +28,8 @@ class UI {
   /** The list whose heading is an input for its new name. */
   renaming = $state<string | null>(null)
   help = $state(false)
+  /** The Log a task dialog (desktop; the phone docks its field at the bottom instead). */
+  capture = $state(false)
   sheet = $state(false)
   railOpen = $state(readRail())
   /** Phone: the row whose swipe tray (> and <) is open. */
@@ -96,6 +98,18 @@ class UI {
   openHelp() {
     this.rememberFocus()
     this.help = true
+  }
+
+  /** Log a task: the field docked at the bottom on the phone, the dialog everywhere else. */
+  openCapture() {
+    const docked = document.getElementById('capture')
+    if (docked) {
+      docked.focus()
+      return
+    }
+    this.rememberFocus()
+    this.tray = null
+    this.capture = true
   }
 
   toggleRail() {

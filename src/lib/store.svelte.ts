@@ -696,6 +696,11 @@ class Store implements Host {
     this.#hideToast()
   }
 
+  /** A passing word on the toast, such as where a task was logged; an undo still on offer there matters more. */
+  note(message: string) {
+    if (!this.toast?.undo) this.#showToast(message)
+  }
+
   /** Runs the toast's undo; returns what it restored, for focus. */
   undo(): UndoTarget {
     const undo = this.toast?.undo
